@@ -3,7 +3,7 @@
 
 * [SimpleRecyclerAdapter](https://github.com/e16din/SimpleRecycler#simplerecycleradapter)
 * [SimpleRecyclerView](https://github.com/e16din/SimpleRecycler#simplerecyclerview)
-* [SimplePagingAdapter](https://github.com/e16din/SimpleRecycler#SimplePagingAdapter)
+* [SimplePagingAdapter](https://github.com/e16din/SimpleRecycler#simplepagingadapter)
 
 ##Подключаем библиотеку в build.gradle: 
 ```groovy
