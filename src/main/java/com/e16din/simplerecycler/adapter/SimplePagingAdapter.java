@@ -10,8 +10,7 @@ import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;
 
-public abstract class SimplePagingAdapter<H extends SimpleViewHolder, T>
-        extends SimpleRecyclerAdapter<H, T> {
+public abstract class SimplePagingAdapter<H extends SimpleViewHolder, T> extends BaseInsertsAdapter<H, T> {
 
     @LayoutRes
     private int mBottomProgressLayoutId = R.layout.layout_bottom_progress;
@@ -37,6 +36,7 @@ public abstract class SimplePagingAdapter<H extends SimpleViewHolder, T>
     @Override
     public void onLastItem() {
         showBottomProgress();
+        super.onLastItem();
     }
 
     public void showBottomProgress() {

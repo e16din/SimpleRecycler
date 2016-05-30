@@ -29,11 +29,6 @@ public class SimpleRecyclerView extends RecyclerView {
 
     private void init() {
         clearOnScrollListeners();
-        addOnScrollListener(new OnScrollSimpleListener((LinearLayoutManager) getLayoutManager()) {
-            @Override
-            public void onLastItem() {
-                //do something
-            }
-        });
+        addOnScrollListener(new OnScrollSimpleListener((LinearLayoutManager) getLayoutManager()));
     }
 }

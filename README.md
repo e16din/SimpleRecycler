@@ -18,7 +18,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.e16din:SimpleRecycler:0.1.2'
+    compile 'com.github.e16din:SimpleRecycler:0.1.3'
 }
 ```
 
@@ -107,7 +107,7 @@ public class RecyclerAdapter<T extends ItemModel>
 
 #SimpleRecyclerView
 Наследуется от RecyclerView, добавляет логику взаимодействия с SimpleRecyclerAdapter и SimplePagingAdapter.
-Сейчас это отслеживание последнего элемента при скролле, необходимо для SimplePagingAdapter, используйте SimpleRecyclerView только если необходим такой функционал.
+Сейчас это отслеживание последнего элемента при скролле.
 
 #SimplePagingAdapter
 Добавляет элемент загрузки в конец ленты, по умолчанию это progress bar.
