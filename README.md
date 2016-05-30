@@ -1,11 +1,11 @@
-# SimpleRecyclerAdapter
+#SimpleRecycler
 Набор для удобной работы со списками.  
 
-* [SimpleRecyclerAdapter](#SimpleRecyclerAdapter)
-* [SimpleRecyclerView](#SimpleRecyclerView)
-* [SimplePagingAdapter](#SimplePagingAdapter)
+* [SimpleRecyclerAdapter](https://github.com/e16din/SimpleRecycler#simplerecycleradapter)
+* [SimpleRecyclerView](https://github.com/e16din/SimpleRecycler#simplerecyclerview)
+* [SimplePagingAdapter](https://github.com/e16din/SimpleRecycler#SimplePagingAdapter)
 
-## Подключаем библиотеку в build.gradle: 
+##Подключаем библиотеку в build.gradle: 
 ```groovy
 repositories {
     maven { url "https://jitpack.io" }
@@ -22,7 +22,7 @@ dependencies {
 }
 ```
 
-# SimpleRecyclerAdapter
+#SimpleRecyclerAdapter
 Простой в использовании адаптер.  
 
 ## Добавляем элементы и вставки:
@@ -105,11 +105,11 @@ public class RecyclerAdapter<T extends ItemModel>
 }
 ```
 
-# SimpleRecyclerView
+#SimpleRecyclerView
 Наследуется от RecyclerView, добавляет логику взаимодействия с SimpleRecyclerAdapter и SimplePagingAdapter.
 Сейчас это отслеживание последнего элемента при скролле, необходимо для SimplePagingAdapter, используйте SimpleRecyclerView только если необходим такой функционал.
 
-# SimplePagingAdapter
+#SimplePagingAdapter
 Добавляет элемент загрузки в конец ленты, по умолчанию это progress bar.
 
 ## Изменяем макет закрузки:
