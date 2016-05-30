@@ -1,4 +1,4 @@
-package com.e16din.simplerecycleradapter;
+package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
 import android.os.Build;
@@ -12,6 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.e16din.simplerecycler.R;
+import com.e16din.simplerecycler.model.Insertion;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,7 +31,6 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
 
     private int mItemLayoutId;
 
-    private OnNoMoreItemsListener mOnNoMoreItemsListener;
     private OnItemClickListener<M> mOnItemClickListener;
     private OnInsertionClickListener mOnInsertionClickListener;
 
@@ -36,40 +39,38 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
         mItemLayoutId = layoutId;
     }
 
-    public SimpleRecyclerAdapter(@NonNull Context context) {
-        this.mContext = context;
-    }
-
-    public SimpleRecyclerAdapter(@NonNull Context context, @NonNull List items) {
-        this.mContext = context;
-        this.mItems = items;
-    }
-
-    public SimpleRecyclerAdapter(@NonNull Context context, @NonNull List items, int resId,
-                                 OnItemClickListener<M> onItemClickListener,
-                                 OnNoMoreItemsListener onNoMoreItemsListener) {
-        this.mContext = context;
-        this.mItems = items;
-        this.mItemLayoutId = resId;
-        this.mOnNoMoreItemsListener = onNoMoreItemsListener;
-        this.mOnItemClickListener = onItemClickListener;
-    }
-
-    public SimpleRecyclerAdapter(@NonNull Context context, @NonNull List items, int resId,
+    public SimpleRecyclerAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
                                  OnItemClickListener<M> onItemClickListener) {
-        this(context, items, resId, onItemClickListener, null);
+        mContext = context;
+        mItems = items;
+        mItemLayoutId = resId;
+        mOnItemClickListener = onItemClickListener;
     }
 
-    public SimpleRecyclerAdapter(@NonNull Context context, @NonNull List items, int resId) {
-        this(context, items, resId, null, null);
+    public SimpleRecyclerAdapter(@NonNull Context context, @NonNull List<Object> items, int resId) {
+        this(context, items, resId, null);
     }
+
+    public SimpleRecyclerAdapter(@NonNull Context context, @NonNull List<Object> items) {
+        this(context, items, 0, null);
+    }
+
+    public SimpleRecyclerAdapter(@NonNull Context context) {
+        this(context, new ArrayList<>());
+    }
+
 
     public void add(int position, Object item) {
-        int insertPosition = calcInsertPosition(position);
+        try {
+            int insertPosition = calcInsertPosition(position);
 
-        mItems.add(insertPosition, item);
+            mItems.add(insertPosition, item);
 
-        notifyItemInserted(insertPosition);
+            notifyItemInserted(insertPosition);
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
     }
 
     public void add(Object item) {
@@ -77,9 +78,22 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
     }
 
     public void remove(int position) {
-        mItems.remove(position);
+        try {
+            mItems.remove(position);
 
-        notifyItemRemoved(position);
+            notifyItemRemoved(position);
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
+    }
+
+    protected void removeLast() {
+        remove(getItemCount() - 1);
+    }
+
+    protected void removeFirst() {
+        remove(0);
     }
 
     private int calcInsertPosition(int position) {
@@ -110,10 +124,15 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
     }
 
     public void addHeader(@LayoutRes int layoutId, Object data) {
-        int insertPosition = getHeadersCount();
+        try {
+            int insertPosition = getHeadersCount();
 
-        mItems.add(insertPosition, new Insertion(layoutId, data, Insertion.TYPE_HEADER));
-        notifyItemInserted(insertPosition);
+            mItems.add(insertPosition, new Insertion(layoutId, data, Insertion.TYPE_HEADER));
+            notifyItemInserted(insertPosition);
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
     }
 
     public void addHeader(@LayoutRes int layoutId) {
@@ -121,8 +140,13 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
     }
 
     public void addFooter(@LayoutRes int layoutId, Object data) {
-        mItems.add(new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
-        notifyItemInserted(getItemCount() - 1);
+        try {
+            mItems.add(new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
+            notifyItemInserted(getItemCount() - 1);
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
     }
 
     public void addFooter(@LayoutRes int layoutId) {
@@ -132,9 +156,9 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
     public int getFootersCount() {
         int count = 0;
         for (int i = mItems.size() - 1; i > 0; i--) {
-            if (mItems.get(i) instanceof Insertion) {
-                Insertion insert = (Insertion) mItems.get(i);
-                if (insert.getType() == Insertion.TYPE_FOOTER) {
+            if (isInsertion(i)) {
+                Insertion insert = getInsertion(i);
+                if (insert.getType() >= Insertion.TYPE_FOOTER) {
                     count += 1;
                 } else {
                     break;
@@ -150,9 +174,10 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
     public int getHeadersCount() {
         int count = 0;
         for (int i = 0; i < mItems.size() - 1; i++) {
-            if (mItems.get(i) instanceof Insertion) {
-                Insertion insert = (Insertion) mItems.get(i);
-                if (insert.getType() == Insertion.TYPE_HEADER) {
+            if (isInsertion(i)) {
+                Insertion insert = getInsertion(i);
+                if (insert.getType() >= Insertion.TYPE_HEADER
+                        && insert.getType() < Insertion.TYPE_FOOTER) {
                     count += 1;
                 } else {
                     break;
@@ -165,12 +190,17 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
         return count;
     }
 
-    public void addAll(int position, List<M> items) {
-        int insertPosition = calcInsertPosition(position);
+    public void addAll(int position, List items) {
+        try {
+            int insertPosition = calcInsertPosition(position);
 
-        mItems.addAll(insertPosition, items);
+            mItems.addAll(insertPosition, items);
 
-        notifyItemRangeInserted(insertPosition, items.size());
+            notifyItemRangeInserted(insertPosition, items.size());
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
     }
 
     public void addAll(List items) {
@@ -178,8 +208,13 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
     }
 
     public void clearAll() {
-        mItems.clear();
-        notifyDataSetChanged();
+        try {
+            mItems.clear();
+            notifyDataSetChanged();
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -204,7 +239,8 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
                 v = LayoutInflater.from(parent.getContext()).inflate(mItemLayoutId, parent, false);
                 break;
             case TYPE_INSERTION:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_insertion, parent, false);
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_insertion,
+                        parent, false);
                 break;
         }
 
@@ -235,27 +271,17 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
             });
         }
 
-        onBindCommon(holder.vContainer, position);
+        onBindCommon(holder.vContainer);
     }
 
-    private void onBindCommon(View vContainer, final int position) {
-
+    private void onBindCommon(View vContainer) {
+        //update ripple effect (or selector for old androids)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             vContainer.setBackgroundResource(getItemSelectorId());
         } else {
             TypedValue outValue = new TypedValue();
             mContext.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
             vContainer.setBackgroundResource(outValue.resourceId);
-        }
-
-        if (position == mItems.size() - 1) {
-            onNoMoreItems();
-        }
-    }
-
-    protected void onNoMoreItems() {
-        if (mOnNoMoreItemsListener != null) {
-            mOnNoMoreItemsListener.onNoMoreItems(mItems.size());
         }
     }
 
@@ -277,14 +303,13 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
             });
         }
 
-        onBindCommon(vInsertion, position);
+        onBindCommon(vInsertion);
         onBindInsertion(holder, position);
     }
 
     protected void onBindInsertion(H holder, int position) {
         //override it for set data
     }
-
 
     @DrawableRes
     protected int getItemSelectorId() {
@@ -294,13 +319,12 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
     @Override
     public int getItemCount() {
         return mItems == null ? 0 : mItems.size();
-
     }
 
     public int getOnlyItemsCount() {
         int itemsCount = 0;
         for (int i = 0; i < getItemCount(); i++) {
-            if (!(mItems.get(i) instanceof Insertion)) {
+            if (!isInsertion(i)) {
                 itemsCount += 1;
             }
         }
@@ -310,16 +334,16 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
 
     //return null if it is insertion object
     public M getItem(int position) {
-        return !(mItems.get(position) instanceof Insertion) ? (M) mItems.get(position) : null;
+        return !isInsertion(position) ? (M) mItems.get(position) : null;
     }
 
     //return null if it is item object
     public Insertion getInsertion(int position) {
-        return mItems.get(position) instanceof Insertion ? (Insertion) mItems.get(position) : null;
+        return isInsertion(position) ? (Insertion) mItems.get(position) : null;
     }
 
-    public void setOnNoMoreItemsListener(OnNoMoreItemsListener onNoMoreItemsListener) {
-        this.mOnNoMoreItemsListener = onNoMoreItemsListener;
+    protected boolean isInsertion(int position) {
+        return mItems.get(position) instanceof Insertion;
     }
 
     public void setOnItemClickListener(OnItemClickListener<M> onItemClickListener) {
@@ -338,15 +362,15 @@ public abstract class SimpleRecyclerAdapter<H extends SimpleViewHolder, M>
         return mContext;
     }
 
+    public void onLastItem(){
+        //override it
+    }
+
     public interface OnItemClickListener<M> {
         void onClick(M item, int position);
     }
 
     public interface OnInsertionClickListener {
         void onClick(Insertion insertion, int position);
-    }
-
-    public interface OnNoMoreItemsListener {
-        void onNoMoreItems(int itemsCount);
     }
 }

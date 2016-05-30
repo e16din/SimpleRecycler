@@ -14,7 +14,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.e16din:SimpleRecyclerAdapter:0.1.1'
+    compile 'com.github.e16din:SimpleRecycler:0.1.2'
 }
 ```
 
@@ -97,4 +97,30 @@ public class RecyclerAdapter<T extends ItemModel>
     }
 }
 ```
+
+# SimpleRecyclerView
+Наследуется от RecyclerView, добавляет логику взаимодействия с SimpleRecyclerAdapter и SimplePagingAdapter.
+Сейчас это отслеживание последнего элемента при скролле, необходимо для SimplePagingAdapter, используйте SimpleRecyclerView только если необходим такой функционал.
+
+# SimplePagingAdapter
+Добавляет элемент загрузки в конец ленты, по умолчанию это progress bar.
+
+## Изменяем макет закрузки:
+```java
+
+mAdapter.setBottomProgressLayoutId(R.layout.footer_progress);
+```
+
+## Скрываем загрузку:
+```java
+
+mAdapter.hideBottomProgress();
+```
+
+## Показываем загрузку:
+```java
+
+mAdapter.showBottomProgress();
+```
+
 

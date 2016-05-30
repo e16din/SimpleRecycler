@@ -1,4 +1,4 @@
-package com.e16din.simplerecycleradapter;
+package com.e16din.simplerecycler.model;
 
 
 import android.support.annotation.LayoutRes;
@@ -6,8 +6,8 @@ import android.support.annotation.LayoutRes;
 public class Insertion {
 
     public static final int TYPE_DEFAULT = 0;
-    public static final int TYPE_HEADER = 1;
-    public static final int TYPE_FOOTER = 2;
+    public static final int TYPE_HEADER = 1;//from 1 to 99
+    public static final int TYPE_FOOTER = 100;//from 100
 
     @LayoutRes
     private int layoutId;

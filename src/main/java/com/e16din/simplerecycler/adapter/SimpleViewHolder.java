@@ -1,10 +1,10 @@
-package com.e16din.simplerecycleradapter;
+package com.e16din.simplerecycler.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 
-public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
+public class SimpleViewHolder extends RecyclerView.ViewHolder {
     protected View vContainer;
 
     public SimpleViewHolder(View itemView) {
