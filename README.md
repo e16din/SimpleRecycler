@@ -1,5 +1,9 @@
 # SimpleRecyclerAdapter
-Простой в использовании адаптер, для быстрой разработки приложений.  
+Набор для удобной работы со списками.  
+
+* [SimpleRecyclerAdapter](#SimpleRecyclerAdapter)
+* [SimpleRecyclerView](#SimpleRecyclerView)
+* [SimplePagingAdapter](#SimplePagingAdapter)
 
 ## Подключаем библиотеку в build.gradle: 
 ```groovy
@@ -17,6 +21,9 @@ dependencies {
     compile 'com.github.e16din:SimpleRecycler:0.1.2'
 }
 ```
+
+# SimpleRecyclerAdapter
+Простой в использовании адаптер.  
 
 ## Добавляем элементы и вставки:
 ```java
