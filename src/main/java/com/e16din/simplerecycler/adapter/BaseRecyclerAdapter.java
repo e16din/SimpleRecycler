@@ -205,6 +205,10 @@ public abstract class BaseRecyclerAdapter<H extends SimpleViewHolder, M>
         return onLastItemListener;
     }
 
+    public OnItemClickListener<M> getOnItemClickListener() {
+        return mOnItemClickListener;
+    }
+
     //use with SimpleRecyclerView
     public void setOnLastItemListener(Runnable onLastItemListener) {
         this.onLastItemListener = onLastItemListener;

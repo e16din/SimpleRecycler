@@ -18,7 +18,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.e16din:SimpleRecycler:0.1.3'
+    compile 'com.github.e16din:SimpleRecycler:0.1.4'
 }
 ```
 
