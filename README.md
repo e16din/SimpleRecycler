@@ -111,14 +111,6 @@ public class RecyclerAdapter<T extends ItemModel>
 Добавляет элемент загрузки в конец ленты, по умолчанию это progress bar.
 Работает только в паре с SimpleRecyclerView и его наследниками.
 
-#SimpleRecyclerView
-Наследуется от RecyclerView, добавляет логику взаимодействия с SimpleRecyclerAdapter и SimplePagingAdapter.
-Сейчас это отслеживание последнего элемента при скролле.
-
-#SimpleListView
-Наследуется от SimpleRecyclerView, автоматически устанавливает LinearLayoutManager при создании.
-
-
 ## Изменяем макет закрузки:
 ```java
 
@@ -136,5 +128,14 @@ mAdapter.hideBottomProgress();
 
 mAdapter.showBottomProgress();
 ```
+============================
+
+#SimpleRecyclerView
+Наследуется от RecyclerView, добавляет логику взаимодействия с SimpleRecyclerAdapter и SimplePagingAdapter.
+Сейчас это отслеживание последнего элемента при скролле.
+
+#SimpleListView
+Наследуется от SimpleRecyclerView, автоматически устанавливает LinearLayoutManager при создании.
+
 
 
