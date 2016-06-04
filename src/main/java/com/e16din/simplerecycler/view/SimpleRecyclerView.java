@@ -24,10 +24,7 @@ public class SimpleRecyclerView extends RecyclerView {
     @Override
     public void setAdapter(Adapter adapter) {
         super.setAdapter(adapter);
-        init();
-    }
 
-    private void init() {
         clearOnScrollListeners();
         addOnScrollListener(new OnScrollSimpleListener((LinearLayoutManager) getLayoutManager()));
     }

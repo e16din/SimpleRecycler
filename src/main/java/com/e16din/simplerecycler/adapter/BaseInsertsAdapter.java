@@ -144,8 +144,6 @@ public abstract class BaseInsertsAdapter<H extends SimpleViewHolder, M>
         return newViewHolder(v);
     }
 
-    protected abstract H newViewHolder(View v);
-
     @Override
     public void onBindViewHolder(H holder, final int position) {
         if (needInsertion(position)) {

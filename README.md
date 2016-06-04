@@ -2,8 +2,10 @@
 Набор для удобной работы со списками.  
 
 * [SimpleRecyclerAdapter](https://github.com/e16din/SimpleRecycler#simplerecycleradapter)
-* [SimpleRecyclerView](https://github.com/e16din/SimpleRecycler#simplerecyclerview)
 * [SimplePagingAdapter](https://github.com/e16din/SimpleRecycler#simplepagingadapter)
+* [SimpleRecyclerView](https://github.com/e16din/SimpleRecycler#simplerecyclerview)
+* [SimpleListView](https://github.com/e16din/SimpleRecycler#simplelistview)
+
 
 ##Подключаем библиотеку в build.gradle: 
 ```groovy
@@ -18,7 +20,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.e16din:SimpleRecycler:0.1.4'
+    compile 'com.github.e16din:SimpleRecycler:0.1.5'
 }
 ```
 
@@ -105,12 +107,17 @@ public class RecyclerAdapter<T extends ItemModel>
 }
 ```
 
+#SimplePagingAdapter
+Добавляет элемент загрузки в конец ленты, по умолчанию это progress bar.
+Работает только в паре с SimpleRecyclerView и его наследниками.
+
 #SimpleRecyclerView
 Наследуется от RecyclerView, добавляет логику взаимодействия с SimpleRecyclerAdapter и SimplePagingAdapter.
 Сейчас это отслеживание последнего элемента при скролле.
 
-#SimplePagingAdapter
-Добавляет элемент загрузки в конец ленты, по умолчанию это progress bar.
+#SimpleListView
+Наследуется от SimpleRecyclerView, автоматически устанавливает LinearLayoutManager при создании.
+
 
 ## Изменяем макет закрузки:
 ```java
