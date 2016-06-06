@@ -156,37 +156,45 @@ public abstract class SimpleRecyclerAdapter<M>
         onBindItemViewHolder(holder, position);
     }
 
-    protected void onBindItemViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        if (mOnItemClickListener != null) {
-            final M item = getItem(position);
-
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnItemClickListener.onClick(item, position);
-                }
-            });
+    protected void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
+        ViewGroup vItem = (ViewGroup) holder.itemView;
+        if (mRippleEffectEnabled) {
+            vItem = addRippleEffect((ViewGroup) holder.itemView, position);
         }
-
-        if (mRippleEffectEnabled) addRippleEffect((ViewGroup) holder.itemView, position);
+        updateItemClickListener(position, vItem);
     }
 
-    protected void addRippleEffect(ViewGroup vContainer, int position) {
+    protected ViewGroup addRippleEffect(ViewGroup vContainer, final int position) {
         Drawable bgDrawable = vContainer.getChildAt(0).getBackground();
+        ViewGroup vResult = vContainer;
+
         if (bgDrawable == null) {
             addRippleToView(vContainer);
 
         } else {
-//
-//            FrameLayout child = new FrameLayout(getContext());
-//            child.setLayoutParams(new RecyclerView.LayoutParams(64, 64));
-//
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 vContainer.setBackground(bgDrawable);
             } else {
                 vContainer.setBackgroundDrawable(bgDrawable);
             }
-            addRippleToView((ViewGroup) vContainer.getChildAt(0));
+
+            vResult = (ViewGroup) vContainer.getChildAt(0);
+        }
+
+        addRippleToView(vResult);
+        return vResult;
+    }
+
+    protected void updateItemClickListener(final int position, ViewGroup vItem) {
+        if (mOnItemClickListener != null) {
+            final M item = getItem(position);
+
+            vItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnItemClickListener.onClick(item, position);
+                }
+            });
         }
     }
 
