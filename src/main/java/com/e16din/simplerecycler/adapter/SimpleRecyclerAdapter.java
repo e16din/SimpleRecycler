@@ -6,7 +6,6 @@ import android.os.Build;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -184,7 +183,7 @@ public abstract class SimpleRecyclerAdapter<M>
 //
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 vContainer.setBackground(bgDrawable);
-            }else{
+            } else {
                 vContainer.setBackgroundDrawable(bgDrawable);
             }
             addRippleToView((ViewGroup) vContainer.getChildAt(0));
@@ -199,13 +198,7 @@ public abstract class SimpleRecyclerAdapter<M>
         } else {
             TypedValue outValue = new TypedValue();
             mContext.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Drawable drawable = ContextCompat.getDrawable(getContext(), outValue.resourceId);
-                vContainer.setForeground(drawable);
-            } else {
-                vContainer.setBackgroundResource(outValue.resourceId);
-            }
+            vContainer.setBackgroundResource(outValue.resourceId);
         }
     }
 

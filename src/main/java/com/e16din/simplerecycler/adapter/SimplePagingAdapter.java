@@ -70,6 +70,8 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     }
 
     public boolean hasBottomProgress() {
+        if (getItemCount() == 0) return false;
+
         int lastPosition = getLastPosition();
 
         if (isInsertion(lastPosition)) {
