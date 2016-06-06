@@ -3,6 +3,8 @@ package com.e16din.simplerecycler.adapter;
 import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.model.Insertion;
@@ -31,6 +33,12 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         super(context);
     }
 
+
+    @Override
+    public RecyclerView.ViewHolder newInsertionViewHolder(View v) {
+        return new PagingViewHolder(v);
+    }
+
     @Override
     public void onLastItem() {
         showBottomProgress();
@@ -40,15 +48,17 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     public void showBottomProgress() {
         try {
             if (!hasBottomProgress()) {
+                Insertion insertion =
+                        new Insertion(mBottomProgressLayoutId, null, Insertion.TYPE_ABSOLUTE_FOOTER);
+
                 if (hasAbsoluteFooter(getLastPosition())) {
-                    getItems().add(getLastPosition() - 1, new Insertion(mBottomProgressLayoutId, null, Insertion.TYPE_ABSOLUTE_FOOTER));
+                    getItems().add(getLastPosition() - 1, insertion);
                     notifyItemInserted(getLastPosition() - 1);
                 } else {
-                    getItems().add(new Insertion(mBottomProgressLayoutId, null, Insertion.TYPE_ABSOLUTE_FOOTER));
+                    getItems().add(insertion);
                     notifyItemInserted(getLastPosition());
                 }
             }
-
         } catch (IllegalStateException e) {
             //todo: update this way
             e.printStackTrace();
@@ -74,5 +84,12 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
 
     public void setBottomProgressLayoutId(int bottomProgressLayoutId) {
         mBottomProgressLayoutId = bottomProgressLayoutId;
+    }
+
+    //for newInsertionViewHolder
+    static class PagingViewHolder extends RecyclerView.ViewHolder {
+        public PagingViewHolder(View view) {
+            super(view);
+        }
     }
 }
