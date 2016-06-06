@@ -16,6 +16,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     @LayoutRes
     private int mBottomProgressLayoutId = R.layout.layout_bottom_progress;
 
+
     public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
                                OnItemClickListener<T> onItemClickListener) {
         super(context, items, resId, onItemClickListener);
@@ -45,19 +46,58 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         super.onLastItem();
     }
 
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        if (getItemCount() == 0) {
+            showBottomProgress();
+        }
+    }
+
+    @Override
+    public void add(Object item) {
+        hideBottomProgress();
+        super.add(item);
+    }
+
+    @Override
+    public void addAll(List items) {
+        hideBottomProgress();
+        super.addAll(items);
+    }
+
+    @Override
+    public void addFooter(@LayoutRes int layoutId) {
+        hideBottomProgress();
+        super.addFooter(layoutId);
+    }
+
+    @Override
+    public void addFooter(@LayoutRes int layoutId, Object data) {
+        hideBottomProgress();
+        super.addFooter(layoutId, data);
+    }
+
+    @Override
+    public void addHeader(@LayoutRes int layoutId) {
+        hideBottomProgress();
+        super.addHeader(layoutId);
+    }
+
+    @Override
+    public void addHeader(@LayoutRes int layoutId, Object data) {
+        hideBottomProgress();
+        super.addHeader(layoutId, data);
+    }
+
     public void showBottomProgress() {
         try {
             if (!hasBottomProgress()) {
                 Insertion insertion =
                         new Insertion(mBottomProgressLayoutId, null, Insertion.TYPE_ABSOLUTE_FOOTER);
 
-                if (hasAbsoluteFooter(getLastPosition())) {
-                    getItems().add(getLastPosition() - 1, insertion);
-                    notifyItemInserted(getLastPosition() - 1);
-                } else {
-                    getItems().add(insertion);
-                    notifyItemInserted(getLastPosition());
-                }
+                getItems().add(insertion);
+                notifyItemInserted(getLastPosition());
             }
         } catch (IllegalStateException e) {
             //todo: update this way

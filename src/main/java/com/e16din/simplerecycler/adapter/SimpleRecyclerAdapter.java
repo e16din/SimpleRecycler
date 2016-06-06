@@ -71,11 +71,15 @@ public abstract class SimpleRecyclerAdapter<M>
 
     public void add(int position, Object item) {
         try {
-            int insertPosition = calcInsertPosition(position);
+            if (getItemCount() == 0) {
+                mItems.add(item);
+                notifyItemInserted(0);
+            } else {
+                int insertPosition = calcInsertPosition(position);
+                mItems.add(insertPosition, item);
+                notifyItemInserted(insertPosition);
+            }
 
-            mItems.add(insertPosition, item);
-
-            notifyItemInserted(insertPosition);
         } catch (IllegalStateException e) {
             //todo: update this way
             e.printStackTrace();
@@ -83,7 +87,7 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     public void add(Object item) {
-        add(getItemCount() == 0 ? 0 : getLastPosition(), item);
+        add(getLastPosition(), item);
     }
 
     public void remove(int position) {
@@ -98,11 +102,15 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     protected void removeLast() {
-        remove(getLastPosition());
+        if (getItemCount() > 0) {
+            remove(getLastPosition());
+        }
     }
 
     protected void removeFirst() {
-        remove(0);
+        if (getItemCount() > 0) {
+            remove(0);
+        }
     }
 
     public void addItem(int position, M item) {
@@ -115,11 +123,15 @@ public abstract class SimpleRecyclerAdapter<M>
 
     public void addAll(int position, List items) {
         try {
-            int insertPosition = calcInsertPosition(position);
+            if (getItemCount() == 0) {
+                mItems.addAll(items);
+                notifyItemRangeInserted(0, items.size());
+            } else {
+                int insertPosition = calcInsertPosition(position);
+                mItems.addAll(insertPosition, items);
+                notifyItemRangeInserted(insertPosition, items.size());
+            }
 
-            mItems.addAll(insertPosition, items);
-
-            notifyItemRangeInserted(insertPosition, items.size());
         } catch (IllegalStateException e) {
             //todo: update this way
             e.printStackTrace();
@@ -127,7 +139,7 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     public void addAll(List items) {
-        addAll(getItemCount() == 0 ? 0 : getLastPosition(), items);
+        addAll(getLastPosition(), items);
     }
 
     public void clearAll() {
@@ -264,7 +276,7 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     protected int getLastPosition() {
-        return getItemCount() - 1;
+        return getItemCount() == 0 ? 0 : getItemCount() - 1;
     }
 
     public interface OnItemClickListener<M> {
