@@ -5,16 +5,14 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 
 import com.e16din.simplerecycler.R;
-import com.e16din.simplerecycler.model.BottomProgress;
 import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;
 
-public abstract class SimplePagingAdapter<H extends SimpleViewHolder, T> extends BaseInsertsAdapter<H, T> {
+public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
 
     @LayoutRes
     private int mBottomProgressLayoutId = R.layout.layout_bottom_progress;
-
 
     public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
                                OnItemClickListener<T> onItemClickListener) {
@@ -40,7 +38,21 @@ public abstract class SimplePagingAdapter<H extends SimpleViewHolder, T> extends
     }
 
     public void showBottomProgress() {
-        if (!hasBottomProgress()) addInsertion(new BottomProgress(mBottomProgressLayoutId));
+        try {
+            if (!hasBottomProgress()) {
+                if (hasAbsoluteFooter(getLastPosition())) {
+                    getItems().add(getLastPosition() - 1, new Insertion(mBottomProgressLayoutId, null, Insertion.TYPE_ABSOLUTE_FOOTER));
+                    notifyItemInserted(getLastPosition() - 1);
+                } else {
+                    getItems().add(new Insertion(mBottomProgressLayoutId, null, Insertion.TYPE_ABSOLUTE_FOOTER));
+                    notifyItemInserted(getLastPosition());
+                }
+            }
+
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
     }
 
     public void hideBottomProgress() {
@@ -48,16 +60,15 @@ public abstract class SimplePagingAdapter<H extends SimpleViewHolder, T> extends
     }
 
     public boolean hasBottomProgress() {
-        for (int i = getItemCount() - 1; i > 0; i--) {
-            if (isInsertion(i)) {
-                Insertion insert = getInsertion(i);
-                if (insert.getType() == BottomProgress.TYPE_BOTTOM_PROGRESS) {
-                    return true;
-                }
-            } else {
-                break;
+        int lastPosition = getLastPosition();
+
+        if (isInsertion(lastPosition)) {
+            Insertion insert = getInsertion(lastPosition);
+            if (insert.getType() == Insertion.TYPE_ABSOLUTE_FOOTER) {
+                return true;
             }
         }
+
         return false;
     }
 

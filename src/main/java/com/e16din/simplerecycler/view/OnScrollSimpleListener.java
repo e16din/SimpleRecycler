@@ -3,7 +3,7 @@ package com.e16din.simplerecycler.view;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.e16din.simplerecycler.adapter.BaseRecyclerAdapter;
+import com.e16din.simplerecycler.adapter.SimpleRecyclerAdapter;
 
 public class OnScrollSimpleListener extends RecyclerView.OnScrollListener {
 
@@ -25,7 +25,7 @@ public class OnScrollSimpleListener extends RecyclerView.OnScrollListener {
         boolean isLastItem = firstVisibleItem + visibleItemCount >= totalItemCount;
 
         if (isLastItem && dy >= 0) {
-            BaseRecyclerAdapter adapter = (BaseRecyclerAdapter) vRecycler.getAdapter();
+            SimpleRecyclerAdapter adapter = (SimpleRecyclerAdapter) vRecycler.getAdapter();
             adapter.onLastItem();
         }
     }

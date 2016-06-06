@@ -6,8 +6,13 @@ import android.support.annotation.LayoutRes;
 public class Insertion {
 
     public static final int TYPE_DEFAULT = 0;
-    public static final int TYPE_HEADER = 1;//from 1 to 99
-    public static final int TYPE_FOOTER = 100;//from 100
+    //headers from 1 to 99
+    public static final int TYPE_HEADER = 1;
+    public static final int TYPE_ABSOLUTE_HEADER = 99;//only one
+    //footers from 100 to 199
+    public static final int TYPE_FOOTER = 100;
+    public static final int TYPE_ABSOLUTE_FOOTER = 199;//only one
+
 
     @LayoutRes
     private int layoutId;

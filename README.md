@@ -1,8 +1,9 @@
 #SimpleRecycler
 Набор для удобной работы со списками.  
 
-* [SimpleRecyclerAdapter](https://github.com/e16din/SimpleRecycler#simplerecycleradapter)
+* [SimpleAdapter](https://github.com/e16din/SimpleRecycler#simpleadapter)
 * [SimplePagingAdapter](https://github.com/e16din/SimpleRecycler#simplepagingadapter)
+* [SimpleInsertsAdapter](https://github.com/e16din/SimpleRecycler#simpleinsertsadapter)
 * [SimpleRecyclerView](https://github.com/e16din/SimpleRecycler#simplerecyclerview)
 * [SimpleListView](https://github.com/e16din/SimpleRecycler#simplelistview)
 
@@ -20,12 +21,14 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.e16din:SimpleRecycler:0.1.5'
+    compile 'com.github.e16din:SimpleRecycler:0.2.0'
 }
 ```
 
-#SimpleRecyclerAdapter
-Простой в использовании адаптер.  
+#SimpleAdapter
+Простой в использовании адаптер.
+Включает функционал базовых адаптеров(SimplePagingAdapter, SimpleInsertsAdapter, SimpleRecyclerView), каждый из которых можно использовать самостоятельно.
+
 
 ## Добавляем элементы и вставки:
 ```java
@@ -66,45 +69,93 @@ setOnInsertionClickListener(new OnInsertionClickListener() {
         });
 ```
 
-## Наследуем SimpleRecyclerAdapter:
+## Активируем footer подгрузки:
 ```java
-public class RecyclerAdapter<T extends ItemModel>
-        extends SimpleRecyclerAdapter<RecyclerAdapter.MyViewHolder, T> {
 
-    public RecyclerAdapter(@NonNull Context context, @NonNull List<T> items) {
-        super(context, items, R.layout.item);
+mAdapter.setNeedShowBottomProgress(true);
+```
+
+## Наследуем SimpleAdapter:
+```java
+public class RecyclerAdapter extends SimpleAdapter<String> {
+
+    public RecyclerAdapter(@NonNull Context context, @NonNull List<Object> items) {
+        super(context, items, R.layout.item_simple_recycler);
+        setNeedShowBottomProgress(true);
     }
 
     @Override
-    protected MyViewHolder newViewHolder(View v) {
-        return new MyViewHolder(v);
-    }
-
-    @Override
-    protected void onBindItemViewHolder(MyViewHolder holder, int position) {
+    protected void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
         super.onBindItemViewHolder(holder, position);
+        ItemViewHolder h = (ItemViewHolder) holder;
 
-        final ItemModel item = getItem(position);
+        String item = getItem(position);
 
-        //...
+        h.vItemText.setText(item);
     }
 
-	@Override
-    protected void onBindInsertion(H holder, int position) {
-    	final Insertion insertion = getInsertion(position);
+    @Override
+    protected void onBindInsertionViewHolder(RecyclerView.ViewHolder holder, int position) {
+        super.onBindInsertionViewHolder(holder, position);
+        InsertionViewHolder h = (InsertionViewHolder) holder;
 
-        //...
+        Insertion insertion = getInsertion(position);
+
+        String text = null;
+        switch (insertion.getType()) {
+            case Insertion.TYPE_HEADER:
+                text = "Header";
+                break;
+            case Insertion.TYPE_DEFAULT:
+                text = position - getHeadersCount() + ". Default insertion";
+                break;
+            case Insertion.TYPE_FOOTER:
+                text = "Footer";
+                break;
+        }
+
+        h.vText.setText(text);
+        h.vInsertionData.setText("" + insertion.getData());
     }
 
-    public static class MyViewHolder extends SimpleViewHolder {
-		//...
+    @Override
+    protected void addRippleEffect(ViewGroup vContainer, int position) {
+        if (position != 1) {//for example, item(1) without ripple
+            super.addRippleEffect(vContainer, position);
+        }
+    }
 
-        MyViewHolder(View itemView) {
-            super(itemView);
-            //...
+    @Override
+    protected ItemViewHolder newViewHolder(View v) {
+        return new ItemViewHolder(v);
+    }
+
+    @Override
+    public InsertionViewHolder newInsertionViewHolder(View v) {
+        return new InsertionViewHolder(v);
+    }
+
+    static class ItemViewHolder extends RecyclerView.ViewHolder {
+        TextView vItemText;
+
+        public ItemViewHolder(View view) {
+            super(view);
+            vItemText = (TextView) view.findViewById(R.id.vItemText);
+        }
+    }
+
+    static class InsertionViewHolder extends RecyclerView.ViewHolder {
+        TextView vText;
+        TextView vInsertionData;
+
+        public InsertionViewHolder(View view) {
+            super(view);
+            vText = (TextView) view.findViewById(R.id.vText);
+            vInsertionData = (TextView) view.findViewById(R.id.vInsertionData);
         }
     }
 }
+
 ```
 
 #SimplePagingAdapter
@@ -128,6 +179,11 @@ mAdapter.hideBottomProgress();
 
 mAdapter.showBottomProgress();
 ```
+
+#SimpleInsertsAdapter
+Включает функционал вставки произвольных View в список элементов.
+Вставка footer'ов и header'ов.
+
 ============================
 
 #SimpleRecyclerView
