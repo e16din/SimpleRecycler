@@ -162,21 +162,14 @@ public class RecyclerAdapter extends SimpleAdapter<String> {
 Добавляет элемент загрузки в конец ленты, по умолчанию это progress bar.
 Работает только в паре с SimpleRecyclerView и его наследниками.
 
-## Изменяем макет закрузки:
 ```java
-
+//Изменяем макет закрузки:
 mAdapter.setBottomProgressLayoutId(R.layout.footer_progress);
-```
 
-## Скрываем загрузку:
-```java
-
+//Скрываем загрузку:
 mAdapter.hideBottomProgress();
-```
 
-## Показываем загрузку:
-```java
-
+//Показываем загрузку:
 mAdapter.showBottomProgress();
 ```
 
