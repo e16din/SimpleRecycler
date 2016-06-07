@@ -7,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.e16din.simplerecycler.R;
-import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;
 
@@ -92,13 +91,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
 
     public void showBottomProgress() {
         try {
-            if (!hasBottomProgress()) {
-                Insertion insertion =
-                        new Insertion(mBottomProgressLayoutId, null, Insertion.TYPE_ABSOLUTE_FOOTER);
-
-                getItems().add(insertion);
-                notifyItemInserted(getLastPosition());
-            }
+            addAbsoluteFooter(mBottomProgressLayoutId);
         } catch (IllegalStateException e) {
             //todo: update this way
             e.printStackTrace();
@@ -106,22 +99,15 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     }
 
     public void hideBottomProgress() {
-        if (hasBottomProgress()) removeLast();
+        int position = getAbsoluteFooterPosition();
+
+        if (position >= 0) {
+            remove(position);
+        }
     }
 
     public boolean hasBottomProgress() {
-        if (getItemCount() == 0) return false;
-
-        int lastPosition = getLastPosition();
-
-        if (isInsertion(lastPosition)) {
-            Insertion insert = getInsertion(lastPosition);
-            if (insert.getType() == Insertion.TYPE_ABSOLUTE_FOOTER) {
-                return true;
-            }
-        }
-
-        return false;
+        return hasAbsoluteFooter();
     }
 
     public void setBottomProgressLayoutId(int bottomProgressLayoutId) {

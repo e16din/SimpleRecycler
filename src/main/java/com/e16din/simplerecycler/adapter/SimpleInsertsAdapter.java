@@ -18,6 +18,8 @@ import java.util.List;
 
 public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
+    public static final String LOG_INSERTS = "log_inserts";
+
     public static final int TYPE_INSERTION = 1;
 
     private OnInsertionClickListener mOnInsertionClickListener;
@@ -77,8 +79,9 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
     /**
      * Add header before all items and after TYPE_ABSOLUTE_HEADER
-     * @param layoutId  header layout
-     * @param data      data to binding
+     *
+     * @param layoutId header layout
+     * @param data     data to binding
      */
     public void addHeader(@LayoutRes int layoutId, Object data) {
         int insertPosition = getHeadersCount() == 0 ? 0 : getHeadersCount() - 1;
@@ -88,7 +91,8 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
     /**
      * Add header before all items and after TYPE_ABSOLUTE_HEADER
-     * @param layoutId  header layout
+     *
+     * @param layoutId header layout
      */
     public void addHeader(@LayoutRes int layoutId) {
         addHeader(layoutId, null);
@@ -96,8 +100,9 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
     /**
      * Add footer after all items and before TYPE_ABSOLUTE_FOOTER
-     * @param layoutId  footer layout
-     * @param data      data to binding
+     *
+     * @param layoutId footer layout
+     * @param data     data to binding
      */
     public void addFooter(@LayoutRes int layoutId, Object data) {
         try {
@@ -117,7 +122,8 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
     /**
      * Add footer after all items and before TYPE_ABSOLUTE_FOOTER
-     * @param layoutId  footer layout
+     *
+     * @param layoutId footer layout
      */
     public void addFooter(@LayoutRes int layoutId) {
         addFooter(layoutId, null);
@@ -180,7 +186,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
                 return super.onCreateViewHolder(parent, viewType);
             case TYPE_INSERTION:
                 View v = LayoutInflater.from(getContext()).inflate(R.layout.container, parent, false);
-                return newInsertionViewHolder(v);//see mInsertHolders
+                return newInsertionViewHolder(v);
         }
 
         return null;
@@ -249,7 +255,36 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         return itemsCount;
     }
 
-    //
+    protected boolean hasAbsoluteFooter() {
+        return getAbsoluteFooterPosition() >= 0;
+    }
+
+    protected int getAbsoluteFooterPosition() {
+        int result = -1;
+        if (getItemCount() == 0) return result;
+
+        for (int i = getItemCount() - 1; i >= 0; i--) {
+            if (isInsertion(i) && getInsertion(i).getType() == Insertion.TYPE_ABSOLUTE_FOOTER) {
+                result = i;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Add only one absolute footer. All another inserts before it.
+     */
+    protected void addAbsoluteFooter(@LayoutRes int layoutId) {
+        if (!hasAbsoluteFooter()) {
+            Insertion insertion =
+                    new Insertion(layoutId, null, Insertion.TYPE_ABSOLUTE_FOOTER);
+
+            getItems().add(insertion);
+            notifyItemInserted(getLastPosition());
+        } //else: The absolute footer once inserted, remove it if you need, and try again
+    }
 
     /**
      * Get item by position
@@ -263,6 +298,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
     /**
      * Get insertion by position
+     *
      * @param position
      * @return insertion or null if it is item object
      */
