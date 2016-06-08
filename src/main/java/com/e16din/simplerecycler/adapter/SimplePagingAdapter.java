@@ -65,7 +65,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
      *
      * @param size Size of items list
      */
-    protected void onNewPageAdded(int size) {
+    public void onNewPageAdded(int size) {
         if (size < mPageSize) {
             setAllItemsLoaded(true);
             hideBottomProgress();
