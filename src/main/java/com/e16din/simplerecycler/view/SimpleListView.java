@@ -24,6 +24,10 @@ public class SimpleListView extends SimpleRecyclerView {
         init(context);
     }
 
+    public void scrollToPosition(int position) {
+        getLayoutManager().scrollToPosition(position);
+    }
+
     private void init(Context context) {
         setLayoutManager(new LinearLayoutManager(context));
     }
