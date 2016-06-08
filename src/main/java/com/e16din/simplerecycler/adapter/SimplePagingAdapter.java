@@ -15,6 +15,9 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     @LayoutRes
     private int mBottomProgressLayoutId = R.layout.layout_bottom_progress;
 
+    private int mPageSize = 10;
+
+    private boolean mAllItemsLoaded;
 
     public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
                                OnItemClickListener<T> onItemClickListener) {
@@ -39,9 +42,12 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         return new PagingViewHolder(v);
     }
 
+    /**
+     * Show bottom progress bar if mAllItemsLoaded is false
+     */
     @Override
     public void onLastItem() {
-        showBottomProgress();
+        if (!isAllItemsLoaded()) showBottomProgress();
         super.onLastItem();
     }
 
@@ -53,16 +59,37 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         }
     }
 
+    /**
+     * Compute mAllItemsLoaded,
+     * if size < mPageSize then hide bottom progress and no more show it.
+     *
+     * @param size Size of items list
+     */
+    protected void onNewPageAdded(int size) {
+        if (size < mPageSize) {
+            setAllItemsLoaded(true);
+            hideBottomProgress();
+        }
+    }
+
     @Override
     public void add(Object item) {
         hideBottomProgress();
         super.add(item);
     }
 
+    /**
+     * Add items to list.
+     * In paging adapter also call method onNewPageAdded which check size of array and compute mAllItemsLoaded,
+     * if items.size() < mPageSize then hide bottom progress and no more show it.
+     *
+     * @param items Items
+     */
     @Override
     public void addAll(List items) {
         hideBottomProgress();
         super.addAll(items);
+        onNewPageAdded(items == null ? 0 : items.size());
     }
 
     @Override
@@ -112,6 +139,22 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
 
     public void setBottomProgressLayoutId(int bottomProgressLayoutId) {
         mBottomProgressLayoutId = bottomProgressLayoutId;
+    }
+
+    public int getPageSize() {
+        return mPageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.mPageSize = pageSize;
+    }
+
+    public boolean isAllItemsLoaded() {
+        return mAllItemsLoaded;
+    }
+
+    public void setAllItemsLoaded(boolean allItemsLoaded) {
+        mAllItemsLoaded = allItemsLoaded;
     }
 
     //for newInsertionViewHolder
