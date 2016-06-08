@@ -8,6 +8,7 @@ import com.e16din.simplerecycler.adapter.SimpleRecyclerAdapter;
 public class OnScrollSimpleListener extends RecyclerView.OnScrollListener {
 
     private LinearLayoutManager mLinearLayoutManager;
+    private int lastTotalItemCount;
 
 
     public OnScrollSimpleListener(LinearLayoutManager linearLayoutManager) {
@@ -19,14 +20,18 @@ public class OnScrollSimpleListener extends RecyclerView.OnScrollListener {
         super.onScrolled(vRecycler, dx, dy);
 
         int visibleItemCount = vRecycler.getChildCount();
-        int totalItemCount = vRecycler.getAdapter().getItemCount();
+        int currentTotalItemCount = vRecycler.getAdapter().getItemCount();
         int firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
 
-        boolean isLastItem = firstVisibleItem + visibleItemCount >= totalItemCount;
+        boolean isLastItem = firstVisibleItem + visibleItemCount >= currentTotalItemCount;
 
         if (isLastItem && dy >= 0) {
-            SimpleRecyclerAdapter adapter = (SimpleRecyclerAdapter) vRecycler.getAdapter();
-            adapter.onLastItem();
+            if (currentTotalItemCount != lastTotalItemCount) {
+                SimpleRecyclerAdapter adapter = (SimpleRecyclerAdapter) vRecycler.getAdapter();
+                adapter.onLastItem();
+            }
         }
+
+        lastTotalItemCount = currentTotalItemCount;
     }
 }

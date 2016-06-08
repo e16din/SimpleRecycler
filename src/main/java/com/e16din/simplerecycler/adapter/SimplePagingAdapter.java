@@ -47,8 +47,10 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
      */
     @Override
     public void onLastItem() {
-        if (!isAllItemsLoaded()) showBottomProgress();
-        super.onLastItem();
+        if (!isAllItemsLoaded()) {
+            showBottomProgress();
+            super.onLastItem();
+        }
     }
 
     @Override
