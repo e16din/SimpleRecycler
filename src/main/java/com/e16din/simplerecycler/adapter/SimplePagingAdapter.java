@@ -80,20 +80,43 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         super.add(item);
     }
 
-    /**
-     * Add items to list.
-     * In paging adapter also call method onNewPageAdded which check size of array and compute mAllItemsLoaded,
-     * if items.size() < mPageSize then hide bottom progress and no more show it.
-     *
-     * @param items Items
-     */
     @Override
     public void addAll(List items) {
         hideBottomProgress();
         super.addAll(items);
+    }
+
+    @Override
+    public void addAll(int position, List items) {
+        hideBottomProgress();
+        super.addAll(position, items);
+    }
+
+    /**
+     * Add items to list.
+     * Call method onNewPageAdded which check size of array and compute mAllItemsLoaded,
+     * if items.size() < mPageSize then hide bottom progress and no more show it.
+     *
+     * @param items Items
+     */
+    public void addPage(List items) {
+        addAll(items);
         onNewPageAdded(items == null ? 0 : items.size());
     }
 
+    /**
+     * Add items to list.
+     * Call method onNewPageAdded which check size of array and compute mAllItemsLoaded,
+     * if items.size() < mPageSize then hide bottom progress and no more show it.
+     *
+     * @param position Insert position
+     * @param items    Items
+     */
+    public void addPage(int position, List items) {
+        addAll(position, items);
+        onNewPageAdded(items == null ? 0 : items.size());
+    }
+    
     @Override
     public void addFooter(@LayoutRes int layoutId) {
         hideBottomProgress();
