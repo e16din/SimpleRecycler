@@ -105,9 +105,12 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
      * @param data     data to binding
      */
     public void addFooter(@LayoutRes int layoutId, Object data) {
+        setHasNewItems(true);
+
         try {
             if (hasAbsoluteFooter(getLastPosition())) {
-                getItems().add(getLastPosition() - 1, new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
+                getItems().add(getLastPosition() - 1,
+                        new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
                 notifyItemInserted(getLastPosition() - 1);
             } else {
                 getItems().add(new Insertion(layoutId, data, Insertion.TYPE_FOOTER));

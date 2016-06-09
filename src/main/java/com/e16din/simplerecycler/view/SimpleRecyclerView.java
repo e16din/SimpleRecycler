@@ -3,10 +3,8 @@ package com.e16din.simplerecycler.view;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-
 
 public class SimpleRecyclerView extends RecyclerView {
     public SimpleRecyclerView(Context context) {
@@ -26,6 +24,6 @@ public class SimpleRecyclerView extends RecyclerView {
         super.setAdapter(adapter);
 
         clearOnScrollListeners();
-        addOnScrollListener(new OnScrollSimpleListener((LinearLayoutManager) getLayoutManager()));
+        addOnScrollListener(new OnScrollSimpleListener());
     }
 }

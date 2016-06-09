@@ -116,7 +116,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         addAll(position, items);
         onNewPageAdded(items == null ? 0 : items.size());
     }
-    
+
     @Override
     public void addFooter(@LayoutRes int layoutId) {
         hideBottomProgress();

@@ -31,9 +31,12 @@ public abstract class SimpleRecyclerAdapter<M>
     private int mItemLayoutId;
 
     private OnItemClickListener<M> mOnItemClickListener;
-    private Runnable onLastItemListener;
+    private Runnable mOnLastItemListener;
 
     private boolean mRippleEffectEnabled = true;
+    private RecyclerView.ViewHolder mLastHolder;
+
+    private boolean mHasNewItems;
 
 
     public void setItemLayoutId(@LayoutRes int layoutId) {
@@ -70,6 +73,8 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     public void add(int position, Object item) {
+        mHasNewItems = true;
+
         try {
             if (getItemCount() == 0) {
                 mItems.add(item);
@@ -122,6 +127,8 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     public void addAll(int position, List items) {
+        mHasNewItems = true;
+
         try {
             if (getItemCount() == 0) {
                 mItems.addAll(items);
@@ -165,6 +172,7 @@ public abstract class SimpleRecyclerAdapter<M>
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        mLastHolder = holder;
         onBindItemViewHolder(holder, position);
     }
 
@@ -245,8 +253,10 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     public void onLastItem() {
-        if (onLastItemListener != null) {
-            onLastItemListener.run();
+        mHasNewItems = false;
+
+        if (mOnLastItemListener != null) {
+            mOnLastItemListener.run();
         }
     }
 
@@ -255,7 +265,7 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     public Runnable getOnLastItemListener() {
-        return onLastItemListener;
+        return mOnLastItemListener;
     }
 
     public OnItemClickListener<M> getOnItemClickListener() {
@@ -264,7 +274,7 @@ public abstract class SimpleRecyclerAdapter<M>
 
     //use with SimpleRecyclerView
     public void setOnLastItemListener(Runnable onLastItemListener) {
-        this.onLastItemListener = onLastItemListener;
+        this.mOnLastItemListener = onLastItemListener;
     }
 
     public boolean isRippleEffectEnabled() {
@@ -275,8 +285,29 @@ public abstract class SimpleRecyclerAdapter<M>
         mRippleEffectEnabled = rippleEffectEnabled;
     }
 
+    /**
+     * Last position of items and insertions
+     * @return size of all items and insertions - 1
+     */
     protected int getLastPosition() {
         return getItemCount() == 0 ? 0 : getItemCount() - 1;
+    }
+
+    public RecyclerView.ViewHolder getLastHolder() {
+        return mLastHolder;
+    }
+
+    /**
+     * Check new items after onLastItem
+     *
+     * @return true if after call onLastItem we add new items to this adapter
+     */
+    public boolean hasNewItems() {
+        return mHasNewItems;
+    }
+
+    public void setHasNewItems(boolean hasNewItems) {
+        mHasNewItems = hasNewItems;
     }
 
     public interface OnItemClickListener<M> {

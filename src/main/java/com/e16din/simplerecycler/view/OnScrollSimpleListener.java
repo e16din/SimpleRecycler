@@ -1,37 +1,29 @@
 package com.e16din.simplerecycler.view;
 
-import android.support.v7.widget.LinearLayoutManager;
+import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.e16din.simplerecycler.adapter.SimpleRecyclerAdapter;
 
 public class OnScrollSimpleListener extends RecyclerView.OnScrollListener {
 
-    private LinearLayoutManager mLinearLayoutManager;
-    private int lastTotalItemCount;
-
-
-    public OnScrollSimpleListener(LinearLayoutManager linearLayoutManager) {
-        this.mLinearLayoutManager = linearLayoutManager;
-    }
-
     @Override
     public void onScrolled(RecyclerView vRecycler, int dx, int dy) {
         super.onScrolled(vRecycler, dx, dy);
 
-        int visibleItemCount = vRecycler.getChildCount();
-        int currentTotalItemCount = vRecycler.getAdapter().getItemCount();
-        int firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+        Rect scrollBounds = new Rect();
+        vRecycler.getHitRect(scrollBounds);
 
-        boolean isLastItem = firstVisibleItem + visibleItemCount >= currentTotalItemCount;
+        SimpleRecyclerAdapter adapter = (SimpleRecyclerAdapter) vRecycler.getAdapter();
 
-        if (isLastItem && dy >= 0) {
-            if (currentTotalItemCount != lastTotalItemCount) {
-                SimpleRecyclerAdapter adapter = (SimpleRecyclerAdapter) vRecycler.getAdapter();
+        if(adapter.hasNewItems()) {
+            View vLast = adapter.getLastHolder().itemView;
+            if (vLast.getLocalVisibleRect(scrollBounds)) {
+                // Any portion of the vLast, even a single pixel, is within the visible window
+
                 adapter.onLastItem();
             }
         }
-
-        lastTotalItemCount = currentTotalItemCount;
     }
 }
