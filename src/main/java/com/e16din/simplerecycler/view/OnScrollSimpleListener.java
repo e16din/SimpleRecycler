@@ -17,7 +17,7 @@ public class OnScrollSimpleListener extends RecyclerView.OnScrollListener {
 
         SimpleRecyclerAdapter adapter = (SimpleRecyclerAdapter) vRecycler.getAdapter();
 
-        if(adapter.hasNewItems()) {
+        if (adapter.getLastHolder() != null && adapter.hasNewItems()) {
             View vLast = adapter.getLastHolder().itemView;
             if (vLast.getLocalVisibleRect(scrollBounds)) {
                 // Any portion of the vLast, even a single pixel, is within the visible window

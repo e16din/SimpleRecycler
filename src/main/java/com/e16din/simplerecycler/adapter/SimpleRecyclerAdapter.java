@@ -73,7 +73,7 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     public void add(int position, Object item) {
-        mHasNewItems = true;
+        setHasNewItems(true);
 
         try {
             if (getItemCount() == 0) {
@@ -127,7 +127,7 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     public void addAll(int position, List items) {
-        mHasNewItems = true;
+        setHasNewItems(true);
 
         try {
             if (getItemCount() == 0) {
@@ -172,7 +172,8 @@ public abstract class SimpleRecyclerAdapter<M>
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        mLastHolder = holder;
+        mLastHolder = position == getItemCount() - 1 ? holder : null;
+
         onBindItemViewHolder(holder, position);
     }
 
@@ -253,7 +254,7 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     public void onLastItem() {
-        mHasNewItems = false;
+        setHasNewItems(false);
 
         if (mOnLastItemListener != null) {
             mOnLastItemListener.run();
@@ -287,6 +288,7 @@ public abstract class SimpleRecyclerAdapter<M>
 
     /**
      * Last position of items and insertions
+     *
      * @return size of all items and insertions - 1
      */
     protected int getLastPosition() {
