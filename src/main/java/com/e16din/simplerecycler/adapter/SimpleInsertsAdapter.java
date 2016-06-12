@@ -201,6 +201,8 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (needInsertion(position)) {
             onPreBindInsertionViewHolder(holder, position);
+
+            setLastHolder(position == getItemCount() - 1 ? holder : null);
             return;
         }
 

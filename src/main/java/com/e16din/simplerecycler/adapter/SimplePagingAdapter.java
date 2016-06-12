@@ -18,6 +18,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     private int mPageSize = 10;
 
     private boolean mAllItemsLoaded;
+    private boolean mNeedShowProgressFromStart = true;
 
     public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
                                OnItemClickListener<T> onItemClickListener) {
@@ -48,7 +49,6 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     @Override
     public void onLastItem() {
         if (!isAllItemsLoaded() && hasNewItems()) {
-            showBottomProgress();
             super.onLastItem();
         }
     }
@@ -56,7 +56,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        if (getItemCount() == 0) {
+        if (getItemCount() == 0 && mNeedShowProgressFromStart) {
             showBottomProgress();
         }
     }
@@ -78,18 +78,28 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     public void add(Object item) {
         hideBottomProgress();
         super.add(item);
+        showBottomProgress();
+    }
+
+    @Override
+    public void add(int position, Object item) {
+        hideBottomProgress();
+        super.add(position, item);
+        showBottomProgress();
     }
 
     @Override
     public void addAll(List items) {
         hideBottomProgress();
         super.addAll(items);
+        showBottomProgress();
     }
 
     @Override
     public void addAll(int position, List items) {
         hideBottomProgress();
         super.addAll(position, items);
+        showBottomProgress();
     }
 
     /**
@@ -121,24 +131,28 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     public void addFooter(@LayoutRes int layoutId) {
         hideBottomProgress();
         super.addFooter(layoutId);
+        showBottomProgress();
     }
 
     @Override
     public void addFooter(@LayoutRes int layoutId, Object data) {
         hideBottomProgress();
         super.addFooter(layoutId, data);
+        showBottomProgress();
     }
 
     @Override
     public void addHeader(@LayoutRes int layoutId) {
         hideBottomProgress();
         super.addHeader(layoutId);
+        showBottomProgress();
     }
 
     @Override
     public void addHeader(@LayoutRes int layoutId, Object data) {
         hideBottomProgress();
         super.addHeader(layoutId, data);
+        showBottomProgress();
     }
 
     public void showBottomProgress() {
@@ -180,6 +194,10 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
 
     public void setAllItemsLoaded(boolean allItemsLoaded) {
         mAllItemsLoaded = allItemsLoaded;
+    }
+
+    public void setNeedShowProgressFromStart(boolean needShowProgressFromStart) {
+        mNeedShowProgressFromStart = needShowProgressFromStart;
     }
 
     //for newInsertionViewHolder

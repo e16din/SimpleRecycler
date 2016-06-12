@@ -172,9 +172,9 @@ public abstract class SimpleRecyclerAdapter<M>
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        mLastHolder = position == getItemCount() - 1 ? holder : null;
-
         onBindItemViewHolder(holder, position);
+
+        setLastHolder(position == getItemCount() - 1 ? holder : null);
     }
 
     protected void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -284,6 +284,10 @@ public abstract class SimpleRecyclerAdapter<M>
 
     public void setRippleEffectEnabled(boolean rippleEffectEnabled) {
         mRippleEffectEnabled = rippleEffectEnabled;
+    }
+
+    protected void setLastHolder(RecyclerView.ViewHolder lastHolder) {
+        mLastHolder = lastHolder;
     }
 
     /**
