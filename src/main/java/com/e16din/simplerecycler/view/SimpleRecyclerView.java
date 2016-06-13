@@ -2,6 +2,7 @@ package com.e16din.simplerecycler.view;
 
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -24,6 +25,11 @@ public class SimpleRecyclerView extends RecyclerView {
         super.setAdapter(adapter);
 
         clearOnScrollListeners();
-        addOnScrollListener(new OnScrollSimpleListener());
+        addOnScrollListener(newListener());
+    }
+
+    @NonNull
+    protected OnScrollSimpleListener newListener() {
+        return new OnScrollSimpleListener();
     }
 }

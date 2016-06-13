@@ -43,14 +43,17 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         return new PagingViewHolder(v);
     }
 
-    /**
-     * Show bottom progress bar if mAllItemsLoaded is false
-     */
     @Override
     public void onLastItem() {
-        if (!isAllItemsLoaded() && hasNewItems()) {
+        if (!mAllItemsLoaded) {
             super.onLastItem();
+        } else {
+            setHasNewItems(false);
         }
+    }
+
+    public void fireOnLastItem() {
+        super.onLastItem();
     }
 
     @Override
@@ -67,7 +70,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
      *
      * @param size Size of items list
      */
-    public void onNewPageAdded(int size) {
+    public void onNewItemsAdded(int size) {
         if (size < mPageSize) {
             setAllItemsLoaded(true);
             hideBottomProgress();
@@ -104,19 +107,19 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
 
     /**
      * Add items to list.
-     * Call method onNewPageAdded which check size of array and compute mAllItemsLoaded,
+     * Call method onNewItemsAdded which check size of array and compute mAllItemsLoaded,
      * if items.size() < mPageSize then hide bottom progress and no more show it.
      *
      * @param items Items
      */
     public void addPage(List items) {
         addAll(items);
-        onNewPageAdded(items == null ? 0 : items.size());
+        onNewItemsAdded(items == null ? 0 : items.size());
     }
 
     /**
      * Add items to list.
-     * Call method onNewPageAdded which check size of array and compute mAllItemsLoaded,
+     * Call method onNewItemsAdded which check size of array and compute mAllItemsLoaded,
      * if items.size() < mPageSize then hide bottom progress and no more show it.
      *
      * @param position Insert position
@@ -124,7 +127,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
      */
     public void addPage(int position, List items) {
         addAll(position, items);
-        onNewPageAdded(items == null ? 0 : items.size());
+        onNewItemsAdded(items == null ? 0 : items.size());
     }
 
     @Override

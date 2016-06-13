@@ -1,5 +1,5 @@
 #SimpleRecycler
-Набор для удобной работы со списками.  
+Набор для удобной работы со списками.
 
 * [SimpleAdapter](https://github.com/e16din/SimpleRecycler#simpleadapter)
 * [SimplePagingAdapter](https://github.com/e16din/SimpleRecycler#simplepagingadapter)
@@ -21,13 +21,15 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.e16din:SimpleRecycler:0.3.1'
+    compile 'com.github.e16din:SimpleRecycler:0.3.2'
 }
 ```
 
 #SimpleAdapter
-Простой в использовании адаптер.
-Включает функционал базовых адаптеров(SimplePagingAdapter, SimpleInsertsAdapter, SimpleRecyclerView), каждый из которых можно использовать самостоятельно.
+Простой в использовании адаптер. 
+Автоматически добавляет ripple effect (см. SimpleRecyclerAdapter).
+
+Включает функционал базовых адаптеров(SimplePagingAdapter, SimpleInsertsAdapter, SimpleRecyclerAdapter), каждый из которых можно использовать самостоятельно.
 
 
 ## Добавляем элементы и вставки:

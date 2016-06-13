@@ -127,7 +127,7 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     public void addAll(int position, List items) {
-        setHasNewItems(true);
+        setHasNewItems(items != null && items.size() > 0);
 
         try {
             if (getItemCount() == 0) {
@@ -187,23 +187,17 @@ public abstract class SimpleRecyclerAdapter<M>
 
     protected ViewGroup addRippleEffect(ViewGroup vContainer, final int position) {
         Drawable bgDrawable = vContainer.getChildAt(0).getBackground();
-        ViewGroup vResult = vContainer;
 
-        if (bgDrawable == null) {
-            addRippleToView(vContainer);
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            vContainer.setBackground(bgDrawable);
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                vContainer.setBackground(bgDrawable);
-            } else {
-                vContainer.setBackgroundDrawable(bgDrawable);
-            }
-
-            vResult = (ViewGroup) vContainer.getChildAt(0);
+            vContainer.setBackgroundDrawable(bgDrawable);
         }
 
-        addRippleToView(vResult);
-        return vResult;
+        vContainer = (ViewGroup) vContainer.getChildAt(0);
+
+        addRippleToView(vContainer);
+        return vContainer;
     }
 
     protected void updateItemClickListener(final int position, ViewGroup vItem) {
