@@ -21,7 +21,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.e16din:SimpleRecycler:0.3.2'
+    compile 'com.github.e16din:SimpleRecycler:0.3.3'
 }
 ```
 
@@ -87,7 +87,7 @@ public class RecyclerAdapter extends SimpleAdapter<String> {
     }
 
     @Override
-    protected void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
+    protected void onBindItemViewHolder(SimpleViewHolder holder, int position) {
         super.onBindItemViewHolder(holder, position);
         ItemViewHolder h = (ItemViewHolder) holder;
 
@@ -97,7 +97,7 @@ public class RecyclerAdapter extends SimpleAdapter<String> {
     }
 
     @Override
-    protected void onBindInsertionViewHolder(RecyclerView.ViewHolder holder, int position) {
+    protected void onBindInsertionViewHolder(SimpleViewHolder holder, int position) {
         super.onBindInsertionViewHolder(holder, position);
         InsertionViewHolder h = (InsertionViewHolder) holder;
 
@@ -137,7 +137,7 @@ public class RecyclerAdapter extends SimpleAdapter<String> {
         return new InsertionViewHolder(v);
     }
 
-    static class ItemViewHolder extends RecyclerView.ViewHolder {
+    static class ItemViewHolder extends SimpleViewHolder {
         TextView vItemText;
 
         public ItemViewHolder(View view) {
@@ -146,7 +146,7 @@ public class RecyclerAdapter extends SimpleAdapter<String> {
         }
     }
 
-    static class InsertionViewHolder extends RecyclerView.ViewHolder {
+    static class InsertionViewHolder extends SimpleViewHolder {
         TextView vText;
         TextView vInsertionData;
 

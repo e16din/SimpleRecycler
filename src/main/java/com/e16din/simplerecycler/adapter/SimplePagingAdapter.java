@@ -39,7 +39,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
 
 
     @Override
-    public RecyclerView.ViewHolder newInsertionViewHolder(View v) {
+    public SimpleViewHolder newInsertionViewHolder(View v) {
         return new PagingViewHolder(v);
     }
 
@@ -204,7 +204,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     }
 
     //for newInsertionViewHolder
-    static class PagingViewHolder extends RecyclerView.ViewHolder {
+    static class PagingViewHolder extends SimpleViewHolder {
         public PagingViewHolder(View view) {
             super(view);
         }

@@ -1,7 +1,6 @@
 package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
@@ -19,8 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public abstract class SimpleRecyclerAdapter<M>
-        extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<SimpleViewHolder> {
 
     public static final int TYPE_DEFAULT = 0;
 
@@ -34,7 +32,7 @@ public abstract class SimpleRecyclerAdapter<M>
     private Runnable mOnLastItemListener;
 
     private boolean mRippleEffectEnabled = true;
-    private RecyclerView.ViewHolder mLastHolder;
+    private SimpleViewHolder mLastHolder;
 
     private boolean mHasNewItems;
 
@@ -160,47 +158,58 @@ public abstract class SimpleRecyclerAdapter<M>
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         FrameLayout vContainer = (FrameLayout)
                 LayoutInflater.from(getContext()).inflate(R.layout.container, parent, false);
         View v = LayoutInflater.from(parent.getContext()).inflate(mItemLayoutId, parent, false);
         vContainer.addView(v);
-        return newViewHolder(vContainer);
+        return rippledViewHolder(vContainer);
     }
 
-    protected abstract RecyclerView.ViewHolder newViewHolder(View v);
+    protected abstract SimpleViewHolder newViewHolder(View v);
+
+    protected SimpleViewHolder rippledViewHolder(View v) {
+        SimpleViewHolder holder = newViewHolder(v);
+
+        addRippleEffectToHolder((ViewGroup) v, holder);
+
+        return holder;
+    }
+
+    protected void addRippleEffectToHolder(ViewGroup vRoot, SimpleViewHolder holder) {
+        if (!mRippleEffectEnabled) return;
+
+        holder.vFirstChild = vRoot.getChildAt(0);
+        if (holder.vFirstChild != null) {
+            holder.mBackgroundDrawable = holder.vFirstChild.getBackground();
+        }
+
+        //update ripple effect (or selector for old androids)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            holder.mSelectorResId = getItemSelectorId();
+        } else {
+            TypedValue outValue = new TypedValue();
+            mContext.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
+            holder.mSelectorResId = outValue.resourceId;
+        }
+
+        holder.reset();
+    }
+
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(SimpleViewHolder holder, final int position) {
         onBindItemViewHolder(holder, position);
 
         setLastHolder(position == getItemCount() - 1 ? holder : null);
     }
 
-    protected void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ViewGroup vItem = (ViewGroup) holder.itemView;
-        if (mRippleEffectEnabled) {
-            vItem = addRippleEffect((ViewGroup) holder.itemView, position);
-        }
-        updateItemClickListener(position, vItem);
+    protected void onBindItemViewHolder(SimpleViewHolder holder, int position) {
+        updateItemClickListener(position, holder.vFirstChild != null ? holder.vFirstChild : holder.itemView);
     }
 
-    protected ViewGroup addRippleEffect(ViewGroup vContainer, final int position) {
-        Drawable bgDrawable = vContainer.getChildAt(0).getBackground();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            vContainer.setBackground(bgDrawable);
-        } else {
-            vContainer.setBackgroundDrawable(bgDrawable);
-        }
-
-        vContainer = (ViewGroup) vContainer.getChildAt(0);
-
-        addRippleToView(vContainer);
-        return vContainer;
-    }
-
-    protected void updateItemClickListener(final int position, ViewGroup vItem) {
+    protected void updateItemClickListener(final int position, View vItem) {
         if (mOnItemClickListener != null) {
             final M item = getItem(position);
 
@@ -210,18 +219,6 @@ public abstract class SimpleRecyclerAdapter<M>
                     mOnItemClickListener.onClick(item, position);
                 }
             });
-        }
-    }
-
-    protected void addRippleToView(ViewGroup vContainer) {
-        //update ripple effect (or selector for old androids)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            vContainer.setBackgroundResource(getItemSelectorId());
-
-        } else {
-            TypedValue outValue = new TypedValue();
-            mContext.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
-            vContainer.setBackgroundResource(outValue.resourceId);
         }
     }
 
@@ -280,7 +277,7 @@ public abstract class SimpleRecyclerAdapter<M>
         mRippleEffectEnabled = rippleEffectEnabled;
     }
 
-    protected void setLastHolder(RecyclerView.ViewHolder lastHolder) {
+    protected void setLastHolder(SimpleViewHolder lastHolder) {
         mLastHolder = lastHolder;
     }
 
@@ -293,7 +290,7 @@ public abstract class SimpleRecyclerAdapter<M>
         return getItemCount() == 0 ? 0 : getItemCount() - 1;
     }
 
-    public RecyclerView.ViewHolder getLastHolder() {
+    public SimpleViewHolder getLastHolder() {
         return mLastHolder;
     }
 
