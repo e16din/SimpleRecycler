@@ -252,6 +252,10 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         }
     }
 
+    public boolean isEmpty() {
+        return getItemCount() == 0;
+    }
+
     public List getItems() {
         return mItems;
     }

@@ -252,6 +252,9 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         return R.drawable.selector_list_item_default;
     }
 
+    public boolean isEmpty() {
+        return getOnlyItemsCount() == 0;
+    }
 
     public int getOnlyItemsCount() {
         int itemsCount = 0;
