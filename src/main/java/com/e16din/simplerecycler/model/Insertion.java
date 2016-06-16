@@ -10,8 +10,8 @@ public class Insertion {
     public static final int TYPE_HEADER = 1;
     public static final int TYPE_ABSOLUTE_HEADER = 99;//only one
     //footers from 100 to 199
-    public static final int TYPE_FOOTER = 100;
-    public static final int TYPE_ABSOLUTE_FOOTER = 199;//only one
+    public static final int TYPE_FOOTER = 1000;
+    public static final int TYPE_ABSOLUTE_FOOTER = 1999;
 
 
     @LayoutRes

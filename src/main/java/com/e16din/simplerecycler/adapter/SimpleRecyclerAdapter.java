@@ -70,18 +70,19 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         return position;
     }
 
+    /**
+     * Add an item to adapter
+     *
+     * @param position insert position
+     * @param item     the item
+     */
     public void add(int position, Object item) {
         setHasNewItems(true);
 
         try {
-            if (getItemCount() == 0) {
-                mItems.add(item);
-                notifyItemInserted(0);
-            } else {
-                int insertPosition = calcInsertPosition(position);
-                mItems.add(insertPosition, item);
-                notifyItemInserted(insertPosition);
-            }
+            int insertPosition = calcInsertPosition(position);
+            mItems.add(insertPosition, item);
+            notifyItemInserted(insertPosition);
 
         } catch (IllegalStateException e) {
             //todo: update this way
@@ -89,10 +90,20 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         }
     }
 
+    /**
+     * Add an item to end of adapter
+     *
+     * @param item the item
+     */
     public void add(Object item) {
-        add(getLastPosition(), item);
+        add(getLastItemPosition(), item);
     }
 
+    /**
+     * Remove an item by position
+     *
+     * @param position item position
+     */
     public void remove(int position) {
         try {
             mItems.remove(position);
@@ -106,7 +117,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
 
     protected void removeLast() {
         if (getItemCount() > 0) {
-            remove(getLastPosition());
+            remove(getLastItemPosition());
         }
     }
 
@@ -116,26 +127,19 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         }
     }
 
-    public void addItem(int position, M item) {
-        add(position, item);
-    }
-
-    public void addItem(M item) {
-        add(item);
-    }
-
+    /**
+     * Add items to adapter
+     *
+     * @param position insert position
+     * @param items    the items
+     */
     public void addAll(int position, List items) {
         setHasNewItems(items != null && items.size() > 0);
 
         try {
-            if (getItemCount() == 0) {
-                mItems.addAll(items);
-                notifyItemRangeInserted(0, items.size());
-            } else {
-                int insertPosition = calcInsertPosition(position);
-                mItems.addAll(insertPosition, items);
-                notifyItemRangeInserted(insertPosition, items.size());
-            }
+            int insertPosition = calcInsertPosition(position);
+            mItems.addAll(insertPosition, items);
+            notifyItemRangeInserted(insertPosition, items.size());
 
         } catch (IllegalStateException e) {
             //todo: update this way
@@ -143,10 +147,18 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         }
     }
 
+    /**
+     * Add items to end of adapter
+     *
+     * @param items the items
+     */
     public void addAll(List items) {
-        addAll(getLastPosition(), items);
+        addAll(getLastItemPosition(), items);
     }
 
+    /**
+     * Remove all items from this adapter
+     */
     public void clearAll() {
         try {
             mItems.clear();
@@ -290,7 +302,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
      *
      * @return size of all items and insertions - 1
      */
-    protected int getLastPosition() {
+    protected int getLastItemPosition() {
         return getItemCount() == 0 ? 0 : getItemCount() - 1;
     }
 

@@ -40,21 +40,17 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         super(context);
     }
 
-    @Override
-    protected int calcInsertPosition(int position) {
-        int insertPosition = position;
+    protected int getAbsoluteFootersCount() {
+        int result = 0;
+        if (getItemCount() == 0) return result;
 
-        if (insertPosition == getLastPosition()) {
-            insertPosition -= getFootersCount();
-        } else {
-            insertPosition += getHeadersCount();
+        for (int i = getItemCount() - 1; i >= 0; i--) {
+            if (isInsertion(i) && getInsertion(i).getType() >= Insertion.TYPE_ABSOLUTE_FOOTER) {
+                result += 1;
+            }
         }
-        return insertPosition;
-    }
 
-    public boolean hasAbsoluteFooter(int position) {
-        Insertion insertion = getInsertion(position);
-        return insertion != null && insertion.getType() == Insertion.TYPE_ABSOLUTE_FOOTER;
+        return result;
     }
 
     public boolean hasAbsoluteHeader(int position) {
@@ -62,18 +58,88 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         return insertion != null && insertion.getType() == Insertion.TYPE_ABSOLUTE_HEADER;
     }
 
+    @Override
+    protected int calcInsertPosition(int insertPosition) {
+        if (isHeader(insertPosition)) {
+            for (int i = 0; i <= insertPosition; i++) {
+                if (isHeader(i)) {
+                    insertPosition += 1;
+                } else {
+                    break;
+                }
+            }
+        } else if (isFooter(insertPosition)) {
+            for (int i = insertPosition; i > 0; i--) {
+                if (isFooter(i)) {
+                    insertPosition -= 1;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        return insertPosition;
+    }
+
+    @Override
+    protected int getLastItemPosition() {
+        final int onlyItemsCount = getOnlyItemsCount();
+        return onlyItemsCount == 0 ? 0 : onlyItemsCount - 1;
+    }
+
+    public boolean isFooter(int i) {
+        return isInsertion(i) && getInsertion(i).getType() >= Insertion.TYPE_FOOTER;
+    }
+
+    public boolean isHeader(int i) {
+        return isInsertion(i)
+                && getInsertion(i).getType() >= Insertion.TYPE_HEADER
+                && getInsertion(i).getType() <= Insertion.TYPE_ABSOLUTE_HEADER;
+    }
+
     /**
-     * Add custom view insertion
+     * Add custom view insertion to adapter
      */
     public void addInsertion(int position, Insertion insertion) {
         add(position, insertion);
     }
 
     /**
-     * Add custom view insertion
+     * Add custom view insertion to adapter
      */
     public void addInsertion(Insertion insertion) {
         add(insertion);
+    }
+
+
+    @Override
+    public void add(Object item) {
+        setHasNewItems(true);
+
+        try {
+            int insertPosition = getItemCount() - getFootersCount();
+            getItems().add(insertPosition, item);
+            notifyItemInserted(insertPosition);
+
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addAll(List items) {
+        setHasNewItems(items != null && items.size() > 0);
+
+        try {
+            int insertPosition = getItemCount() - getFootersCount();
+            getItems().addAll(insertPosition, items);
+            notifyItemRangeInserted(insertPosition, items.size());
+
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -83,9 +149,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
      * @param data     data to binding
      */
     public void addHeader(@LayoutRes int layoutId, Object data) {
-        int insertPosition = getHeadersCount() == 0 ? 0 : getHeadersCount() - 1;
-
-        add(insertPosition, new Insertion(layoutId, data, Insertion.TYPE_HEADER));
+        add(0, new Insertion(layoutId, data, Insertion.TYPE_HEADER));
     }
 
     /**
@@ -105,13 +169,15 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
      */
     public void addFooter(@LayoutRes int layoutId, Object data) {
         try {
-            if (hasAbsoluteFooter(getLastPosition())) {
-                getItems().add(getLastPosition() - 1,
+            int absoluteFootersCount = getAbsoluteFootersCount();
+            if (absoluteFootersCount > 0) {
+                int position = getItemCount() - absoluteFootersCount;
+                getItems().add(position,
                         new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
-                notifyItemInserted(getLastPosition() - 1);
+                notifyItemInserted(position);
             } else {
                 getItems().add(new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
-                notifyItemInserted(getLastPosition());
+                notifyItemInserted(getLastItemPosition());
             }
 
         } catch (IllegalStateException e) {
@@ -144,7 +210,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
             }
         }
 
-        return count - 1;
+        return count;
     }
 
     public int getHeadersCount() {
@@ -267,35 +333,27 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         return itemsCount;
     }
 
-    protected boolean hasAbsoluteFooter() {
-        return getAbsoluteFooterPosition() >= 0;
-    }
 
-    protected int getAbsoluteFooterPosition() {
-        int result = -1;
-        if (getItemCount() == 0) return result;
-
-        for (int i = getItemCount() - 1; i >= 0; i--) {
-            if (isInsertion(i) && getInsertion(i).getType() == Insertion.TYPE_ABSOLUTE_FOOTER) {
-                result = i;
-                break;
-            }
-        }
-
-        return result;
+    /**
+     * Add absolute footer. All another inserts before it.
+     */
+    protected void addAbsoluteFooter(@LayoutRes int layoutId) {
+        addAbsoluteFooter(layoutId, Insertion.TYPE_ABSOLUTE_FOOTER);
     }
 
     /**
-     * Add only one absolute footer. All another inserts before it.
+     * Add absolute footer. All another inserts before it.
      */
-    protected void addAbsoluteFooter(@LayoutRes int layoutId) {
-        if (!hasAbsoluteFooter()) {
-            Insertion insertion =
-                    new Insertion(layoutId, null, Insertion.TYPE_ABSOLUTE_FOOTER);
+    protected void addAbsoluteFooter(@LayoutRes int layoutId, int type) {
+        try {
+            Insertion insertion = new Insertion(layoutId, null, type);
 
             getItems().add(insertion);
-            notifyItemInserted(getLastPosition());
-        } //else: The absolute footer once inserted, remove it if you need, and try again
+            notifyItemInserted(getItemCount()-1);
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
     }
 
     /**

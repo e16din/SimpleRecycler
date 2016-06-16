@@ -21,7 +21,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.e16din:SimpleRecycler:0.3.4'
+    compile 'com.github.e16din:SimpleRecycler:0.3.5'
 }
 ```
 
@@ -41,8 +41,8 @@ mAdapter.addHeader(R.layout.header);
 mAdapter.addFooter(R.layout.footer);
 
 //add item after footers and before headers
-mAdapter.addItem(item);
-mAdapter.addItem(0, item);
+mAdapter.add(item);
+mAdapter.add(0, item);
 
 //add insertion after footers and before headers
 mAdapter.addInsertion(new Insertion(R.layout.insertion, anyData));

@@ -7,10 +7,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.e16din.simplerecycler.R;
+import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;
 
 public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
+
+    public static final int TYPE_BOTTOM_PROGRESS = Insertion.TYPE_ABSOLUTE_FOOTER + 1;
 
     @LayoutRes
     private int mBottomProgressLayoutId = R.layout.layout_bottom_progress;
@@ -45,10 +48,12 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
 
     @Override
     public void onLastItem() {
-        if (!mAllItemsLoaded) {
-            super.onLastItem();
-        } else {
-            setHasNewItems(false);
+        if (getOnlyItemsCount() >= mPageSize) {
+            if (!mAllItemsLoaded) {
+                fireOnLastItem();
+            } else {
+                setHasNewItems(false);
+            }
         }
     }
 
@@ -59,7 +64,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        if (getItemCount() == 0 && mNeedShowProgressFromStart) {
+        if (mNeedShowProgressFromStart) {
             showBottomProgress();
         }
     }
@@ -75,34 +80,6 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
             setAllItemsLoaded(true);
             hideBottomProgress();
         }
-    }
-
-    @Override
-    public void add(Object item) {
-        hideBottomProgress();
-        super.add(item);
-        showBottomProgress();
-    }
-
-    @Override
-    public void add(int position, Object item) {
-        hideBottomProgress();
-        super.add(position, item);
-        showBottomProgress();
-    }
-
-    @Override
-    public void addAll(List items) {
-        hideBottomProgress();
-        super.addAll(items);
-        showBottomProgress();
-    }
-
-    @Override
-    public void addAll(int position, List items) {
-        hideBottomProgress();
-        super.addAll(position, items);
-        showBottomProgress();
     }
 
     /**
@@ -130,37 +107,15 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         onNewItemsAdded(items == null ? 0 : items.size());
     }
 
-    @Override
-    public void addFooter(@LayoutRes int layoutId) {
-        hideBottomProgress();
-        super.addFooter(layoutId);
-        showBottomProgress();
-    }
-
-    @Override
-    public void addFooter(@LayoutRes int layoutId, Object data) {
-        hideBottomProgress();
-        super.addFooter(layoutId, data);
-        showBottomProgress();
-    }
-
-    @Override
-    public void addHeader(@LayoutRes int layoutId) {
-        hideBottomProgress();
-        super.addHeader(layoutId);
-        showBottomProgress();
-    }
-
-    @Override
-    public void addHeader(@LayoutRes int layoutId, Object data) {
-        hideBottomProgress();
-        super.addHeader(layoutId, data);
-        showBottomProgress();
-    }
-
     public void showBottomProgress() {
+        if (!hasBottomProgress()) {
+            fireShowBottomProgress();
+        }
+    }
+
+    public void fireShowBottomProgress() {
         try {
-            addAbsoluteFooter(mBottomProgressLayoutId);
+            addAbsoluteFooter(mBottomProgressLayoutId, TYPE_BOTTOM_PROGRESS);
         } catch (IllegalStateException e) {
             //todo: update this way
             e.printStackTrace();
@@ -168,15 +123,34 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     }
 
     public void hideBottomProgress() {
-        int position = getAbsoluteFooterPosition();
+        int position = getBottomProgressPosition();
 
         if (position >= 0) {
             remove(position);
         }
     }
 
+    /**
+     * Bottom progress item position.
+     *
+     * @return bottom progress item position or -1 if array is empty
+     */
+    protected int getBottomProgressPosition() {
+        int result = -1;
+        if (getItemCount() == 0) return result;
+
+        for (int i = getItemCount() - 1; i >= 0; i--) {
+            if (isInsertion(i) && getInsertion(i).getType() == TYPE_BOTTOM_PROGRESS) {
+                result = i;
+                break;
+            }
+        }
+
+        return result;
+    }
+
     public boolean hasBottomProgress() {
-        return hasAbsoluteFooter();
+        return getBottomProgressPosition() >= 0;
     }
 
     public void setBottomProgressLayoutId(int bottomProgressLayoutId) {
