@@ -197,7 +197,8 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
     public int getFootersCount() {
         int count = 0;
-        for (int i = getItemCount() - 1; i > 0; i--) {
+
+        for (int i = getItemCount() - 1; i >= 0; i--) {
             if (isInsertion(i)) {
                 Insertion insert = getInsertion(i);
                 if (insert.getType() >= Insertion.TYPE_FOOTER) {
@@ -215,7 +216,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
     public int getHeadersCount() {
         int count = 0;
-        for (int i = 0; i < getItemCount() - 1; i++) {
+        for (int i = 0; i < getItemCount(); i++) {
             if (isInsertion(i)) {
                 Insertion insert = getInsertion(i);
                 if (insert.getType() >= Insertion.TYPE_HEADER
@@ -349,7 +350,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
             Insertion insertion = new Insertion(layoutId, null, type);
 
             getItems().add(insertion);
-            notifyItemInserted(getItemCount()-1);
+            notifyItemInserted(getItemCount() - 1);
         } catch (IllegalStateException e) {
             //todo: update this way
             e.printStackTrace();
