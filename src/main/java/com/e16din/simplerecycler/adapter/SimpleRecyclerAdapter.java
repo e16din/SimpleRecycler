@@ -172,7 +172,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
     @Override
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         FrameLayout vContainer = (FrameLayout)
-                LayoutInflater.from(getContext()).inflate(R.layout.container, parent, false);
+                LayoutInflater.from(getContext()).inflate(R.layout.layout_container, parent, false);
         View v = LayoutInflater.from(parent.getContext()).inflate(mItemLayoutId, parent, false);
         vContainer.addView(v);
         return rippledViewHolder(vContainer);

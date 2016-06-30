@@ -60,6 +60,8 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
     @Override
     protected int calcInsertPosition(int insertPosition) {
+        if(getItemCount() == 0) return 0;
+
         if (isHeader(insertPosition)) {
             for (int i = 0; i <= insertPosition; i++) {
                 if (isHeader(i)) {
@@ -118,7 +120,13 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
         try {
             int insertPosition = getItemCount() - getFootersCount();
-            getItems().add(insertPosition, item);
+
+            if (insertPosition != 0) {
+                getItems().add(insertPosition, item);
+            } else {
+                getItems().add(item);
+            }
+
             notifyItemInserted(insertPosition);
 
         } catch (IllegalStateException e) {
@@ -133,7 +141,13 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
         try {
             int insertPosition = getItemCount() - getFootersCount();
-            getItems().addAll(insertPosition, items);
+
+            if (insertPosition != 0) {
+                getItems().addAll(insertPosition, items);
+            } else {
+                getItems().addAll(items);
+            }
+
             notifyItemRangeInserted(insertPosition, items.size());
 
         } catch (IllegalStateException e) {
@@ -252,7 +266,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
             case TYPE_DEFAULT:
                 return super.onCreateViewHolder(parent, viewType);
             case TYPE_INSERTION:
-                View v = LayoutInflater.from(getContext()).inflate(R.layout.container, parent, false);
+                View v = LayoutInflater.from(getContext()).inflate(R.layout.layout_container, parent, false);
                 return newInsertionViewHolder(v);
         }
 

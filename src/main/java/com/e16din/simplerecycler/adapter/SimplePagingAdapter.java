@@ -69,6 +69,20 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         }
     }
 
+    @Override
+    protected void onBindInsertionViewHolder(SimpleViewHolder holder, int position) {
+        super.onBindInsertionViewHolder(holder, position);
+    }
+
+    //    @Override
+//    protected void addRippleEffect(SimpleViewHolder holder, int position) {
+//        if (position != 1) {//for example, item(1) without ripple
+//            super.addRippleEffect(holder, position);
+//        }
+//    }
+
+
+
     /**
      * Compute mAllItemsLoaded,
      * if size < mPageSize then hide bottom progress and no more show it.
@@ -83,7 +97,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     }
 
     /**
-     * Add items to list.
+     * Add new page to adapter.
      * Call method onNewItemsAdded which check size of array and compute mAllItemsLoaded,
      * if items.size() < mPageSize then hide bottom progress and no more show it.
      *
@@ -94,8 +108,9 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         onNewItemsAdded(items == null ? 0 : items.size());
     }
 
+
     /**
-     * Add items to list.
+     * Add new page to adapter.
      * Call method onNewItemsAdded which check size of array and compute mAllItemsLoaded,
      * if items.size() < mPageSize then hide bottom progress and no more show it.
      *

@@ -7,6 +7,7 @@
 * [SimpleRecyclerView](https://github.com/e16din/SimpleRecycler#simplerecyclerview)
 * [SimpleListView](https://github.com/e16din/SimpleRecycler#simplelistview)
 
+[![Release](https://jitpack.io/v/e16din/SimpleRecycler.svg)](https://jitpack.io/#e16din/SimpleRecycler)
 
 ##Подключаем библиотеку в build.gradle: 
 ```groovy
@@ -21,7 +22,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.e16din:SimpleRecycler:0.3.6'
+    compile 'com.github.e16din:SimpleRecycler:0.+'
 }
 ```
 
@@ -40,15 +41,15 @@ mAdapter.addHeader(R.layout.header);
 //add footer
 mAdapter.addFooter(R.layout.footer);
 
-//add item after footers and before headers
+//add item after headers and before footers
 mAdapter.add(item);
 mAdapter.add(0, item);
 
-//add insertion after footers and before headers
+//add insertion after headers and before footers
 mAdapter.addInsertion(new Insertion(R.layout.insertion, anyData));
 mAdapter.addInsertion(0, new Insertion(R.layout.insertion, anyData));
 
-//add item or insertion after footers and before headers
+//add item or insertion after headers and before footers
 mAdapter.add(itemOrInsertion);
 ```
 
