@@ -1,4 +1,4 @@
-package com.e16din.simplerecycler.adapter;
+package com.e16din.simplerecycler.adapter.holders;
 
 import android.content.Context;
 import android.os.Build;
@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.e16din.simplerecycler.R;
+import com.e16din.simplerecycler.adapter.SimpleViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;

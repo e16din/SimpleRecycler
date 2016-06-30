@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.e16din.simplerecycler.R;
+import com.e16din.simplerecycler.adapter.holders.PagingViewHolder;
 import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;
@@ -80,7 +81,6 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
 //            super.addRippleEffect(holder, position);
 //        }
 //    }
-
 
 
     /**
@@ -193,9 +193,5 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     }
 
     //for newInsertionViewHolder
-    static class PagingViewHolder extends SimpleViewHolder {
-        public PagingViewHolder(View view) {
-            super(view);
-        }
-    }
+
 }

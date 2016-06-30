@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class SimpleViewHolder extends RecyclerView.ViewHolder {
-    View vFirstChild;
-    Drawable mBackgroundDrawable;
-    int mSelectorResId;
-    boolean mIsSelectorEnabled = true;
+    public View vFirstChild;
+    public Drawable mBackgroundDrawable;
+    public int mSelectorResId;
+    public boolean mIsSelectorEnabled = true;
 
     public SimpleViewHolder(View itemView) {
         super(itemView);

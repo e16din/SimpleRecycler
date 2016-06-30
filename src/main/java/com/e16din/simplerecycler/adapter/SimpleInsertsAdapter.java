@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.e16din.simplerecycler.R;
+import com.e16din.simplerecycler.adapter.holders.SimpleRecyclerAdapter;
 import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;

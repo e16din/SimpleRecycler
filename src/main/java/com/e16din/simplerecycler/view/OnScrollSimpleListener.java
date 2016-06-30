@@ -4,7 +4,7 @@ import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.e16din.simplerecycler.adapter.SimpleRecyclerAdapter;
+import com.e16din.simplerecycler.adapter.holders.SimpleRecyclerAdapter;
 
 public class OnScrollSimpleListener extends RecyclerView.OnScrollListener {
 
