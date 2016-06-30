@@ -1,10 +1,13 @@
-package com.e16din.simplerecycler.adapter.holders;
+package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -13,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.e16din.simplerecycler.R;
-import com.e16din.simplerecycler.adapter.SimpleViewHolder;
+import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -323,6 +326,24 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
     public void setHasNewItems(boolean hasNewItems) {
         mHasNewItems = hasNewItems;
     }
+
+
+    public Resources getResources() {
+        return getContext().getResources();
+    }
+
+    public String getString(@StringRes int resId) {
+        return getContext().getString(resId);
+    }
+
+    public int getColor(int resId) {
+        return ContextCompat.getColor(getContext(), resId);
+    }
+
+    public View findViewById(SimpleViewHolder holder, int resId){
+        return holder.itemView.findViewById(resId);
+    }
+
 
     public interface OnItemClickListener<M> {
         void onClick(M item, int position);

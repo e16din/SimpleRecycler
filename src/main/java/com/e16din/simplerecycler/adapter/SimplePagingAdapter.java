@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.adapter.holders.PagingViewHolder;
+import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;

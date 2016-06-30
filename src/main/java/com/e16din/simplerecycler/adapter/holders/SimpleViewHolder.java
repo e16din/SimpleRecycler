@@ -1,4 +1,4 @@
-package com.e16din.simplerecycler.adapter;
+package com.e16din.simplerecycler.adapter.holders;
 
 import android.graphics.drawable.Drawable;
 import android.os.Build;
