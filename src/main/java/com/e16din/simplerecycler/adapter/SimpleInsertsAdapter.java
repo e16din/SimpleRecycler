@@ -13,6 +13,7 @@ import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 import com.e16din.simplerecycler.model.Insertion;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,6 +24,11 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     public static final int TYPE_INSERTION = 1;
 
     private OnInsertionClickListener mOnInsertionClickListener;
+
+    private int mOnlyItemsCount;//count of items exclude all insertions
+    private int mOnlyInsertsCount;//count of inserts exclude headers and footers
+    private int mHeadersCount;
+    private int mFootersCount;
 
     public SimpleInsertsAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
                                 SimpleRecyclerAdapter.OnItemClickListener<M> onItemClickListener) {
@@ -39,6 +45,178 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
     public SimpleInsertsAdapter(@NonNull Context context) {
         super(context);
+    }
+
+    @Override
+    public void remove(int position) {
+        if (isHeader(position)) {
+            mHeadersCount -= 1;
+        } else if (isFooter(position)) {
+            mFootersCount -= 1;
+        } else if (isInsertion(position)) {
+            mOnlyInsertsCount -= 1;
+        } else {
+            mOnlyItemsCount -= 1;
+        }
+
+        super.remove(position);
+    }
+
+    @Override
+    public void clearAll() {
+        mOnlyItemsCount = 0;
+        mOnlyInsertsCount = 0;
+        mHeadersCount = 0;
+        mFootersCount = 0;
+
+        super.clearAll();
+    }
+
+    public void clearAllBetweenHeadersAndFooters() {
+        List headersAndFooters = new ArrayList();
+
+        headersAndFooters.addAll(getHeaders());
+        headersAndFooters.addAll(getFooters());
+
+        try {
+            getItems().clear();
+            mOnlyInsertsCount = 0;
+            mOnlyItemsCount = 0;
+            notifyDataSetChanged();
+            reAddAll(headersAndFooters);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void clearOnlyItems() {
+        List insertions = new ArrayList();
+
+        insertions.addAll(getHeaders());
+        insertions.addAll(getOnlyInsertions());
+        insertions.addAll(getFooters());
+
+        try {
+            getItems().clear();
+            mOnlyItemsCount = 0;
+            notifyDataSetChanged();
+            reAddAll(insertions);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void clearHeaders() {
+        int startHeadersCount = getHeadersCount();
+        if (startHeadersCount == 0) {
+            return;
+        }
+
+        try {
+            List items = getItems();
+
+            while (isHeader(0)) {
+                items.remove(0);
+            }
+
+            mHeadersCount = 0;
+            notifyItemRangeRemoved(0, startHeadersCount);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void clearFooters() {
+        int startItemCount = getItemCount();
+        int startFootersCount = getFootersCount();
+
+        if (startFootersCount == 0) {
+            return;
+        }
+
+        try {
+            List items = getItems();
+
+            while (isHeader(getItemCount() - 1)) {
+                items.remove(getItemCount() - 1);
+            }
+
+            mFootersCount = 0;
+
+            notifyItemRangeRemoved(startItemCount - startFootersCount, startFootersCount);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Clear all insertions with headers and footers
+     */
+    public void clearAllInsertions() {
+        List items = new ArrayList();
+
+        items.addAll(getOnlyItems());
+
+        try {
+            getItems().clear();
+            mOnlyInsertsCount = 0;
+            mHeadersCount = 0;
+            mFootersCount = 0;
+            notifyDataSetChanged();
+            reAddAll(items);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @NonNull
+    public List getOnlyItems() {
+        ArrayList result = new ArrayList();
+
+        for (int i = getHeadersCount(); i < getItemCount() - getFootersCount(); i++) {
+            if (!isInsertion(i)) {
+                result.add(getItems().get(i));
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Get only insertions
+     *
+     * @return Insertions between headers and footers
+     */
+    @NonNull
+    public List getOnlyInsertions() {
+        ArrayList result = new ArrayList();
+
+        for (int i = getHeadersCount(); i < getItemCount() - getFootersCount(); i++) {
+            if (isInsertion(i)) {
+                result.add(getItems().get(i));
+            }
+        }
+
+        return result;
+    }
+
+    @NonNull
+    public List getHeaders() {
+        if (getHeadersCount() > 0) {
+            return getItems().subList(0, getHeadersCount());
+        }
+
+        return new ArrayList();
+    }
+
+    @NonNull
+    public List getFooters() {
+        if (getFootersCount() > 0) {
+            int itemCount = getItemCount();
+            return getItems().subList(itemCount - getFootersCount(), itemCount);
+        }
+
+        return new ArrayList();
     }
 
     protected int getAbsoluteFootersCount() {
@@ -61,7 +239,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
     @Override
     protected int calcInsertPosition(int insertPosition) {
-        if(getItemCount() == 0) return 0;
+        if (getItemCount() == 0) return 0;
 
         if (isHeader(insertPosition)) {
             for (int i = 0; i <= insertPosition; i++) {
@@ -114,19 +292,31 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         add(insertion);
     }
 
+    protected void updateCounter(Object item) {
+        if (item instanceof Insertion) {
+            int type = ((Insertion) item).getType();
+
+            if (type >= Insertion.TYPE_HEADER && type <= Insertion.TYPE_ABSOLUTE_HEADER) {
+                mHeadersCount += 1;
+            } else if (type >= Insertion.TYPE_ABSOLUTE_FOOTER) {
+                mFootersCount += 1;
+            } else {
+                mOnlyInsertsCount += 1;
+            }
+        } else {
+            mOnlyItemsCount += 1;
+        }
+    }
 
     @Override
-    public void add(Object item) {
+    public void add(int position, Object item) {
         setHasNewItems(true);
 
         try {
-            int insertPosition = getItemCount() - getFootersCount();
+            int insertPosition = calcInsertPosition(position);
+            getItems().add(insertPosition, item);
 
-            if (insertPosition != 0) {
-                getItems().add(insertPosition, item);
-            } else {
-                getItems().add(item);
-            }
+            updateCounter(item);
 
             notifyItemInserted(insertPosition);
 
@@ -137,19 +327,69 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     }
 
     @Override
-    public void addAll(List items) {
-        setHasNewItems(items != null && items.size() > 0);
+    public void add(Object item) {
+        setHasNewItems(true);
 
         try {
             int insertPosition = getItemCount() - getFootersCount();
 
-            if (insertPosition != 0) {
-                getItems().addAll(insertPosition, items);
+            if (getFootersCount() == 0) {
+                getItems().add(item);
             } else {
-                getItems().addAll(items);
+                getItems().add(insertPosition, item);
             }
 
-            notifyItemRangeInserted(insertPosition, items.size());
+            updateCounter(item);
+
+            notifyItemInserted(insertPosition);
+
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
+    }
+
+
+    public void reAddAll(List items) {
+        if (items == null || items.size() == 0) {
+            return;
+        }
+
+        try {
+            getItems().addAll(items);
+            //no update counters, because we save their old values
+            notifyItemRangeInserted(0, items.size());
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addAll(List items) {
+        if (items == null || items.size() == 0) {
+            return;
+        }
+
+        int size = items.size();
+
+        setHasNewItems(size > 0);
+
+        try {
+            int insertPosition = getItemCount() - getFootersCount();
+
+            if (getFootersCount() == 0) {
+                getItems().addAll(items);
+            } else {
+                getItems().addAll(insertPosition, items);
+            }
+
+            for (int i = 0; i < items.size(); i++) {
+                Object item = items.get(i);
+                updateCounter(item);
+            }
+
+            notifyItemRangeInserted(insertPosition, size);
 
         } catch (IllegalStateException e) {
             //todo: update this way
@@ -164,8 +404,18 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
      * @param data     data to binding
      */
     public void addHeader(@LayoutRes int layoutId, Object data) {
-        add(0, new Insertion(layoutId, data, Insertion.TYPE_HEADER));
+        try {
+            int insertPosition = calcInsertPosition(0);
+            getItems().add(insertPosition, new Insertion(layoutId, data, Insertion.TYPE_HEADER));
+            mHeadersCount += 1;
+            notifyItemInserted(insertPosition);
+
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
     }
+
 
     /**
      * Add header before all items and after TYPE_ABSOLUTE_HEADER
@@ -189,9 +439,11 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
                 int position = getItemCount() - absoluteFootersCount;
                 getItems().add(position,
                         new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
+                mFootersCount += 1;
                 notifyItemInserted(position);
             } else {
                 getItems().add(new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
+                mFootersCount += 1;
                 notifyItemInserted(getLastItemPosition());
             }
 
@@ -211,41 +463,11 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     }
 
     public int getFootersCount() {
-        int count = 0;
-
-        for (int i = getItemCount() - 1; i >= 0; i--) {
-            if (isInsertion(i)) {
-                Insertion insert = getInsertion(i);
-                if (insert.getType() >= Insertion.TYPE_FOOTER) {
-                    count += 1;
-                } else {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-
-        return count;
+        return mFootersCount;
     }
 
     public int getHeadersCount() {
-        int count = 0;
-        for (int i = 0; i < getItemCount(); i++) {
-            if (isInsertion(i)) {
-                Insertion insert = getInsertion(i);
-                if (insert.getType() >= Insertion.TYPE_HEADER
-                        && insert.getType() < Insertion.TYPE_FOOTER) {
-                    count += 1;
-                } else {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-
-        return count;
+        return mHeadersCount;
     }
 
     @Override
@@ -338,15 +560,22 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         return getOnlyItemsCount() == 0;
     }
 
+    /**
+     * Get only items count
+     *
+     * @return count of items exclude all insertions
+     */
     public int getOnlyItemsCount() {
-        int itemsCount = 0;
-        for (int i = 0; i < getItemCount(); i++) {
-            if (!isInsertion(i)) {
-                itemsCount += 1;
-            }
-        }
+        return mOnlyItemsCount;
+    }
 
-        return itemsCount;
+    /**
+     * Get only inserts count
+     *
+     * @return count of inserts exclude headers and footers
+     */
+    public int getOnlyInsertsCount() {
+        return mOnlyInsertsCount;
     }
 
 
@@ -365,6 +594,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
             Insertion insertion = new Insertion(layoutId, null, type);
 
             getItems().add(insertion);
+            mFootersCount += 1;
             notifyItemInserted(getItemCount() - 1);
         } catch (IllegalStateException e) {
             //todo: update this way

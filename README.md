@@ -1,5 +1,8 @@
 #SimpleRecycler
-Набор для удобной работы со списками.
+Набор для удобной работы со списками, расширяет RecyclerView + RecyclerAdapter.
+
+Добавлен часто используемый функционал, например вставка хедеров, футеров и произвольных элементов, автоматическое добавление ripple effect'а элементам, callback для обработки клика на элемент.
+
 
 * [SimpleAdapter](https://github.com/e16din/SimpleRecycler#simpleadapter)
 * [SimplePagingAdapter](https://github.com/e16din/SimpleRecycler#simplepagingadapter)
@@ -9,7 +12,7 @@
 
 [![Release](https://jitpack.io/v/e16din/SimpleRecycler.svg)](https://jitpack.io/#e16din/SimpleRecycler)
 
-##Подключаем библиотеку в build.gradle: 
+##Подключаем библиотеку в build.gradle:
 ```groovy
 repositories {
     maven { url "https://jitpack.io" }
@@ -27,11 +30,10 @@ dependencies {
 ```
 
 #SimpleAdapter
-Простой в использовании адаптер. 
+Простой в использовании адаптер.
 Автоматически добавляет ripple effect (см. SimpleRecyclerAdapter).
 
 Включает функционал базовых адаптеров(SimplePagingAdapter, SimpleInsertsAdapter, SimpleRecyclerAdapter), каждый из которых можно использовать самостоятельно.
-
 
 ## Добавляем элементы и вставки:
 ```java
@@ -72,13 +74,9 @@ setOnInsertionClickListener(new OnInsertionClickListener() {
         });
 ```
 
-## Активируем footer подгрузки:
-```java
-
-mAdapter.setNeedShowBottomProgress(true);
-```
 
 ## Наследуем SimpleAdapter:
+
 ```java
 public class RecyclerAdapter extends SimpleAdapter<String> {
 
@@ -122,13 +120,6 @@ public class RecyclerAdapter extends SimpleAdapter<String> {
     }
 
     @Override
-    protected void addRippleEffect(ViewGroup vContainer, int position) {
-        if (position != 1) {//for example, item(1) without ripple
-            super.addRippleEffect(vContainer, position);
-        }
-    }
-
-    @Override
     protected ItemViewHolder newViewHolder(View v) {
         return new ItemViewHolder(v);
     }
@@ -161,11 +152,21 @@ public class RecyclerAdapter extends SimpleAdapter<String> {
 
 ```
 
+## Активируем footer подгрузки:
+```java
+
+mAdapter.setNeedShowBottomProgress(true);
+```
+
 #SimplePagingAdapter
 Добавляет элемент загрузки в конец ленты, по умолчанию это progress bar.
 Работает только в паре с SimpleRecyclerView и его наследниками.
+Бар подгрузки скрывается автоматически если добавленных элементов меньше чем getPageSize()
 
 ```java
+//Устанавливаем размер страницы
+setPageSize(20);
+
 //Изменяем макет закрузки:
 mAdapter.setBottomProgressLayoutId(R.layout.footer_progress);
 
@@ -179,6 +180,7 @@ mAdapter.showBottomProgress();
 #SimpleInsertsAdapter
 Включает функционал вставки произвольных View в список элементов.
 Вставка footer'ов и header'ов.
+Имеет отдельный от основного ViewHandler и обрабатывается на onBindInsertionViewHolder.
 
 ============================
 
@@ -188,6 +190,3 @@ mAdapter.showBottomProgress();
 
 #SimpleListView
 Наследуется от SimpleRecyclerView, автоматически устанавливает LinearLayoutManager при создании.
-
-
-

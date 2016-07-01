@@ -109,26 +109,24 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
      * @param position item position
      */
     public void remove(int position) {
-        try {
-            mItems.remove(position);
+        if (getItemCount() >= position) {
+            try {
+                mItems.remove(position);
 
-            notifyItemRemoved(position);
-        } catch (IllegalStateException e) {
-            //todo: update this way
-            e.printStackTrace();
+                notifyItemRemoved(position);
+            } catch (IllegalStateException e) {
+                //todo: update this way
+                e.printStackTrace();
+            }
         }
     }
 
     protected void removeLast() {
-        if (getItemCount() > 0) {
-            remove(getLastItemPosition());
-        }
+        remove(getLastItemPosition());
     }
 
     protected void removeFirst() {
-        if (getItemCount() > 0) {
-            remove(0);
-        }
+        remove(0);
     }
 
     /**
@@ -138,7 +136,11 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
      * @param items    the items
      */
     public void addAll(int position, List items) {
-        setHasNewItems(items != null && items.size() > 0);
+        if (items == null || items.size() == 0) {
+            return;
+        }
+
+        setHasNewItems(items.size() > 0);
 
         try {
             int insertPosition = calcInsertPosition(position);
@@ -192,6 +194,12 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         return holder;
     }
 
+    /**
+     * Add ripple effect to view holder
+     *
+     * @param vRoot  root view
+     * @param holder simple view holder
+     */
     protected void addRippleEffectToHolder(ViewGroup vRoot, SimpleViewHolder holder) {
         if (!mRippleEffectEnabled) return;
 
@@ -340,7 +348,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         return ContextCompat.getColor(getContext(), resId);
     }
 
-    public View findViewById(SimpleViewHolder holder, int resId){
+    public View findViewById(SimpleViewHolder holder, int resId) {
         return holder.itemView.findViewById(resId);
     }
 

@@ -71,19 +71,6 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         }
     }
 
-    @Override
-    protected void onBindInsertionViewHolder(SimpleViewHolder holder, int position) {
-        super.onBindInsertionViewHolder(holder, position);
-    }
-
-    //    @Override
-//    protected void addRippleEffect(SimpleViewHolder holder, int position) {
-//        if (position != 1) {//for example, item(1) without ripple
-//            super.addRippleEffect(holder, position);
-//        }
-//    }
-
-
     /**
      * Compute mAllItemsLoaded,
      * if size < mPageSize then hide bottom progress and no more show it.
@@ -165,6 +152,36 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
         return result;
     }
 
+    @Override
+    public void clearAllInsertions() {
+        boolean hasBottomProgress = hasBottomProgress();
+
+        fireClearAllInsertions();
+
+        if (hasBottomProgress) {
+            showBottomProgress();
+        }
+    }
+
+    @Override
+    public void clearFooters() {
+        boolean hasBottomProgress = hasBottomProgress();
+
+        fireClearFooters();
+
+        if (hasBottomProgress) {
+            showBottomProgress();
+        }
+    }
+
+    public void fireClearFooters() {
+        super.clearFooters();
+    }
+
+    public void fireClearAllInsertions() {
+        super.clearAllInsertions();
+    }
+
     public boolean hasBottomProgress() {
         return getBottomProgressPosition() >= 0;
     }
@@ -192,7 +209,4 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     public void setNeedShowProgressFromStart(boolean needShowProgressFromStart) {
         mNeedShowProgressFromStart = needShowProgressFromStart;
     }
-
-    //for newInsertionViewHolder
-
 }
