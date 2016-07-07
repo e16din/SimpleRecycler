@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class SimpleViewHolder extends RecyclerView.ViewHolder {
-    public View vFirstChild;
+    public View vContainer;
     public Drawable mBackgroundDrawable;
     public int mSelectorResId;
     public boolean mIsSelectorEnabled = true;
@@ -19,8 +19,8 @@ public class SimpleViewHolder extends RecyclerView.ViewHolder {
 
     public void reset() {
         if (itemView instanceof ViewGroup) {
-            if (mIsSelectorEnabled && vFirstChild != null) {
-                vFirstChild.setBackgroundResource(mSelectorResId);
+            if (mIsSelectorEnabled && vContainer != null) {
+                vContainer.setBackgroundResource(mSelectorResId);
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {

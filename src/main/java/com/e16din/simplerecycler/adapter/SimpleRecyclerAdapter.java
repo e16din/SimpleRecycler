@@ -2,21 +2,27 @@ package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Rect;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.e16din.lightutils.LightUtils;
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
+import com.e16din.simplerecycler.view.OnClickTouchListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +31,7 @@ import java.util.List;
 public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<SimpleViewHolder> {
 
     public static final int TYPE_DEFAULT = 0;
+    public static final int INVALID_VALUE = -1;
 
     private final Context mContext;
 
@@ -33,12 +40,16 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
     private int mItemLayoutId;
 
     private OnItemClickListener<M> mOnItemClickListener;
+    private OnItemViewsClickListener<M> mOnItemViewsClickListener;
+
     private Runnable mOnLastItemListener;
 
     private boolean mRippleEffectEnabled = true;
     private SimpleViewHolder mLastHolder;
 
     private boolean mHasNewItems;
+    private List<Integer> mClickableViewsList;
+    private int[] mClickableViewsArray;
 
 
     public void setItemLayoutId(@LayoutRes int layoutId) {
@@ -47,6 +58,8 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
 
     public SimpleRecyclerAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
                                  OnItemClickListener<M> onItemClickListener) {
+        LightUtils.init(context);
+
         mContext = context;
         mItems = items;
         mItemLayoutId = resId;
@@ -72,6 +85,10 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
 
     protected int calcInsertPosition(int position) {
         return position;
+    }
+
+    public void set(int position, String s) {
+        mItems.set(position, s);
     }
 
     /**
@@ -208,9 +225,9 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
     protected void addRippleEffectToHolder(ViewGroup vRoot, SimpleViewHolder holder) {
         if (!mRippleEffectEnabled) return;
 
-        holder.vFirstChild = vRoot.getChildAt(0);
-        if (holder.vFirstChild != null) {
-            holder.mBackgroundDrawable = holder.vFirstChild.getBackground();
+        holder.vContainer = vRoot.getChildAt(0);
+        if (holder.vContainer != null) {
+            holder.mBackgroundDrawable = holder.vContainer.getBackground();
         }
 
         //update ripple effect (or selector for old androids)
@@ -234,21 +251,75 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
     }
 
     protected void onBindItemViewHolder(SimpleViewHolder holder, int position) {
-        updateItemClickListener(position, holder.vFirstChild != null ? holder.vFirstChild : holder.itemView);
+        updateItemClickListener(position, holder.itemView);
     }
 
 
-    protected void updateItemClickListener(final int position, View vItem) {
-        if (mOnItemClickListener != null) {
-            final M item = getItem(position);
+    protected void updateItemClickListener(final int position, View vRoot) {
+        final M item = getItem(position);
 
-            vItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnItemClickListener.onClick(item, position);
+        vRoot.setOnTouchListener(new OnClickTouchListener() {
+            @Override
+            public void onClickTouch(View view, MotionEvent e) {
+                int absPosition = calcAbsolutePosition(position);
+
+                if (mOnItemViewsClickListener != null) {
+                    if (view instanceof ViewGroup) {
+                        ViewGroup vContainer = (ViewGroup) view;
+                        int childViewId = getClickedViewId(vContainer, e);
+
+                        if (childViewId != INVALID_VALUE) {
+                            mOnItemViewsClickListener.onClick(childViewId, item, position, absPosition);
+                        } else if (mOnItemClickListener != null) {
+                            mOnItemClickListener.onClick(item, position, absPosition);
+                        }
+                    }
+                } else if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onClick(item, position, absPosition);
                 }
-            });
+            }
+        });
+    }
+
+    /**
+     * Override it if you need different logic
+     *
+     * @param position item position
+     * @return absolute position
+     */
+    protected int calcAbsolutePosition(int position) {
+        return position;
+    }
+
+    private int getClickedViewId(ViewGroup view, MotionEvent e) {
+        if (mClickableViewsList != null) {
+            for (int viewId : mClickableViewsList) {
+                if (isViewClicked(viewId, view, e)) {
+                    return viewId;
+                }
+            }
         }
+
+        if (mClickableViewsArray != null) {
+            for (int viewId : mClickableViewsArray) {
+                if (isViewClicked(viewId, view, e)) {
+                    return viewId;
+                }
+            }
+        }
+
+        return INVALID_VALUE;
+    }
+
+    @Nullable
+    private boolean isViewClicked(int viewId, ViewGroup vParent, MotionEvent e) {
+        Rect rect = new Rect();
+        int x = (int) e.getRawX();
+        int y = (int) e.getRawY();
+
+        vParent.findViewById(viewId).getGlobalVisibleRect(rect);
+
+        return rect.contains(x, y);
     }
 
     @DrawableRes
@@ -266,7 +337,19 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
     }
 
     public void setOnItemClickListener(OnItemClickListener<M> onItemClickListener) {
-        this.mOnItemClickListener = onItemClickListener;
+        mOnItemClickListener = onItemClickListener;
+    }
+
+    public void setOnItemViewsClickListener(List<Integer> clickableViews,
+                                            OnItemViewsClickListener<M> onItemViewsClickListener) {
+        mClickableViewsList = clickableViews;
+        mOnItemViewsClickListener = onItemViewsClickListener;
+    }
+
+    public void setOnItemViewsClickListener(int[] clickableViews,
+                                            OnItemViewsClickListener<M> onItemViewsClickListener) {
+        mClickableViewsArray = clickableViews;
+        mOnItemViewsClickListener = onItemViewsClickListener;
     }
 
     protected Context getContext() {
@@ -359,6 +442,10 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
 
 
     public interface OnItemClickListener<M> {
-        void onClick(M item, int position);
+        void onClick(M item, int itemPosition, int absolutePosition);
+    }
+
+    public interface OnItemViewsClickListener<M> {
+        void onClick(@IdRes int childViewId, M item, int itemPosition, int absolutePosition);
     }
 }

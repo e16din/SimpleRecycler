@@ -120,7 +120,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
             }
 
             mHeadersCount = 0;
-            notifyItemRangeRemoved(0, startHeadersCount);
+            notifyDataSetChanged();
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
@@ -263,6 +263,12 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     }
 
     @Override
+    protected int calcAbsolutePosition(int position) {
+        return calcInsertPosition(position);
+    }
+
+
+    @Override
     protected int getLastItemPosition() {
         final int onlyItemsCount = getOnlyItemsCount();
         return onlyItemsCount == 0 ? 0 : onlyItemsCount - 1;
@@ -318,7 +324,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
             updateCounter(item);
 
-            notifyItemInserted(insertPosition);
+            notifyDataSetChanged();
 
         } catch (IllegalStateException e) {
             //todo: update this way
@@ -341,7 +347,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
             updateCounter(item);
 
-            notifyItemInserted(insertPosition);
+            notifyDataSetChanged();
 
         } catch (IllegalStateException e) {
             //todo: update this way
@@ -349,7 +355,9 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         }
     }
 
-
+    /**
+     * Add all items without update counters
+     */
     public void reAddAll(List items) {
         if (items == null || items.size() == 0) {
             return;
@@ -389,7 +397,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
                 updateCounter(item);
             }
 
-            notifyItemRangeInserted(insertPosition, size);
+            notifyDataSetChanged();
 
         } catch (IllegalStateException e) {
             //todo: update this way
@@ -408,7 +416,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
             int insertPosition = calcInsertPosition(0);
             getItems().add(insertPosition, new Insertion(layoutId, data, Insertion.TYPE_HEADER));
             mHeadersCount += 1;
-            notifyItemInserted(insertPosition);
+            notifyDataSetChanged();
 
         } catch (IllegalStateException e) {
             //todo: update this way
@@ -513,8 +521,9 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     private void onPreBindInsertionViewHolder(SimpleViewHolder holder, final int position) {
         final Insertion insertion = getInsertion(position);
 
-        ViewGroup vInsertion = (ViewGroup) LayoutInflater.from(getContext()).inflate(
-                insertion.getLayoutId(), null, false);
+        ViewGroup vInsertion = (ViewGroup)
+                LayoutInflater.from(getContext()).inflate(insertion.getLayoutId(), null, false);
+
         FrameLayout vContainer = (FrameLayout) holder.itemView;
         vContainer.removeAllViews();
         vContainer.addView(vInsertion);
