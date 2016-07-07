@@ -100,7 +100,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
      * @param item the item
      */
     public void add(Object item) {
-        add(getLastItemPosition(), item);
+        add(getItemCount(), item);
     }
 
     /**
@@ -119,6 +119,11 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
                 e.printStackTrace();
             }
         }
+    }
+
+    public void removeAll(List items) {
+        getItems().removeAll(items);
+        notifyDataSetChanged();
     }
 
     protected void removeLast() {
@@ -159,7 +164,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
      * @param items the items
      */
     public void addAll(List items) {
-        addAll(getLastItemPosition(), items);
+        addAll(getItemCount(), items);
     }
 
     /**
