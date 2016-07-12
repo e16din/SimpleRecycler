@@ -102,7 +102,11 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
 
         try {
             int insertPosition = calcInsertPosition(position);
-            mItems.add(insertPosition, item);
+            if (insertPosition == getItemCount()) {
+                mItems.add(item);
+            } else {
+                mItems.add(insertPosition, item);
+            }
             notifyItemInserted(insertPosition);
 
         } catch (IllegalStateException e) {
@@ -166,7 +170,11 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
 
         try {
             int insertPosition = calcInsertPosition(position);
-            mItems.addAll(insertPosition, items);
+            if (insertPosition == getItemCount()) {
+                mItems.addAll(items);
+            } else {
+                mItems.addAll(insertPosition, items);
+            }
             notifyItemRangeInserted(insertPosition, items.size());
 
         } catch (IllegalStateException e) {

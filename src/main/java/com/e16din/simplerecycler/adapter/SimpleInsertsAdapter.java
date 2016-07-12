@@ -320,7 +320,12 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
         try {
             int insertPosition = calcInsertPosition(position);
-            getItems().add(insertPosition, item);
+
+            if (insertPosition == getItemCount()) {
+                getItems().add(item);
+            } else {
+                getItems().add(insertPosition, item);
+            }
 
             updateCounter(item);
 
@@ -387,6 +392,38 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
             int insertPosition = getItemCount() - getFootersCount();
 
             if (getFootersCount() == 0) {
+                getItems().addAll(items);
+            } else {
+                getItems().addAll(insertPosition, items);
+            }
+
+            for (int i = 0; i < items.size(); i++) {
+                Object item = items.get(i);
+                updateCounter(item);
+            }
+
+            notifyDataSetChanged();
+
+        } catch (IllegalStateException e) {
+            //todo: update this way
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addAll(int position, List items) {
+        if (items == null || items.size() == 0) {
+            return;
+        }
+
+        int size = items.size();
+
+        setHasNewItems(size > 0);
+
+        try {
+            int insertPosition = calcInsertPosition(position);
+
+            if (insertPosition == getItemCount()) {
                 getItems().addAll(items);
             } else {
                 getItems().addAll(insertPosition, items);

@@ -66,12 +66,12 @@ mAdapter.setOnItemClickListener(new OnItemClickListener<M>() {
         });
         
 //item views
-mAdapter.setOnItemViewsClickListener(new int[]{R.id.vOne, R.id.vTwo, R.id.vThree},
+mAdapter.setOnItemViewsClickListener(new int[] {R.id.vOne, R.id.vTwo, R.id.vThree},
         new SimpleRecyclerAdapter.OnItemViewsClickListener<String>() {
             @Override
             public void onClick(@IdRes int childViewId, String item,
                                      int itemPosition, int absolutePosition) {
-                switch() {
+                switch(childViewId) {
                     case R.id.vOne:
                         mAdapter.set(absolutePosition, "click one!");
                         break;
@@ -88,7 +88,7 @@ mAdapter.setOnItemViewsClickListener(new int[]{R.id.vOne, R.id.vTwo, R.id.vThree
         });
 
 //inserts, headers, footers
-setOnInsertionClickListener(new OnInsertionClickListener() {
+mAdapter.setOnInsertionClickListener(new OnInsertionClickListener() {
             @Override
             public void onClick(Insertion insertion, int position) {
                 //...
