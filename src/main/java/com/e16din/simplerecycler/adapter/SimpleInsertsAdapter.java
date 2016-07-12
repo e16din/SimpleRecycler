@@ -243,7 +243,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
         if (isHeader(insertPosition)) {
             for (int i = 0; i <= insertPosition; i++) {
-                if (isHeader(i)) {
+                if (i < getItemCount() && isHeader(i)) {
                     insertPosition += 1;
                 } else {
                     break;
