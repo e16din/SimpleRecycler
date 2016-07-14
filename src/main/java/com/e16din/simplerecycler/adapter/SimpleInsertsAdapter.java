@@ -5,6 +5,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -12,6 +13,7 @@ import android.widget.FrameLayout;
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 import com.e16din.simplerecycler.model.Insertion;
+import com.e16din.simplerecycler.view.OnClickTouchListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     public static final String LOG_INSERTS = "log_inserts";
 
     public static final int TYPE_INSERTION = 1;
+
 
     private OnInsertionClickListener mOnInsertionClickListener;
 
@@ -263,13 +266,12 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     }
 
     @Override
-    protected int calcAbsolutePosition(int position) {
+    public int calcItemPosition(int position) {
         return calcInsertPosition(position);
     }
 
-
     @Override
-    protected int getLastItemPosition() {
+    public int getLastItemPosition() {
         final int onlyItemsCount = getOnlyItemsCount();
         return onlyItemsCount == 0 ? 0 : onlyItemsCount - 1;
     }
@@ -360,6 +362,14 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         }
     }
 
+    public void fireAdd(int position, Object item) {
+        super.add(position, item);
+    }
+
+    public void fireAdd(Object item) {
+        super.add(item);
+    }
+
     /**
      * Add all items without update counters
      */
@@ -442,6 +452,14 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         }
     }
 
+    public void fireAddAll(int position, List items) {
+        super.addAll(position, items);
+    }
+
+    public void fireAddAll(List items) {
+        super.addAll(items);
+    }
+
     /**
      * Add header before all items and after TYPE_ABSOLUTE_HEADER
      *
@@ -485,7 +503,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
                 getItems().add(position,
                         new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
                 mFootersCount += 1;
-                notifyItemInserted(position);
+                notifyDataSetChanged();
             } else {
                 getItems().add(new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
                 mFootersCount += 1;
@@ -586,6 +604,62 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         addRippleEffectToHolder((ViewGroup) v, holder);
 
         return holder;
+    }
+
+    @Override
+    protected void updateItemClickListener(final int position, View vRoot) {
+        vRoot.setOnTouchListener(null);
+        vRoot.setOnClickListener(null);
+
+        final M item = getItem(position);
+        if (getOnItemClickListener() != null) {
+            vRoot.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getOnItemClickListener().onClick(item, calcItemPosition(position));
+                }
+            });
+            return;
+        }
+
+        if (getOnItemClickListenerWithItemPosition() != null) {
+            vRoot.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getOnItemClickListenerWithItemPosition().onClick(item, position,
+                            calcItemPosition(position));
+                }
+            });
+            return;
+        }
+
+        if (getOnItemViewsClickListener() != null) {
+            vRoot.setOnTouchListener(new OnClickTouchListener() {
+                @Override
+                public void onClickTouch(View view, MotionEvent e) {
+                    int itemPosition = calcItemPosition(position);
+
+                    if (getOnItemViewsClickListener() != null) {
+                        if (view instanceof ViewGroup) {
+                            ViewGroup vContainer = (ViewGroup) view;
+                            int childViewId = getClickedViewId(vContainer, e);
+
+                            if (childViewId != INVALID_VALUE) {
+                                getOnItemViewsClickListener().onClick(childViewId, item, position, itemPosition);
+                            } else if (getOnItemClickListener() != null) {
+                                getOnItemClickListener().onClick(item, itemPosition);
+                            } else if (getOnItemClickListenerWithItemPosition() != null) {
+                                getOnItemClickListenerWithItemPosition().onClick(item, position, itemPosition);
+                            }
+                        }
+                    } else if (getOnItemClickListener() != null) {
+                        getOnItemClickListener().onClick(item, itemPosition);
+                    } else if (getOnItemClickListenerWithItemPosition() != null) {
+                        getOnItemClickListenerWithItemPosition().onClick(item, position, itemPosition);
+                    }
+                }
+            });
+        }
     }
 
     /**

@@ -40,6 +40,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
     private int mItemLayoutId;
 
     private OnItemClickListener<M> mOnItemClickListener;
+    private OnItemClickListenerWithItemPosition<M> mOnItemClickListenerWithItemPosition;
     private OnItemViewsClickListener<M> mOnItemViewsClickListener;
 
     private Runnable mOnLastItemListener;
@@ -107,7 +108,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
             } else {
                 mItems.add(insertPosition, item);
             }
-            notifyItemInserted(insertPosition);
+            notifyDataSetChanged();
 
         } catch (IllegalStateException e) {
             //todo: update this way
@@ -134,7 +135,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
             try {
                 mItems.remove(position);
 
-                notifyItemRemoved(position);
+                notifyDataSetChanged();
             } catch (IllegalStateException e) {
                 //todo: update this way
                 e.printStackTrace();
@@ -264,29 +265,58 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
 
 
     protected void updateItemClickListener(final int position, View vRoot) {
+        vRoot.setOnTouchListener(null);
+        vRoot.setOnClickListener(null);
+
         final M item = getItem(position);
-
-        vRoot.setOnTouchListener(new OnClickTouchListener() {
-            @Override
-            public void onClickTouch(View view, MotionEvent e) {
-                int absPosition = calcAbsolutePosition(position);
-
-                if (mOnItemViewsClickListener != null) {
-                    if (view instanceof ViewGroup) {
-                        ViewGroup vContainer = (ViewGroup) view;
-                        int childViewId = getClickedViewId(vContainer, e);
-
-                        if (childViewId != INVALID_VALUE) {
-                            mOnItemViewsClickListener.onClick(childViewId, item, position, absPosition);
-                        } else if (mOnItemClickListener != null) {
-                            mOnItemClickListener.onClick(item, position, absPosition);
-                        }
-                    }
-                } else if (mOnItemClickListener != null) {
-                    mOnItemClickListener.onClick(item, position, absPosition);
+        if (mOnItemClickListener != null) {
+            vRoot.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mOnItemClickListener.onClick(item, position);
                 }
-            }
-        });
+            });
+            return;
+        }
+
+        if (mOnItemClickListenerWithItemPosition != null) {
+            vRoot.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mOnItemClickListenerWithItemPosition.onClick(item, position,
+                            calcItemPosition(position));
+                }
+            });
+            return;
+        }
+
+        if (mOnItemViewsClickListener != null) {
+            vRoot.setOnTouchListener(new OnClickTouchListener() {
+                @Override
+                public void onClickTouch(View view, MotionEvent e) {
+                    int itemPosition = calcItemPosition(position);
+
+                    if (mOnItemViewsClickListener != null) {
+                        if (view instanceof ViewGroup) {
+                            ViewGroup vContainer = (ViewGroup) view;
+                            int childViewId = getClickedViewId(vContainer, e);
+
+                            if (childViewId != INVALID_VALUE) {
+                                mOnItemViewsClickListener.onClick(childViewId, item, position, itemPosition);
+                            } else if (mOnItemClickListener != null) {
+                                mOnItemClickListener.onClick(item, position);
+                            } else if (mOnItemClickListenerWithItemPosition != null) {
+                                mOnItemClickListenerWithItemPosition.onClick(item, position, itemPosition);
+                            }
+                        }
+                    } else if (mOnItemClickListener != null) {
+                        mOnItemClickListener.onClick(item, position);
+                    } else if (mOnItemClickListenerWithItemPosition != null) {
+                        mOnItemClickListenerWithItemPosition.onClick(item, position, itemPosition);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -295,11 +325,11 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
      * @param position item position
      * @return absolute position
      */
-    protected int calcAbsolutePosition(int position) {
+    public int calcItemPosition(int position) {
         return position;
     }
 
-    private int getClickedViewId(ViewGroup view, MotionEvent e) {
+    protected int getClickedViewId(ViewGroup view, MotionEvent e) {
         if (mClickableViewsList != null) {
             for (int viewId : mClickableViewsList) {
                 if (isViewClicked(viewId, view, e)) {
@@ -393,6 +423,14 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         this.mOnLastItemListener = onLastItemListener;
     }
 
+    public OnItemClickListenerWithItemPosition<M> getOnItemClickListenerWithItemPosition() {
+        return mOnItemClickListenerWithItemPosition;
+    }
+
+    public OnItemViewsClickListener<M> getOnItemViewsClickListener() {
+        return mOnItemViewsClickListener;
+    }
+
     public boolean isRippleEffectEnabled() {
         return mRippleEffectEnabled;
     }
@@ -410,7 +448,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
      *
      * @return size of all items and insertions - 1
      */
-    protected int getLastItemPosition() {
+    public int getLastItemPosition() {
         return getItemCount() == 0 ? 0 : getItemCount() - 1;
     }
 
@@ -448,12 +486,21 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         return holder.itemView.findViewById(resId);
     }
 
+    public void setOnItemClickListenerWithItemPosition(
+            OnItemClickListenerWithItemPosition<M> onItemClickListenerWithItemPosition) {
+        mOnItemClickListenerWithItemPosition = onItemClickListenerWithItemPosition;
+    }
+
 
     public interface OnItemClickListener<M> {
-        void onClick(M item, int itemPosition, int absolutePosition);
+        void onClick(M item, int position);
+    }
+
+    public interface OnItemClickListenerWithItemPosition<M> {
+        void onClick(M item, int position, int itemPosition);
     }
 
     public interface OnItemViewsClickListener<M> {
-        void onClick(@IdRes int childViewId, M item, int itemPosition, int absolutePosition);
+        void onClick(@IdRes int childViewId, M item, int position, int itemPosition);
     }
 }
