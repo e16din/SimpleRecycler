@@ -60,7 +60,7 @@ mAdapter.add(itemOrInsertion);
 //items
 mAdapter.setOnItemClickListener(new OnItemClickListener<M>() {
             @Override
-            public void onClick(M item, int itemPosition, int absolutePosition) {
+            public void onClick(M item, int position) {
                 //...
             }
         });
@@ -70,10 +70,10 @@ mAdapter.setOnItemViewsClickListener(new int[] {R.id.vOne, R.id.vTwo, R.id.vThre
         new SimpleRecyclerAdapter.OnItemViewsClickListener<String>() {
             @Override
             public void onClick(@IdRes int childViewId, String item,
-                                     int itemPosition, int absolutePosition) {
+                                     int position, int itemPosition) {
                 switch(childViewId) {
                     case R.id.vOne:
-                        mAdapter.set(absolutePosition, "click one!");
+                        mAdapter.set(itemPosition, "click one!");
                         break;
                     case R.id.vTwo:
                         //do two
@@ -83,7 +83,7 @@ mAdapter.setOnItemViewsClickListener(new int[] {R.id.vOne, R.id.vTwo, R.id.vThre
                         break;
                 }
 
-                mAdapter.notifyItemChanged(absolutePosition);
+                mAdapter.notifyItemChanged(itemPosition);
             }
         });
 
