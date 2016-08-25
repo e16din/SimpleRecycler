@@ -1,5 +1,5 @@
 # SimpleRecycler
--------------------
+
 [![Release](https://jitpack.io/v/e16din/SimpleRecycler.svg)](https://jitpack.io/#e16din/SimpleRecycler)
 
 This library extends RecyclerView + Recycler Adapter.
