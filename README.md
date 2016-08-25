@@ -1,41 +1,21 @@
-#SimpleRecycler
-Набор для удобной работы со списками, расширяет RecyclerView + RecyclerAdapter.
-
-Добавлен часто используемый функционал, например вставка хедеров, футеров и произвольных элементов, автоматическое добавление ripple effect'а элементам, callback для обработки клика на элемент.
-
-
-* [SimpleAdapter](https://github.com/e16din/SimpleRecycler#simpleadapter)
-* [SimplePagingAdapter](https://github.com/e16din/SimpleRecycler#simplepagingadapter)
-* [SimpleInsertsAdapter](https://github.com/e16din/SimpleRecycler#simpleinsertsadapter)
-* [SimpleRecyclerView](https://github.com/e16din/SimpleRecycler#simplerecyclerview)
-* [SimpleListView](https://github.com/e16din/SimpleRecycler#simplelistview)
-
+# SimpleRecycler
+-------------------
 [![Release](https://jitpack.io/v/e16din/SimpleRecycler.svg)](https://jitpack.io/#e16din/SimpleRecycler)
 
-##Подключаем библиотеку в build.gradle:
-```groovy
-repositories {
-    maven { url "https://jitpack.io" }
-}
+This library extends RecyclerView + Recycler Adapter.
 
-buildscript {
-    repositories {
-        maven { url "https://jitpack.io" }
-    }
-}
+Use it to comfortable work with lists.
 
-dependencies {
-    compile 'com.github.e16din:SimpleRecycler:0.+'
-}
-```
+## From the box:
+* Ripple-effect to items
+* Headers and Footers like in the ListView
+* Custom Insertions between items
+* OnItemClickListener and handy OnItemViewsClickListener
+* Paging with inner logic to load more data
 
-#SimpleAdapter
-Простой в использовании адаптер.
-Автоматически добавляет ripple effect (см. SimpleRecyclerAdapter).
 
-Включает функционал базовых адаптеров(SimplePagingAdapter, SimpleInsertsAdapter, SimpleRecyclerAdapter), каждый из которых можно использовать самостоятельно.
-
-## Добавляем элементы и вставки:
+## Usage
+### Add items
 ```java
 //add header
 mAdapter.addHeader(R.layout.header);
@@ -43,102 +23,45 @@ mAdapter.addHeader(R.layout.header);
 //add footer
 mAdapter.addFooter(R.layout.footer);
 
-//add item after headers and before footers
-mAdapter.add(item);
-mAdapter.add(0, item);
-
 //add insertion after headers and before footers
 mAdapter.addInsertion(new Insertion(R.layout.insertion, anyData));
-mAdapter.addInsertion(0, new Insertion(R.layout.insertion, anyData));
 
-//add item or insertion after headers and before footers
+//add item after headers and before footers
 mAdapter.add(itemOrInsertion);
 ```
 
-## Добавляем обработчики кликов:
+### Set click listeners
 ```java
-//items
-mAdapter.setOnItemClickListener(new OnItemClickListener<M>() {
-            @Override
-            public void onClick(M item, int position) {
-                //...
-            }
-        });
-        
-//item views
-mAdapter.setOnItemViewsClickListener(new int[] {R.id.vOne, R.id.vTwo, R.id.vThree},
-        new SimpleRecyclerAdapter.OnItemViewsClickListener<String>() {
-            @Override
-            public void onClick(@IdRes int childViewId, String item,
-                                     int position, int itemPosition) {
-                switch(childViewId) {
-                    case R.id.vOne:
-                        mAdapter.set(itemPosition, "click one!");
-                        break;
-                    case R.id.vTwo:
-                        //do two
-                        break;
-                    case R.id.vThree:
-                        //do three
-                        break;
-                }
-
-                mAdapter.notifyItemChanged(itemPosition);
-            }
-        });
-
-//inserts, headers, footers
-mAdapter.setOnInsertionClickListener(new OnInsertionClickListener() {
-            @Override
-            public void onClick(Insertion insertion, int position) {
-                //...
-            }
-        });
-```
-
-
-## Наследуем SimpleAdapter:
-
-```java
-public class RecyclerAdapter extends SimpleAdapter<String> {
-
-    public RecyclerAdapter(@NonNull Context context, @NonNull List<Object> items) {
-        super(context, items, R.layout.item_simple_recycler);
-        setNeedShowBottomProgress(true);
-    }
-
+mAdapter.setOnItemClickListener(new SimpleAdapter.OnItemClickListener<String>() {
     @Override
-    protected void onBindItemViewHolder(SimpleViewHolder holder, int position) {
-        super.onBindItemViewHolder(holder, position);
-        ItemViewHolder h = (ItemViewHolder) holder;
-
-        String item = getItem(position);
-
-        h.vItemText.setText(item);
+    public void onClick(String item, int position) {
+        // do something
     }
+});
 
+mAdapter.setOnItemViewsClickListener(new int[]{R.id.vName, R.id.vClickableImage},
+    new SimpleRecyclerAdapter.OnItemViewsClickListener<String>() {
     @Override
-    protected void onBindInsertionViewHolder(SimpleViewHolder holder, int position) {
-        super.onBindInsertionViewHolder(holder, position);
-        InsertionViewHolder h = (InsertionViewHolder) holder;
-
-        Insertion insertion = getInsertion(position);
-
-        String text = null;
-        switch (insertion.getType()) {
-            case Insertion.TYPE_HEADER:
-                text = "Header";
+    public void onClick(@IdRes int childViewId, String item, int position) {
+        switch (childViewId) {
+            case R.id.vName:
+                // on vName click!
                 break;
-            case Insertion.TYPE_DEFAULT:
-                text = position - getHeadersCount() + ". Default insertion";
-                break;
-            case Insertion.TYPE_FOOTER:
-                text = "Footer";
+            case R.id.vClickableImage:
+                // on vClickableImage click!
                 break;
         }
+    }
+});
+```
 
-        h.vText.setText(text);
-        h.vInsertionData.setText("" + insertion.getData());
+### Implement adapter
+```java
+public class MyAdapter extends SimpleAdapter<String, RecyclerAdapter.ItemViewHolder> {
+
+    public MyAdapter(Context context, List<Object> items) {
+        super(context, items, R.layout.item_simple_recycler);
+        setNeedShowBottomProgress(true);
     }
 
     @Override
@@ -147,68 +70,65 @@ public class RecyclerAdapter extends SimpleAdapter<String> {
     }
 
     @Override
-    public InsertionViewHolder newInsertionViewHolder(View v) {
-        return new InsertionViewHolder(v);
+    protected void onBindItemViewHolder(ItemViewHolder holder, int position) {
+        super.onBindItemViewHolder(holder, position);
+
+        String item = getItem(position);
+
+        holder.vName.setText(item);
+    }
+
+    @Override
+    protected void onBindHeaderViewHolder(SimpleViewHolder holder, int position) {
+        //do something with headers
     }
 
     static class ItemViewHolder extends SimpleViewHolder {
-        TextView vItemText;
+        TextView vName;
 
         public ItemViewHolder(View view) {
             super(view);
-            vItemText = (TextView) view.findViewById(R.id.vItemText);
-        }
-    }
-
-    static class InsertionViewHolder extends SimpleViewHolder {
-        TextView vText;
-        TextView vInsertionData;
-
-        public InsertionViewHolder(View view) {
-            super(view);
-            vText = (TextView) view.findViewById(R.id.vText);
-            vInsertionData = (TextView) view.findViewById(R.id.vInsertionData);
+            vName = (TextView) view.findViewById(R.id.vName);
         }
     }
 }
-
 ```
 
-## Активируем footer подгрузки:
-```java
 
-mAdapter.setNeedShowBottomProgress(true);
+## Download
+Step 1. Add it in your root build.gradle at the end of repositories:
+```groovy
+    allprojects {
+        repositories {
+            ...
+            maven { url "https://jitpack.io" }
+        }
+    }
+```
+Step 2. Add the dependency
+```groovy
+    dependencies {
+        compile 'com.github.e16din:SimpleRecycler:0.4.5'
+    }
 ```
 
-#SimplePagingAdapter
-Добавляет элемент загрузки в конец ленты, по умолчанию это progress bar.
-Работает только в паре с SimpleRecyclerView и его наследниками.
-Бар подгрузки скрывается автоматически если добавленных элементов меньше чем getPageSize()
+## License MIT
+Copyright (c) 2016 [Александр Кундрюков (e16din)](https://goo.gl/4xTCko)
 
-```java
-//Устанавливаем размер страницы
-setPageSize(20);
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-//Изменяем макет закрузки:
-mAdapter.setBottomProgressLayoutId(R.layout.footer_progress);
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-//Скрываем загрузку:
-mAdapter.hideBottomProgress();
-
-//Показываем загрузку:
-mAdapter.showBottomProgress();
-```
-
-#SimpleInsertsAdapter
-Включает функционал вставки произвольных View в список элементов.
-Вставка footer'ов и header'ов.
-Имеет отдельный от основного ViewHandler и обрабатывается на onBindInsertionViewHolder.
-
-============================
-
-#SimpleRecyclerView
-Наследуется от RecyclerView, добавляет логику взаимодействия с SimpleRecyclerAdapter и SimplePagingAdapter.
-Сейчас это отслеживание последнего элемента при скролле.
-
-#SimpleListView
-Наследуется от SimpleRecyclerView, автоматически устанавливает LinearLayoutManager при создании.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
