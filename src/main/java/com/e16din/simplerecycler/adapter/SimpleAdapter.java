@@ -3,13 +3,17 @@ package com.e16din.simplerecycler.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
+
 import java.util.List;
 
-public abstract class SimpleAdapter<T> extends SimplePagingAdapter<T> {
+public abstract class SimpleAdapter<MODEL, HOLDER extends SimpleViewHolder> extends SimplePagingAdapter<MODEL, HOLDER> {
+
     private boolean mNeedShowBottomProgress = false;
 
+
     public SimpleAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
-                         OnItemClickListener<T> onItemClickListener) {
+                         OnItemClickListener<MODEL> onItemClickListener) {
         super(context, items, resId, onItemClickListener);
     }
 

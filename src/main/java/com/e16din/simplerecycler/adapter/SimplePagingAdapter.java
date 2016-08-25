@@ -4,16 +4,15 @@ import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
 import com.e16din.simplerecycler.R;
-import com.e16din.simplerecycler.adapter.holders.PagingViewHolder;
 import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;
 
-public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
+public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder>
+        extends SimpleInsertsAdapter<MODEL, HOLDER> {
 
     public static final int TYPE_BOTTOM_PROGRESS = Insertion.TYPE_ABSOLUTE_FOOTER + 1;
 
@@ -26,7 +25,7 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
     private boolean mNeedShowProgressFromStart = true;
 
     public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
-                               OnItemClickListener<T> onItemClickListener) {
+                               OnItemClickListener<MODEL> onItemClickListener) {
         super(context, items, resId, onItemClickListener);
     }
 
@@ -40,12 +39,6 @@ public abstract class SimplePagingAdapter<T> extends SimpleInsertsAdapter<T> {
 
     public SimplePagingAdapter(@NonNull Context context) {
         super(context);
-    }
-
-
-    @Override
-    public SimpleViewHolder newInsertionViewHolder(View v) {
-        return new PagingViewHolder(v);
     }
 
     @Override

@@ -31,4 +31,9 @@ public class SimpleListView extends SimpleRecyclerView {
     private void init(Context context) {
         setLayoutManager(new LinearLayoutManager(context));
     }
+
+    @Override
+    public LinearLayoutManager getLayoutManager() {
+        return (LinearLayoutManager) super.getLayoutManager();
+    }
 }

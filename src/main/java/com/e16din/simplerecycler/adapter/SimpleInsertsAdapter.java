@@ -4,8 +4,8 @@ import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -13,15 +13,13 @@ import android.widget.FrameLayout;
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 import com.e16din.simplerecycler.model.Insertion;
-import com.e16din.simplerecycler.view.OnClickTouchListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
-
-    public static final String LOG_INSERTS = "log_inserts";
+public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolder>
+        extends SimpleRecyclerAdapter<MODEL, HOLDER> {
 
     public static final int TYPE_INSERTION = 1;
 
@@ -34,7 +32,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     private int mFootersCount;
 
     public SimpleInsertsAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
-                                SimpleRecyclerAdapter.OnItemClickListener<M> onItemClickListener) {
+                                SimpleRecyclerAdapter.OnItemClickListener<MODEL> onItemClickListener) {
         super(context, items, resId, onItemClickListener);
     }
 
@@ -76,7 +74,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     }
 
     public void clearAllBetweenHeadersAndFooters() {
-        List headersAndFooters = new ArrayList();
+        List<Object> headersAndFooters = new ArrayList<>();
 
         headersAndFooters.addAll(getHeaders());
         headersAndFooters.addAll(getFooters());
@@ -93,7 +91,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     }
 
     public void clearOnlyItems() {
-        List insertions = new ArrayList();
+        List<Object> insertions = new ArrayList<>();
 
         insertions.addAll(getHeaders());
         insertions.addAll(getOnlyInsertions());
@@ -156,7 +154,7 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
      * Clear all insertions with headers and footers
      */
     public void clearAllInsertions() {
-        List items = new ArrayList();
+        List<Object> items = new ArrayList<>();
 
         items.addAll(getOnlyItems());
 
@@ -173,13 +171,11 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     }
 
     @NonNull
-    public List getOnlyItems() {
-        ArrayList result = new ArrayList();
+    public List<MODEL> getOnlyItems() {
+        ArrayList<MODEL> result = new ArrayList<>();
 
         for (int i = getHeadersCount(); i < getItemCount() - getFootersCount(); i++) {
-            if (!isInsertion(i)) {
-                result.add(getItems().get(i));
-            }
+            result.add(getItem(i));
         }
 
         return result;
@@ -191,12 +187,12 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
      * @return Insertions between headers and footers
      */
     @NonNull
-    public List getOnlyInsertions() {
-        ArrayList result = new ArrayList();
+    public List<Insertion> getOnlyInsertions() {
+        ArrayList<Insertion> result = new ArrayList<>();
 
         for (int i = getHeadersCount(); i < getItemCount() - getFootersCount(); i++) {
             if (isInsertion(i)) {
-                result.add(getItems().get(i));
+                result.add((Insertion) getItems().get(i));
             }
         }
 
@@ -204,22 +200,22 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
     }
 
     @NonNull
-    public List getHeaders() {
+    public List<Object> getHeaders() {
         if (getHeadersCount() > 0) {
             return getItems().subList(0, getHeadersCount());
         }
 
-        return new ArrayList();
+        return new ArrayList<>();
     }
 
     @NonNull
-    public List getFooters() {
+    public List<Object> getFooters() {
         if (getFootersCount() > 0) {
             int itemCount = getItemCount();
             return getItems().subList(itemCount - getFootersCount(), itemCount);
         }
 
-        return new ArrayList();
+        return new ArrayList<>();
     }
 
     protected int getAbsoluteFootersCount() {
@@ -263,11 +259,6 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         }
 
         return insertPosition;
-    }
-
-    @Override
-    public int calcItemPosition(int position) {
-        return calcInsertPosition(position);
     }
 
     @Override
@@ -559,7 +550,12 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         return null;
     }
 
-    public abstract SimpleViewHolder newInsertionViewHolder(View v);
+    /**
+     * Override this method if you need to bind view holder for insertions
+     */
+    public SimpleViewHolder newInsertionViewHolder(View v) {
+        return new SimpleViewHolder(v);//empty view holder
+    }
 
     @Override
     public void onBindViewHolder(SimpleViewHolder holder, int position) {
@@ -595,9 +591,20 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
 
         holder = rippledInsertionViewHolder(vContainer);
 
-        onBindInsertionViewHolder(holder, position);
+        onBindInsertionViewHolder((HOLDER) holder, position);
+
+        switch (insertion.getType()) {
+            case Insertion.TYPE_HEADER:
+                onBindHeaderViewHolder(holder, position);
+                break;
+            case Insertion.TYPE_FOOTER:
+                onBindFooterViewHolder(holder, position);
+                break;
+        }
+
     }
 
+    @Nullable
     protected SimpleViewHolder rippledInsertionViewHolder(View v) {
         SimpleViewHolder holder = newInsertionViewHolder(v);
 
@@ -606,69 +613,32 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
         return holder;
     }
 
-    @Override
-    protected void updateItemClickListener(final int position, View vRoot) {
-        vRoot.setOnTouchListener(null);
-        vRoot.setOnClickListener(null);
-
-        final M item = getItem(position);
-        if (getOnItemClickListener() != null) {
-            vRoot.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    getOnItemClickListener().onClick(item, calcItemPosition(position));
-                }
-            });
-            return;
-        }
-
-        if (getOnItemClickListenerWithItemPosition() != null) {
-            vRoot.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    getOnItemClickListenerWithItemPosition().onClick(item, position,
-                            calcItemPosition(position));
-                }
-            });
-            return;
-        }
-
-        if (getOnItemViewsClickListener() != null) {
-            vRoot.setOnTouchListener(new OnClickTouchListener() {
-                @Override
-                public void onClickTouch(View view, MotionEvent e) {
-                    int itemPosition = calcItemPosition(position);
-
-                    if (getOnItemViewsClickListener() != null) {
-                        if (view instanceof ViewGroup) {
-                            ViewGroup vContainer = (ViewGroup) view;
-                            int childViewId = getClickedViewId(vContainer, e);
-
-                            if (childViewId != INVALID_VALUE) {
-                                getOnItemViewsClickListener().onClick(childViewId, item, position, itemPosition);
-                            } else if (getOnItemClickListener() != null) {
-                                getOnItemClickListener().onClick(item, itemPosition);
-                            } else if (getOnItemClickListenerWithItemPosition() != null) {
-                                getOnItemClickListenerWithItemPosition().onClick(item, position, itemPosition);
-                            }
-                        }
-                    } else if (getOnItemClickListener() != null) {
-                        getOnItemClickListener().onClick(item, itemPosition);
-                    } else if (getOnItemClickListenerWithItemPosition() != null) {
-                        getOnItemClickListenerWithItemPosition().onClick(item, position, itemPosition);
-                    }
-                }
-            });
-        }
-    }
-
     /**
-     * Override it to set data on your insertions
+     * Override this method to update your insertions
      *
      * @param holder   view holder
      * @param position insertion position
      */
     protected void onBindInsertionViewHolder(SimpleViewHolder holder, int position) {
+    }
+
+    /**
+     * Override this method to update your footers
+     *
+     * @param holder   view holder
+     * @param position footer position
+     */
+    protected void onBindFooterViewHolder(SimpleViewHolder holder, int position) {
+
+    }
+
+    /**
+     * Override this method to update your headers
+     *
+     * @param holder   view holder
+     * @param position header position
+     */
+    protected void onBindHeaderViewHolder(SimpleViewHolder holder, int position) {
     }
 
     @DrawableRes
@@ -728,14 +698,14 @@ public abstract class SimpleInsertsAdapter<M> extends SimpleRecyclerAdapter<M> {
      * @param position position of item
      * @return item or null if it is insertion object
      */
-    public M getItem(int position) {
+    public MODEL getItem(int position) {
         return !isInsertion(position) ? super.getItem(position) : null;
     }
 
     /**
      * Get insertion by position
      *
-     * @param position
+     * @param position position of insertion
      * @return insertion or null if it is item object
      */
     public Insertion getInsertion(int position) {

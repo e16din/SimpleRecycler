@@ -8,7 +8,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -19,16 +18,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.e16din.lightutils.LightUtils;
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
-import com.e16din.simplerecycler.view.OnClickTouchListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<SimpleViewHolder> {
+public abstract class SimpleRecyclerAdapter<MODEL, HOLDER extends SimpleViewHolder>
+        extends RecyclerView.Adapter<SimpleViewHolder> {
 
     public static final int TYPE_DEFAULT = 0;
     public static final int INVALID_VALUE = -1;
@@ -39,9 +37,8 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
 
     private int mItemLayoutId;
 
-    private OnItemClickListener<M> mOnItemClickListener;
-    private OnItemClickListenerWithItemPosition<M> mOnItemClickListenerWithItemPosition;
-    private OnItemViewsClickListener<M> mOnItemViewsClickListener;
+    private OnItemClickListener<MODEL> mOnItemClickListener;
+    private OnItemViewsClickListener<MODEL> mOnItemViewsClickListener;
 
     private Runnable mOnLastItemListener;
 
@@ -58,9 +55,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
     }
 
     public SimpleRecyclerAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
-                                 OnItemClickListener<M> onItemClickListener) {
-        LightUtils.init(context);
-
+                                 OnItemClickListener<MODEL> onItemClickListener) {
         mContext = context;
         mItems = items;
         mItemLayoutId = resId;
@@ -215,10 +210,10 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         return rippledViewHolder(vContainer);
     }
 
-    protected abstract SimpleViewHolder newViewHolder(View v);
+    protected abstract HOLDER newViewHolder(View v);
 
-    protected SimpleViewHolder rippledViewHolder(View v) {
-        SimpleViewHolder holder = newViewHolder(v);
+    protected HOLDER rippledViewHolder(View v) {
+        HOLDER holder = newViewHolder(v);
 
         addRippleEffectToHolder((ViewGroup) v, holder);
 
@@ -231,7 +226,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
      * @param vRoot  root view
      * @param holder simple view holder
      */
-    protected void addRippleEffectToHolder(ViewGroup vRoot, SimpleViewHolder holder) {
+    protected void addRippleEffectToHolder(@NonNull ViewGroup vRoot, @NonNull SimpleViewHolder holder) {
         if (!mRippleEffectEnabled) return;
 
         holder.vContainer = vRoot.getChildAt(0);
@@ -254,79 +249,56 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
 
     @Override
     public void onBindViewHolder(SimpleViewHolder holder, final int position) {
-        onBindItemViewHolder(holder, position);
+        onBindItemViewHolder((HOLDER) holder, position);
 
         setLastHolder(position == getItemCount() - 1 ? holder : null);
     }
 
-    protected void onBindItemViewHolder(SimpleViewHolder holder, int position) {
+    protected void onBindItemViewHolder(HOLDER holder, int position) {
         updateItemClickListener(position, holder.itemView);
     }
 
 
-    protected void updateItemClickListener(final int position, View vRoot) {
-        vRoot.setOnTouchListener(null);
+    protected void updateItemClickListener(final int position, @NonNull View vRoot) {
         vRoot.setOnClickListener(null);
 
-        final M item = getItem(position);
-        if (mOnItemClickListener != null) {
-            vRoot.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mOnItemClickListener.onClick(item, position);
-                }
-            });
-            return;
+
+        if (mOnItemClickListener == null) return;
+
+
+        final MODEL item = getItem(position);
+
+        vRoot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mOnItemClickListener.onClick(item, position);
+            }
+        });
+
+
+        if (mOnItemViewsClickListener == null) return;
+
+
+        if (mClickableViewsList != null) {
+            for (final int viewId : mClickableViewsList) {
+                updateChildViewClickListener(position, vRoot, item, viewId);
+            }
         }
 
-        if (mOnItemClickListenerWithItemPosition != null) {
-            vRoot.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mOnItemClickListenerWithItemPosition.onClick(item, position,
-                            calcItemPosition(position));
-                }
-            });
-            return;
-        }
-
-        if (mOnItemViewsClickListener != null) {
-            vRoot.setOnTouchListener(new OnClickTouchListener() {
-                @Override
-                public void onClickTouch(View view, MotionEvent e) {
-                    int itemPosition = calcItemPosition(position);
-
-                    if (mOnItemViewsClickListener != null) {
-                        if (view instanceof ViewGroup) {
-                            ViewGroup vContainer = (ViewGroup) view;
-                            int childViewId = getClickedViewId(vContainer, e);
-
-                            if (childViewId != INVALID_VALUE) {
-                                mOnItemViewsClickListener.onClick(childViewId, item, position, itemPosition);
-                            } else if (mOnItemClickListener != null) {
-                                mOnItemClickListener.onClick(item, position);
-                            } else if (mOnItemClickListenerWithItemPosition != null) {
-                                mOnItemClickListenerWithItemPosition.onClick(item, position, itemPosition);
-                            }
-                        }
-                    } else if (mOnItemClickListener != null) {
-                        mOnItemClickListener.onClick(item, position);
-                    } else if (mOnItemClickListenerWithItemPosition != null) {
-                        mOnItemClickListenerWithItemPosition.onClick(item, position, itemPosition);
-                    }
-                }
-            });
+        if (mClickableViewsArray != null) {
+            for (final int viewId : mClickableViewsArray) {
+                updateChildViewClickListener(position, vRoot, item, viewId);
+            }
         }
     }
 
-    /**
-     * Override it if you need different logic
-     *
-     * @param position item position
-     * @return absolute position
-     */
-    public int calcItemPosition(int position) {
-        return position;
+    private void updateChildViewClickListener(final int position, @NonNull View vRoot, final MODEL item, final int viewId) {
+        vRoot.findViewById(viewId).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mOnItemViewsClickListener.onClick(viewId, item, position);
+            }
+        });
     }
 
     protected int getClickedViewId(ViewGroup view, MotionEvent e) {
@@ -349,7 +321,6 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         return INVALID_VALUE;
     }
 
-    @Nullable
     private boolean isViewClicked(int viewId, ViewGroup vParent, MotionEvent e) {
         Rect rect = new Rect();
         int x = (int) e.getRawX();
@@ -370,22 +341,22 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         return mItems == null ? 0 : mItems.size();
     }
 
-    public M getItem(int position) {
-        return (M) mItems.get(position);
+    public MODEL getItem(int position) {
+        return (MODEL) mItems.get(position);
     }
 
-    public void setOnItemClickListener(OnItemClickListener<M> onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListener<MODEL> onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
     }
 
     public void setOnItemViewsClickListener(List<Integer> clickableViews,
-                                            OnItemViewsClickListener<M> onItemViewsClickListener) {
+                                            OnItemViewsClickListener<MODEL> onItemViewsClickListener) {
         mClickableViewsList = clickableViews;
         mOnItemViewsClickListener = onItemViewsClickListener;
     }
 
     public void setOnItemViewsClickListener(int[] clickableViews,
-                                            OnItemViewsClickListener<M> onItemViewsClickListener) {
+                                            OnItemViewsClickListener<MODEL> onItemViewsClickListener) {
         mClickableViewsArray = clickableViews;
         mOnItemViewsClickListener = onItemViewsClickListener;
     }
@@ -406,7 +377,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         return getItemCount() == 0;
     }
 
-    public List getItems() {
+    public List<Object> getItems() {
         return mItems;
     }
 
@@ -414,7 +385,7 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         return mOnLastItemListener;
     }
 
-    public OnItemClickListener<M> getOnItemClickListener() {
+    public OnItemClickListener<MODEL> getOnItemClickListener() {
         return mOnItemClickListener;
     }
 
@@ -423,11 +394,8 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         this.mOnLastItemListener = onLastItemListener;
     }
 
-    public OnItemClickListenerWithItemPosition<M> getOnItemClickListenerWithItemPosition() {
-        return mOnItemClickListenerWithItemPosition;
-    }
 
-    public OnItemViewsClickListener<M> getOnItemViewsClickListener() {
+    public OnItemViewsClickListener<MODEL> getOnItemViewsClickListener() {
         return mOnItemViewsClickListener;
     }
 
@@ -482,25 +450,20 @@ public abstract class SimpleRecyclerAdapter<M> extends RecyclerView.Adapter<Simp
         return ContextCompat.getColor(getContext(), resId);
     }
 
-    public View findViewById(SimpleViewHolder holder, int resId) {
+    public List<Integer> getClickableViewsList() {
+        return mClickableViewsList;
+    }
+
+    public View findViewById(HOLDER holder, int resId) {
         return holder.itemView.findViewById(resId);
     }
 
-    public void setOnItemClickListenerWithItemPosition(
-            OnItemClickListenerWithItemPosition<M> onItemClickListenerWithItemPosition) {
-        mOnItemClickListenerWithItemPosition = onItemClickListenerWithItemPosition;
+
+    public interface OnItemClickListener<MODEL> {
+        void onClick(MODEL item, int position);
     }
 
-
-    public interface OnItemClickListener<M> {
-        void onClick(M item, int position);
-    }
-
-    public interface OnItemClickListenerWithItemPosition<M> {
-        void onClick(M item, int position, int itemPosition);
-    }
-
-    public interface OnItemViewsClickListener<M> {
-        void onClick(@IdRes int childViewId, M item, int position, int itemPosition);
+    public interface OnItemViewsClickListener<MODEL> {
+        void onClick(@IdRes int childViewId, MODEL item, int position);
     }
 }
