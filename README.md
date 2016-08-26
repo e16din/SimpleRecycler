@@ -4,7 +4,6 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-SimpleRecycler-green.svg?style=true)](https://android-arsenal.com/details/1/4223)
 
 This library extends RecyclerView + Recycler Adapter.
-
 Use it to comfortable work with lists.
 
 ## Out of the box:
@@ -58,7 +57,7 @@ mAdapter.setOnItemViewsClickListener(new int[]{R.id.vName, R.id.vClickableImage}
 
 ### Implement adapter
 ```java
-public class MyAdapter extends SimpleAdapter<String, RecyclerAdapter.ItemViewHolder> {
+public class MyAdapter extends SimpleAdapter<String, MyAdapter.ItemViewHolder> {
 
     public MyAdapter(Context context, List<Object> items) {
         super(context, items, R.layout.item_simple_recycler);
