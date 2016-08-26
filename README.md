@@ -4,6 +4,7 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-SimpleRecycler-green.svg?style=true)](https://android-arsenal.com/details/1/4223)
 
 This library extends RecyclerView + Recycler Adapter.
+
 Use it to comfortable work with lists.
 
 ## Out of the box:
