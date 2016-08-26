@@ -24,16 +24,16 @@ public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder
     private boolean mAllItemsLoaded;
     private boolean mNeedShowProgressFromStart = true;
 
-    public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
+    public SimplePagingAdapter(@NonNull Context context, @NonNull List<MODEL> items, int resId,
                                OnItemClickListener<MODEL> onItemClickListener) {
         super(context, items, resId, onItemClickListener);
     }
 
-    public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items, int resId) {
+    public SimplePagingAdapter(@NonNull Context context, @NonNull List<MODEL> items, int resId) {
         super(context, items, resId);
     }
 
-    public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items) {
+    public SimplePagingAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
         super(context, items);
     }
 
@@ -84,7 +84,7 @@ public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder
      *
      * @param items Items
      */
-    public void addPage(List items) {
+    public void addPage(List<MODEL> items) {
         addAll(items);
         onNewItemsAdded(items == null ? 0 : items.size());
     }
@@ -98,7 +98,7 @@ public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder
      * @param position Insert position
      * @param items    Items
      */
-    public void addPage(int position, List items) {
+    public void addPage(int position, List<MODEL> items) {
         addAll(position, items);
         onNewItemsAdded(items == null ? 0 : items.size());
     }

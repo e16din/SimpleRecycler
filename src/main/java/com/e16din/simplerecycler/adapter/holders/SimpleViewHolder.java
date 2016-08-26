@@ -20,6 +20,10 @@ public class SimpleViewHolder extends RecyclerView.ViewHolder {
         reset();
     }
 
+    public final View findViewById(int id) {
+        return itemView.findViewById(id);
+    }
+
     public void reset() {
         if (itemView instanceof ViewGroup) {
             if (mIsSelectorEnabled && vContainer != null) {

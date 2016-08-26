@@ -5,6 +5,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -27,20 +29,21 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
     private OnInsertionClickListener mOnInsertionClickListener;
 
     private int mOnlyItemsCount;//count of items exclude all insertions
-    private int mOnlyInsertsCount;//count of inserts exclude headers and footers
-    private int mHeadersCount;
-    private int mFootersCount;
 
-    public SimpleInsertsAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
+    private SparseArray<Insertion> mHeaders = new SparseArray<>();
+    private SparseArray<Insertion> mInsertions = new SparseArray<>();
+    private SparseArray<Insertion> mFooters = new SparseArray<>();
+
+    public SimpleInsertsAdapter(@NonNull Context context, @NonNull List<MODEL> items, int resId,
                                 SimpleRecyclerAdapter.OnItemClickListener<MODEL> onItemClickListener) {
         super(context, items, resId, onItemClickListener);
     }
 
-    public SimpleInsertsAdapter(@NonNull Context context, @NonNull List<Object> items, int resId) {
+    public SimpleInsertsAdapter(@NonNull Context context, @NonNull List<MODEL> items, int resId) {
         super(context, items, resId);
     }
 
-    public SimpleInsertsAdapter(@NonNull Context context, @NonNull List<Object> items) {
+    public SimpleInsertsAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
         super(context, items);
     }
 
@@ -49,84 +52,100 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
     }
 
     @Override
-    public void remove(int position) {
+    public MODEL remove(int position) {
         if (isHeader(position)) {
-            mHeadersCount -= 1;
+            mHeaders.remove(position);
         } else if (isFooter(position)) {
-            mFootersCount -= 1;
+            mFooters.remove(position);
         } else if (isInsertion(position)) {
-            mOnlyInsertsCount -= 1;
+            mInsertions.remove(position);
         } else {
             mOnlyItemsCount -= 1;
         }
 
-        super.remove(position);
+        return super.remove(position);
     }
 
     @Override
-    public void clearAll() {
+    public void clear() {
         mOnlyItemsCount = 0;
-        mOnlyInsertsCount = 0;
-        mHeadersCount = 0;
-        mFootersCount = 0;
 
-        super.clearAll();
+        mHeaders.clear();
+        mInsertions.clear();
+        mFooters.clear();
+
+        super.clear();
     }
 
+    //todo: check this
     public void clearAllBetweenHeadersAndFooters() {
-        List<Object> headersAndFooters = new ArrayList<>();
+        getItems().clear();
+        mInsertions.clear();
+        mOnlyItemsCount = 0;
 
-        headersAndFooters.addAll(getHeaders());
-        headersAndFooters.addAll(getFooters());
+        final List<MODEL> emptyItems = new ArrayList<>();
 
-        try {
-            getItems().clear();
-            mOnlyInsertsCount = 0;
-            mOnlyItemsCount = 0;
-            notifyDataSetChanged();
-            reAddAll(headersAndFooters);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
+        forEach(mHeaders, new ForEach<Insertion>() {
+            @Override
+            public void onItem(Insertion item) {
+                emptyItems.add(null);
+            }
+        });
+
+        forEach(mFooters, new ForEach<Insertion>() {
+            @Override
+            public void onItem(Insertion item) {
+                emptyItems.add(null);
+            }
+        });
+
+        getItems().addAll(emptyItems);
+        //no update counters, because we save their old values
+        notifyItemRangeInserted(0, emptyItems.size());
+    }
+
+    private <T> void forEach(SparseArray<T> array, ForEach<T> forEach) {
+        for (int i = 0; i < array.size(); i++) {
+            forEach.onItem(array.get(i));
         }
     }
 
+    interface ForEach<T> {
+        void onItem(T item);
+    }
+
+    //todo: update and check this
     public void clearOnlyItems() {
-        List<Object> insertions = new ArrayList<>();
+        List<Insertion> insertions = new ArrayList<>();
 
         insertions.addAll(getHeaders());
         insertions.addAll(getOnlyInsertions());
         insertions.addAll(getFooters());
 
-        try {
-            getItems().clear();
-            mOnlyItemsCount = 0;
-            notifyDataSetChanged();
-            reAddAll(insertions);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
+        getItems().clear();
+        mOnlyItemsCount = 0;
+        notifyDataSetChanged();
+        reAddAll(insertions);
     }
 
+    //todo: update and check this
     public void clearHeaders() {
         int startHeadersCount = getHeadersCount();
         if (startHeadersCount == 0) {
             return;
         }
 
-        try {
-            List items = getItems();
+        List items = getItems();
 
-            while (isHeader(0)) {
-                items.remove(0);
-            }
-
-            mHeadersCount = 0;
-            notifyDataSetChanged();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
+        while (isHeader(0)) {
+            items.remove(0);
         }
+
+        mHeadersCount = 0;
+        notifyDataSetChanged();
     }
 
+    //todo: update and check this
     public void clearFooters() {
         int startItemCount = getItemCount();
         int startFootersCount = getFootersCount();
@@ -135,47 +154,42 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
             return;
         }
 
-        try {
-            List items = getItems();
+        List items = getItems();
 
-            while (isHeader(getItemCount() - 1)) {
-                items.remove(getItemCount() - 1);
-            }
-
-            mFootersCount = 0;
-
-            notifyItemRangeRemoved(startItemCount - startFootersCount, startFootersCount);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
+        while (isHeader(getItemCount() - 1)) {
+            items.remove(getItemCount() - 1);
         }
+
+        mFootersCount = 0;
+
+        notifyItemRangeRemoved(startItemCount - startFootersCount, startFootersCount);
     }
 
     /**
      * Clear all insertions with headers and footers
      */
+    //todo: update and check this
     public void clearAllInsertions() {
         List<Object> items = new ArrayList<>();
 
         items.addAll(getOnlyItems());
 
-        try {
-            getItems().clear();
-            mOnlyInsertsCount = 0;
-            mHeadersCount = 0;
-            mFootersCount = 0;
-            notifyDataSetChanged();
-            reAddAll(items);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
+        getItems().clear();
+        mOnlyInsertsCount = 0;
+        mHeadersCount = 0;
+        mFootersCount = 0;
+        notifyDataSetChanged();
+        reAddAll(items);
     }
 
+
+    //todo: update and check this
     @NonNull
     public List<MODEL> getOnlyItems() {
         ArrayList<MODEL> result = new ArrayList<>();
 
         for (int i = getHeadersCount(); i < getItemCount() - getFootersCount(); i++) {
-            result.add(getItem(i));
+            result.add(get(i));
         }
 
         return result;
@@ -186,6 +200,7 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
      *
      * @return Insertions between headers and footers
      */
+    //todo: update and check this
     @NonNull
     public List<Insertion> getOnlyInsertions() {
         ArrayList<Insertion> result = new ArrayList<>();
@@ -199,25 +214,39 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
         return result;
     }
 
+    //todo: check this
     @NonNull
-    public List<Object> getHeaders() {
+    public final List<Insertion> getHeaders() {
+        List<Insertion> result = new ArrayList<>();
+
         if (getHeadersCount() > 0) {
-            return getItems().subList(0, getHeadersCount());
+            for (int i = 0; i < mHeaders.size(); i++) {
+                result.add(mHeaders.get(i));
+            }
+
+            return result;
         }
 
-        return new ArrayList<>();
+        return result;
     }
 
+    //todo: check this
     @NonNull
-    public List<Object> getFooters() {
+    public List<Insertion> getFooters() {
+        List<Insertion> result = new ArrayList<>();
+
         if (getFootersCount() > 0) {
-            int itemCount = getItemCount();
-            return getItems().subList(itemCount - getFootersCount(), itemCount);
+            for (int i = 0; i < mFooters.size(); i++) {
+                result.add(mFooters.get(i));
+            }
+
+            return result;
         }
 
-        return new ArrayList<>();
+        return result;
     }
 
+    //todo: update and check this
     protected int getAbsoluteFootersCount() {
         int result = 0;
         if (getItemCount() == 0) return result;
@@ -231,11 +260,13 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
         return result;
     }
 
+    //todo: update and check this
     public boolean hasAbsoluteHeader(int position) {
         Insertion insertion = getInsertion(position);
         return insertion != null && insertion.getType() == Insertion.TYPE_ABSOLUTE_HEADER;
     }
 
+    //todo: update and check this
     @Override
     protected int calcInsertPosition(int insertPosition) {
         if (getItemCount() == 0) return 0;
@@ -261,36 +292,75 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
         return insertPosition;
     }
 
+    //todo: update and check this
     @Override
     public int getLastItemPosition() {
         final int onlyItemsCount = getOnlyItemsCount();
         return onlyItemsCount == 0 ? 0 : onlyItemsCount - 1;
     }
 
+    //todo: update and check this
     public boolean isFooter(int i) {
         return isInsertion(i) && getInsertion(i).getType() >= Insertion.TYPE_FOOTER;
     }
 
+    //todo: update and check this
     public boolean isHeader(int i) {
         return isInsertion(i)
                 && getInsertion(i).getType() >= Insertion.TYPE_HEADER
                 && getInsertion(i).getType() <= Insertion.TYPE_ABSOLUTE_HEADER;
     }
 
+    //todo: check this
     /**
      * Add custom view insertion to adapter
      */
     public void addInsertion(int position, Insertion insertion) {
-        add(position, insertion);
+        setHasNewItems(true);
+
+        int insertPosition = calcInsertPosition(position);
+
+        if (insertPosition == getItemCount()) {
+            getItems().add(null);
+            mInsertions.put(size() - 1, insertion);
+        } else {
+            getItems().add(insertPosition, null);
+            mInsertions.put(insertPosition, insertion);
+        }
+
+        updateCounter(insertion);
+
+        notifyDataSetChanged();
     }
 
+    //todo: check this
     /**
      * Add custom view insertion to adapter
      */
-    public void addInsertion(Insertion insertion) {
-        add(insertion);
+    public boolean addInsertion(Insertion insertion) {
+        setHasNewItems(true);
+
+        int insertPosition = getItemCount() - getFootersCount();
+
+        boolean result;
+
+        if (getFootersCount() == 0) {
+            result = getItems().add(null);
+            mInsertions.put(size() - 1, insertion);
+        } else {
+            getItems().add(insertPosition, null);
+            mInsertions.put(insertPosition, insertion);
+            result = true;
+        }
+
+        updateCounter(insertion);
+
+        notifyDataSetChanged();
+
+        return result;
     }
 
+    //todo: update and check this
     protected void updateCounter(Object item) {
         if (item instanceof Insertion) {
             int type = ((Insertion) item).getType();
@@ -308,146 +378,114 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
     }
 
     @Override
-    public void add(int position, Object item) {
+    public void add(int position, MODEL item) {
         setHasNewItems(true);
 
-        try {
-            int insertPosition = calcInsertPosition(position);
+        int insertPosition = calcInsertPosition(position);
 
-            if (insertPosition == getItemCount()) {
-                getItems().add(item);
-            } else {
-                getItems().add(insertPosition, item);
-            }
-
-            updateCounter(item);
-
-            notifyDataSetChanged();
-
-        } catch (IllegalStateException e) {
-            //todo: update this way
-            e.printStackTrace();
+        if (insertPosition == getItemCount()) {
+            getItems().add(item);
+        } else {
+            getItems().add(insertPosition, item);
         }
+
+        updateCounter(item);
+
+        notifyDataSetChanged();
     }
 
     @Override
-    public void add(Object item) {
+    public boolean add(MODEL item) {
         setHasNewItems(true);
 
-        try {
-            int insertPosition = getItemCount() - getFootersCount();
+        int insertPosition = getItemCount() - getFootersCount();
 
-            if (getFootersCount() == 0) {
-                getItems().add(item);
-            } else {
-                getItems().add(insertPosition, item);
-            }
+        boolean result;
 
-            updateCounter(item);
-
-            notifyDataSetChanged();
-
-        } catch (IllegalStateException e) {
-            //todo: update this way
-            e.printStackTrace();
+        if (getFootersCount() == 0) {
+            result = getItems().add(item);
+        } else {
+            getItems().add(insertPosition, item);
+            result = true;
         }
+
+        updateCounter(item);
+
+        notifyDataSetChanged();
+
+        return result;
     }
 
-    public void fireAdd(int position, Object item) {
+    public void fireAdd(int position, MODEL item) {
         super.add(position, item);
     }
 
-    public void fireAdd(Object item) {
+    public void fireAdd(MODEL item) {
         super.add(item);
     }
 
-    /**
-     * Add all items without update counters
-     */
-    public void reAddAll(List items) {
-        if (items == null || items.size() == 0) {
-            return;
+
+    @Override
+    public boolean addAll(@NonNull Collection<? extends MODEL> collection) {
+        if (collection.size() == 0) {
+            return false;
         }
 
-        try {
-            getItems().addAll(items);
-            //no update counters, because we save their old values
-            notifyItemRangeInserted(0, items.size());
-        } catch (IllegalStateException e) {
-            //todo: update this way
-            e.printStackTrace();
+        setHasNewItems(collection.size() > 0);
+
+        int insertPosition = getItemCount() - getFootersCount();
+
+        boolean result;
+
+        if (getFootersCount() == 0) {
+            result = getItems().addAll(collection);
+        } else {
+            result = getItems().addAll(insertPosition, collection);
         }
+
+        for (MODEL item : collection) {
+            updateCounter(item);
+        }
+
+        notifyDataSetChanged();
+
+        return result;
     }
 
     @Override
-    public void addAll(List items) {
-        if (items == null || items.size() == 0) {
-            return;
+    public boolean addAll(int location, @NonNull Collection<? extends MODEL> collection) {
+        if (collection.size() == 0) {
+            return false;
         }
 
-        int size = items.size();
+        int size = collection.size();
 
         setHasNewItems(size > 0);
 
-        try {
-            int insertPosition = getItemCount() - getFootersCount();
+        int insertPosition = calcInsertPosition(location);
 
-            if (getFootersCount() == 0) {
-                getItems().addAll(items);
-            } else {
-                getItems().addAll(insertPosition, items);
-            }
+        boolean result;
 
-            for (int i = 0; i < items.size(); i++) {
-                Object item = items.get(i);
-                updateCounter(item);
-            }
-
-            notifyDataSetChanged();
-
-        } catch (IllegalStateException e) {
-            //todo: update this way
-            e.printStackTrace();
+        if (insertPosition == getItemCount()) {
+            result = getItems().addAll(collection);
+        } else {
+            result = getItems().addAll(insertPosition, collection);
         }
+
+        for (MODEL item : collection) {
+            updateCounter(item);
+        }
+
+        notifyDataSetChanged();
+
+        return result;
     }
 
-    @Override
-    public void addAll(int position, List items) {
-        if (items == null || items.size() == 0) {
-            return;
-        }
-
-        int size = items.size();
-
-        setHasNewItems(size > 0);
-
-        try {
-            int insertPosition = calcInsertPosition(position);
-
-            if (insertPosition == getItemCount()) {
-                getItems().addAll(items);
-            } else {
-                getItems().addAll(insertPosition, items);
-            }
-
-            for (int i = 0; i < items.size(); i++) {
-                Object item = items.get(i);
-                updateCounter(item);
-            }
-
-            notifyDataSetChanged();
-
-        } catch (IllegalStateException e) {
-            //todo: update this way
-            e.printStackTrace();
-        }
-    }
-
-    public void fireAddAll(int position, List items) {
+    public void fireAddAll(int position, List<MODEL> items) {
         super.addAll(position, items);
     }
 
-    public void fireAddAll(List items) {
+    public void fireAddAll(List<MODEL> items) {
         super.addAll(items);
     }
 
@@ -458,16 +496,11 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
      * @param data     data to binding
      */
     public void addHeader(@LayoutRes int layoutId, Object data) {
-        try {
-            int insertPosition = calcInsertPosition(0);
-            getItems().add(insertPosition, new Insertion(layoutId, data, Insertion.TYPE_HEADER));
-            mHeadersCount += 1;
-            notifyDataSetChanged();
-
-        } catch (IllegalStateException e) {
-            //todo: update this way
-            e.printStackTrace();
-        }
+        int insertPosition = calcInsertPosition(0);
+        getItems().add(insertPosition, null);
+        mHeaders.put(insertPosition, new Insertion(layoutId, data, Insertion.TYPE_HEADER));
+        mHeadersCount += 1;
+        notifyDataSetChanged();
     }
 
 
@@ -487,23 +520,20 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
      * @param data     data to binding
      */
     public void addFooter(@LayoutRes int layoutId, Object data) {
-        try {
-            int absoluteFootersCount = getAbsoluteFootersCount();
-            if (absoluteFootersCount > 0) {
-                int position = getItemCount() - absoluteFootersCount;
-                getItems().add(position,
-                        new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
-                mFootersCount += 1;
-                notifyDataSetChanged();
-            } else {
-                getItems().add(new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
-                mFootersCount += 1;
-                notifyItemInserted(getLastItemPosition());
-            }
+        final int absoluteFootersCount = getAbsoluteFootersCount();
+        final Insertion insertion = new Insertion(layoutId, data, Insertion.TYPE_FOOTER);
 
-        } catch (IllegalStateException e) {
-            //todo: update this way
-            e.printStackTrace();
+        if (absoluteFootersCount > 0) {
+            int position = getItemCount() - absoluteFootersCount;
+            getItems().add(position, null);
+            mFooters.put(position, insertion);
+            mFootersCount += 1;
+            notifyDataSetChanged();
+        } else {
+            getItems().add(null);
+            mFooters.put(getItems().size() - 1, insertion);
+            mFootersCount += 1;
+            notifyItemInserted(getLastItemPosition());
         }
     }
 
@@ -591,7 +621,7 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
 
         holder = rippledInsertionViewHolder(vContainer);
 
-        onBindInsertionViewHolder((HOLDER) holder, position);
+        onBindInsertionViewHolder(holder, position);
 
         switch (insertion.getType()) {
             case Insertion.TYPE_HEADER:
@@ -680,26 +710,31 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
      * Add absolute footer. All another inserts before it.
      */
     protected void addAbsoluteFooter(@LayoutRes int layoutId, int type) {
-        try {
-            Insertion insertion = new Insertion(layoutId, null, type);
+        getItems().add(null);
 
-            getItems().add(insertion);
-            mFootersCount += 1;
-            notifyItemInserted(getItemCount() - 1);
-        } catch (IllegalStateException e) {
-            //todo: update this way
-            e.printStackTrace();
-        }
+        final int position = size() - 1;
+
+        mFooters.put(position, new Insertion(layoutId, null, type));
+
+        mFootersCount += 1;
+
+        notifyItemInserted(position);
     }
 
     /**
-     * Get item by position
+     * Returns the element at the specified location in this List.
+     * <p/>
      *
-     * @param position position of item
-     * @return item or null if it is insertion object
+     * @param location the index of the element to return.
+     *                 <p/>
+     * @return the element at the specified location or null if it is insertion object.
+     * <p/>
+     * @throws IndexOutOfBoundsException if location < 0 || location >= size()
      */
-    public MODEL getItem(int position) {
-        return !isInsertion(position) ? super.getItem(position) : null;
+    @Nullable
+    @Override
+    public MODEL get(int location) {
+        return !isInsertion(location) ? super.get(location) : null;
     }
 
     /**
