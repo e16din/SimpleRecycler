@@ -114,7 +114,7 @@ Step 2. Add the dependency
 ```
 
 ## License MIT
-Copyright (c) 2016 [Александр Кундрюков (e16din)](https://goo.gl/4xTCko)
+Copyright (c) 2016 [Александр Кундрюков (e16din)](http://goo.gl/pzjc8x)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
