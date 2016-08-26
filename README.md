@@ -7,7 +7,7 @@ This library extends RecyclerView + Recycler Adapter.
 
 Use it to comfortable work with lists.
 
-## From the box:
+## Out of the box:
 * Ripple-effect to items
 * Headers and Footers like in the ListView
 * Custom Insertions between items
