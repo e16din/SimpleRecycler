@@ -1,6 +1,7 @@
 # SimpleRecycler
 
 [![Release](https://jitpack.io/v/e16din/SimpleRecycler.svg)](https://jitpack.io/#e16din/SimpleRecycler)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-SimpleRecycler-green.svg?style=true)](https://android-arsenal.com/details/1/4223)
 
 This library extends RecyclerView + Recycler Adapter.
 
