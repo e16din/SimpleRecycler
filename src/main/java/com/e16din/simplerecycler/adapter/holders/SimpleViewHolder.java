@@ -6,24 +6,41 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class SimpleViewHolder extends RecyclerView.ViewHolder {
+public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
 
-    public View vContainer;
+    public ViewGroup vContainer;
 
     public Drawable mBackgroundDrawable;
     public int mSelectorResId;
     public boolean mIsSelectorEnabled = true;
 
+    public boolean mInflated;
+
 
     public SimpleViewHolder(View itemView) {
         super(itemView);
-        reset();
+        bind();
+        resetBackgrounds();
     }
 
-    public void reset() {
+    public abstract void bind();
+
+    public final View findViewById(int id) {
+        return itemView.findViewById(id);
+    }
+
+    public void resetBackgrounds() {
+        if (itemView.getBackground() != null) {
+            updateSelectorIfNeed();
+            return;
+        }
+
         if (itemView instanceof ViewGroup) {
-            if (mIsSelectorEnabled && vContainer != null) {
-                vContainer.setBackgroundResource(mSelectorResId);
+
+            if (vContainer != null) {
+                mBackgroundDrawable = vContainer.getBackground();
+
+                updateSelectorIfNeed();
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -32,5 +49,19 @@ public class SimpleViewHolder extends RecyclerView.ViewHolder {
                 itemView.setBackgroundDrawable(mBackgroundDrawable);
             }
         }
+    }
+
+    private void updateSelectorIfNeed() {
+        if (mIsSelectorEnabled && vContainer != null) {
+            vContainer.setBackgroundResource(mSelectorResId);
+        }
+    }
+
+    public boolean isInflated() {
+        return mInflated;
+    }
+
+    public void setInflated(boolean inflated) {
+        mInflated = inflated;
     }
 }

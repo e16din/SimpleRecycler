@@ -7,10 +7,12 @@ import android.support.v7.widget.RecyclerView;
 
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
+import com.e16din.simplerecycler.adapter.listeners.OnItemClickListener;
 import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;
 
+@SuppressWarnings("unused")//remove it to see unused warnings
 public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder>
         extends SimpleInsertsAdapter<MODEL, HOLDER> {
 
@@ -24,16 +26,16 @@ public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder
     private boolean mAllItemsLoaded;
     private boolean mNeedShowProgressFromStart = true;
 
-    public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items, int resId,
+    public SimplePagingAdapter(@NonNull Context context, @NonNull List<MODEL> items, int resId,
                                OnItemClickListener<MODEL> onItemClickListener) {
         super(context, items, resId, onItemClickListener);
     }
 
-    public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items, int resId) {
+    public SimplePagingAdapter(@NonNull Context context, @NonNull List<MODEL> items, int resId) {
         super(context, items, resId);
     }
 
-    public SimplePagingAdapter(@NonNull Context context, @NonNull List<Object> items) {
+    public SimplePagingAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
         super(context, items);
     }
 
@@ -84,9 +86,9 @@ public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder
      *
      * @param items Items
      */
-    public void addPage(List items) {
+    public void addPage(@NonNull List<MODEL> items) {
         addAll(items);
-        onNewItemsAdded(items == null ? 0 : items.size());
+        onNewItemsAdded(items.size());
     }
 
 
@@ -98,9 +100,9 @@ public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder
      * @param position Insert position
      * @param items    Items
      */
-    public void addPage(int position, List items) {
+    public void addPage(int position, @NonNull List<MODEL> items) {
         addAll(position, items);
-        onNewItemsAdded(items == null ? 0 : items.size());
+        onNewItemsAdded(items.size());
     }
 
     public void showBottomProgress() {
@@ -110,12 +112,7 @@ public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder
     }
 
     public void fireShowBottomProgress() {
-        try {
-            addAbsoluteFooter(mBottomProgressLayoutId, TYPE_BOTTOM_PROGRESS);
-        } catch (IllegalStateException e) {
-            //todo: update this way
-            e.printStackTrace();
-        }
+        addAbsoluteFooter(mBottomProgressLayoutId, TYPE_BOTTOM_PROGRESS);
     }
 
     public void hideBottomProgress() {
@@ -136,7 +133,8 @@ public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder
         if (getItemCount() == 0) return result;
 
         for (int i = getItemCount() - 1; i >= 0; i--) {
-            if (isInsertion(i) && getInsertion(i).getType() == TYPE_BOTTOM_PROGRESS) {
+            final Insertion insertion = getInsertion(i);
+            if (insertion != null && insertion.getType() == TYPE_BOTTOM_PROGRESS) {
                 result = i;
                 break;
             }
