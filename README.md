@@ -7,32 +7,39 @@ This library extends RecyclerView + Recycler Adapter.
 Use it to comfortable work with lists.
 
 ## From the box:
+* Asynchronous layout inflation
 * Ripple-effect to items
 * Headers and Footers like in the ListView
 * Custom Insertions between items
 * OnItemClickListener and handy OnItemViewsClickListener
 * Paging with inner logic to load more data
+* Implemented List interface (use adapter as list)
 
 
 ## Usage
+### Asynchronous layout inflation
+```java
+mAdapter.setWaitingLayoutId(R.layout.layout_please_wait);
+```
+
 ### Add items
 ```java
 //add header
-mAdapter.addHeader(R.layout.header);
+mAdapter.addHeader(R.layout.layout_header);
 
 //add footer
-mAdapter.addFooter(R.layout.footer);
+mAdapter.addFooter(R.layout.layout_footer);
 
 //add insertion after headers and before footers
-mAdapter.addInsertion(new Insertion(R.layout.insertion, anyData));
+mAdapter.addInsertion(new Insertion(R.layout.layout_insertion, anyData));
 
 //add item after headers and before footers
-mAdapter.add(itemOrInsertion);
+mAdapter.add(item);
 ```
 
 ### Set click listeners
 ```java
-mAdapter.setOnItemClickListener(new SimpleAdapter.OnItemClickListener<String>() {
+mAdapter.setOnItemClickListener(new OnItemClickListener<String>() {
     @Override
     public void onClick(String item, int position) {
         // do something
@@ -40,26 +47,26 @@ mAdapter.setOnItemClickListener(new SimpleAdapter.OnItemClickListener<String>() 
 });
 
 mAdapter.setOnItemViewsClickListener(new int[]{R.id.vName, R.id.vClickableImage},
-    new SimpleRecyclerAdapter.OnItemViewsClickListener<String>() {
-    @Override
-    public void onClick(@IdRes int childViewId, String item, int position) {
-        switch (childViewId) {
-            case R.id.vName:
-                // on vName click!
-                break;
-            case R.id.vClickableImage:
-                // on vClickableImage click!
-                break;
+    new OnItemViewsClickListener<String>() {
+        @Override
+        public void onClick(@IdRes int childViewId, String item, int position) {
+            switch (childViewId) {
+                case R.id.vName:
+                    // on vName click!
+                    break;
+                case R.id.vClickableImage:
+                    // on vClickableImage click!
+                    break;
+            }
         }
-    }
 });
 ```
 
 ### Implement adapter
 ```java
-public class MyAdapter extends SimpleAdapter<String, RecyclerAdapter.ItemViewHolder> {
+public class MyAdapter extends SimpleAdapter<String, MyAdapter.ItemViewHolder> {
 
-    public MyAdapter(Context context, List<Object> items) {
+    public MyAdapter(Context context, List<String> items) {
         super(context, items, R.layout.item_simple_recycler);
         setNeedShowBottomProgress(true);
     }
@@ -76,11 +83,6 @@ public class MyAdapter extends SimpleAdapter<String, RecyclerAdapter.ItemViewHol
         String item = getItem(position);
 
         holder.vName.setText(item);
-    }
-
-    @Override
-    protected void onBindHeaderViewHolder(SimpleViewHolder holder, int position) {
-        //do something with headers
     }
 
     static class ItemViewHolder extends SimpleViewHolder {
@@ -108,7 +110,7 @@ Step 1. Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 ```groovy
     dependencies {
-        compile 'com.github.e16din:SimpleRecycler:0.4.5'
+        compile 'com.github.e16din:SimpleRecycler:0.4.7'
     }
 ```
 

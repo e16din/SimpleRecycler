@@ -4,7 +4,7 @@ import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.e16din.simplerecycler.adapter.SimpleRecyclerAdapter;
+import com.e16din.simplerecycler.adapter.SimpleClickAdapter;
 
 public class OnScrollSimpleListener extends RecyclerView.OnScrollListener {
 
@@ -15,7 +15,7 @@ public class OnScrollSimpleListener extends RecyclerView.OnScrollListener {
         Rect scrollBounds = new Rect();
         vRecycler.getHitRect(scrollBounds);
 
-        SimpleRecyclerAdapter adapter = (SimpleRecyclerAdapter) vRecycler.getAdapter();
+        SimpleClickAdapter adapter = (SimpleClickAdapter) vRecycler.getAdapter();
 
         if (getCondition(adapter)) {
             View vLast = adapter.getLastHolder().itemView;
@@ -26,7 +26,7 @@ public class OnScrollSimpleListener extends RecyclerView.OnScrollListener {
         }
     }
 
-    public boolean getCondition(SimpleRecyclerAdapter adapter) {
+    public boolean getCondition(SimpleClickAdapter adapter) {
         return adapter.getLastHolder() != null && adapter.hasNewItems();
     }
 }
