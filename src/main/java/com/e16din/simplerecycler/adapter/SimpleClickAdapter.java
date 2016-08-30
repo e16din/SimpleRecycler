@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleClickAdapter<MODEL, HOLDER extends SimpleViewHolder>
-        extends SimpleAsyncAdapter<MODEL, HOLDER> implements List<MODEL> {
+public abstract class SimpleClickAdapter<MODEL> extends SimpleAsyncAdapter<MODEL> {
 
     private OnItemClickListener<MODEL> mOnItemClickListener;
     private OnItemViewsClickListener<MODEL> mOnItemViewsClickListener;
@@ -42,11 +41,11 @@ public abstract class SimpleClickAdapter<MODEL, HOLDER extends SimpleViewHolder>
     }
 
     @Override
-    protected void onBindItemViewHolder(HOLDER holder, int position) {
+    protected void onBindItemViewHolder(SimpleViewHolder holder, int position) {
         updateItemClickListener(holder, position);
     }
 
-    protected void updateItemClickListener(@NonNull HOLDER holder, final int position) {
+    protected void updateItemClickListener(@NonNull SimpleViewHolder holder, final int position) {
         final View vRoot = holder.itemView;
 
         vRoot.setOnClickListener(null);

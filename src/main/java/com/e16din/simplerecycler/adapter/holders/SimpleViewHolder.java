@@ -19,11 +19,11 @@ public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
 
     public SimpleViewHolder(View itemView) {
         super(itemView);
-        bind();
+        findViews();
         resetBackgrounds();
     }
 
-    public abstract void bind();
+    public abstract void findViews();
 
     public final View findViewById(int id) {
         return itemView.findViewById(id);

@@ -15,8 +15,7 @@ import java.util.List;
 
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleAsyncAdapter<MODEL, HOLDER extends SimpleViewHolder>
-        extends SimpleListAdapter<MODEL, HOLDER> {
+public abstract class SimpleAsyncAdapter<MODEL> extends SimpleListAdapter<MODEL> {
 
     public static final int NO_WAITING_LAYOUT = 0;
     @LayoutRes
@@ -39,7 +38,7 @@ public abstract class SimpleAsyncAdapter<MODEL, HOLDER extends SimpleViewHolder>
         final LayoutInflater inflater = LayoutInflater.from(getContext());
         FrameLayout vContainer = (FrameLayout) inflater.inflate(getContainerLayoutId(), parent, false);
 
-        HOLDER holder;
+        SimpleViewHolder holder;
 
         if (mWaitingLayoutId == NO_WAITING_LAYOUT) {
             View v = inflater.inflate(getItemLayoutId(), vContainer, false);
@@ -51,7 +50,7 @@ public abstract class SimpleAsyncAdapter<MODEL, HOLDER extends SimpleViewHolder>
             vContainer.addView(vWaiting);
 
             holder = newViewHolder(vContainer);
-            final HOLDER finalHolder = holder;
+            final SimpleViewHolder finalHolder = holder;
             new AsyncLayoutInflater(getContext()).inflate(getItemLayoutId(), vContainer,
                     new AsyncLayoutInflater.OnInflateFinishedListener() {
                         @Override
@@ -59,7 +58,7 @@ public abstract class SimpleAsyncAdapter<MODEL, HOLDER extends SimpleViewHolder>
                             vContainer.addView(view);
                             vContainer.removeView(vWaiting);
                             finalHolder.setInflated(true);
-                            finalHolder.bind();
+                            finalHolder.findViews();
                             onViewHolderAsyncInflated(finalHolder);
                         }
                     });
@@ -75,7 +74,7 @@ public abstract class SimpleAsyncAdapter<MODEL, HOLDER extends SimpleViewHolder>
         }//else onViewHolderAsyncInflated
     }
 
-    protected void onViewHolderAsyncInflated(HOLDER holder) {
+    protected void onViewHolderAsyncInflated(SimpleViewHolder holder) {
         final int adapterPosition = holder.getAdapterPosition();
         if (adapterPosition >= 0) {
             super.onBindViewHolder(holder, adapterPosition);

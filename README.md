@@ -66,33 +66,32 @@ mAdapter.setOnItemViewsClickListener(new int[]{R.id.vName, R.id.vClickableImage}
 
 ### Implement adapter
 ```java
-public class MyAdapter extends SimpleAdapter<String, MyAdapter.ItemViewHolder> {
+public class MyAdapter extends SimpleAdapter<String> {
 
-    public MyAdapter(Context context, List<String> items) {
-        super(context, items, R.layout.item_simple_recycler);
-        setNeedShowBottomProgress(true);
+    public MyAdapter(@NonNull Context context, @NonNull List<String> items) {
+        super(context, items, R.layout.item);
     }
 
     @Override
-    protected ItemViewHolder newViewHolder(View v) {
-        return new ItemViewHolder(v);
+    protected ItemViewHolder<String> newViewHolder(View v) {
+        return new ViewHolder(v);
     }
 
-    @Override
-    protected void onBindItemViewHolder(ItemViewHolder holder, int position) {
-        super.onBindItemViewHolder(holder, position);
+    static class ViewHolder extends ItemViewHolder<String> {
+        TextView vItemText;
 
-        String item = getItem(position);
+        public ViewHolder(View itemView) {
+            super(itemView);
+        }
 
-        holder.vName.setText(item);
-    }
+        @Override
+        public void findViews() {
+            vItemText = (TextView) findViewById(R.id.vItemText);
+        }
 
-    static class ItemViewHolder extends SimpleViewHolder {
-        TextView vName;
-
-        public ItemViewHolder(View view) {
-            super(view);
-            vName = (TextView) view.findViewById(R.id.vName);
+        @Override
+        public void bindItem(String item, int position) {
+            vItemText.setText(position + ". " + item);
         }
     }
 }
@@ -112,7 +111,7 @@ Step 1. Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 ```groovy
     dependencies {
-        compile 'com.github.e16din:SimpleRecycler:0.4.7'
+        compile 'com.github.e16din:SimpleRecycler:0.4.8'
     }
 ```
 

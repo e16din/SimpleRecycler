@@ -6,15 +6,13 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
 import com.e16din.simplerecycler.R;
-import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 import com.e16din.simplerecycler.adapter.listeners.OnItemClickListener;
 import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimplePagingAdapter<MODEL, HOLDER extends SimpleViewHolder>
-        extends SimpleInsertsAdapter<MODEL, HOLDER> {
+public abstract class SimplePagingAdapter<MODEL> extends SimpleInsertsAdapter<MODEL> {
 
     public static final int TYPE_BOTTOM_PROGRESS = Insertion.TYPE_ABSOLUTE_FOOTER + 1;
 

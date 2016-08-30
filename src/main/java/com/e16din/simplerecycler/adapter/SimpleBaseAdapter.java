@@ -14,14 +14,14 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.e16din.simplerecycler.R;
+import com.e16din.simplerecycler.adapter.holders.ItemViewHolder;
 import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleBaseAdapter<MODEL, HOLDER extends SimpleViewHolder>
-        extends RecyclerView.Adapter<SimpleViewHolder> {
+public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<SimpleViewHolder> {
 
     private final Context mContext;
 
@@ -92,9 +92,9 @@ public abstract class SimpleBaseAdapter<MODEL, HOLDER extends SimpleViewHolder>
         mItems.remove(0);
     }
 
-    protected abstract HOLDER newViewHolder(View v);
+    protected abstract ItemViewHolder<MODEL> newViewHolder(View v);
 
-    protected abstract void onBindItemViewHolder(HOLDER holder, int position);
+    protected abstract void onBindItemViewHolder(SimpleViewHolder holder, int position);
 
     protected Context getContext() {
         return mContext;
@@ -201,7 +201,9 @@ public abstract class SimpleBaseAdapter<MODEL, HOLDER extends SimpleViewHolder>
     public void onBindViewHolder(SimpleViewHolder holder, int position) {
         updateViewHolderSelector(holder);
         holder.resetBackgrounds();
-        onBindItemViewHolder((HOLDER) holder, position);
+        onBindItemViewHolder(holder, position);
+
+        ((ItemViewHolder<MODEL>) holder).bindItem(getItem(position), position);
 
         setLastHolder(position == getItemCount() - 1 ? holder : null);
     }

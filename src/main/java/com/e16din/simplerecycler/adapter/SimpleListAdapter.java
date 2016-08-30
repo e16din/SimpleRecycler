@@ -6,8 +6,6 @@ import android.os.Build;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 
-import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -25,8 +23,7 @@ import java.util.stream.Stream;
  * https://developer.android.com/reference/java/util/List.html
  */
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleListAdapter<MODEL, HOLDER extends SimpleViewHolder>
-        extends SimpleBaseAdapter<MODEL, HOLDER> implements List<MODEL> {
+public abstract class SimpleListAdapter<MODEL> extends SimpleBaseAdapter<MODEL> implements List<MODEL> {
 
     private boolean mAutoNotifyDataSetChanged = true;
 

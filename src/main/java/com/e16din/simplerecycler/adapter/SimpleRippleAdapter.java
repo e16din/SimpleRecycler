@@ -13,8 +13,7 @@ import com.e16din.simplerecycler.adapter.listeners.OnItemClickListener;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleRippleAdapter<MODEL, HOLDER extends SimpleViewHolder>
-        extends SimpleClickAdapter<MODEL, HOLDER> implements List<MODEL> {
+public abstract class SimpleRippleAdapter<MODEL> extends SimpleClickAdapter<MODEL> {
 
     private boolean mRippleEffectEnabled = true;
 

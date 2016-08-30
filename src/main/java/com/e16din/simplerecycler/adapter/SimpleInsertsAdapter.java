@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.e16din.simplerecycler.R;
+import com.e16din.simplerecycler.adapter.holders.InsertViewHolder;
 import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 import com.e16din.simplerecycler.adapter.listeners.OnItemClickListener;
 import com.e16din.simplerecycler.adapter.listeners.OnItemViewsClickListener;
@@ -21,8 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolder>
-        extends SimpleRippleAdapter<MODEL, HOLDER> {
+public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MODEL> {
 
     public static final int TYPE_DEFAULT = 0;
     public static final int TYPE_INSERTION = 1;
@@ -599,14 +599,8 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
     /**
      * Override this method if you need to bind view holder for insertions
      */
-    public SimpleViewHolder newInsertionViewHolder(View v) {
-        final SimpleViewHolder emptyHolder = new SimpleViewHolder(v) {
-            @Override
-            public void bind() {
-            }
-        };
-        emptyHolder.setIsRecyclable(false);
-        return emptyHolder;
+    public InsertViewHolder newInsertionViewHolder(View v) {
+        return new EmptyViewHolder(v);
     }
 
     @Override
@@ -614,6 +608,8 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
         if (isInsertion(position)) {
 
             onPreBindInsertionViewHolder(holder, position);
+
+            ((InsertViewHolder) holder).bindInsert(getInsertion(position), position);
 
             setLastHolder(position == getItemCount() - 1 ? holder : null);
             return;
@@ -817,5 +813,20 @@ public abstract class SimpleInsertsAdapter<MODEL, HOLDER extends SimpleViewHolde
                                               OnItemViewsClickListener<Insertion> onInsertViewsClickListener) {
         mClickableInsertViewsList = clickableViews;
         mOnInsertViewsClickListener = onInsertViewsClickListener;
+    }
+
+    private static class EmptyViewHolder extends InsertViewHolder {
+        public EmptyViewHolder(View v) {
+            super(v);
+            setIsRecyclable(false);
+        }
+
+        @Override
+        public void bindInsert(Insertion item, int position) {
+        }
+
+        @Override
+        public void findViews() {
+        }
     }
 }

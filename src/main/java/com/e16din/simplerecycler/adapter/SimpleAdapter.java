@@ -3,12 +3,11 @@ package com.e16din.simplerecycler.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 import com.e16din.simplerecycler.adapter.listeners.OnItemClickListener;
 
 import java.util.List;
 
-public abstract class SimpleAdapter<MODEL, HOLDER extends SimpleViewHolder> extends SimplePagingAdapter<MODEL, HOLDER> {
+public abstract class SimpleAdapter<MODEL> extends SimplePagingAdapter<MODEL> {
     //SimpleBaseAdapter - base logic
     //SimpleListAdapter - List interface
     //SimpleAsyncAdapter - async inflating
