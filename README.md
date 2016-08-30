@@ -77,7 +77,7 @@ public class MyAdapter extends SimpleAdapter<String> {
         return new ViewHolder(v);
     }
 
-    static class ViewHolder extends ItemViewHolder<String> {
+    class ViewHolder extends ItemViewHolder<String> {
         TextView vItemText;
 
         public ViewHolder(View itemView) {
