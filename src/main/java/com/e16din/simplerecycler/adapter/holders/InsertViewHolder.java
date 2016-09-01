@@ -10,5 +10,6 @@ public abstract class InsertViewHolder extends SimpleViewHolder {
         super(itemView);
     }
 
-    public abstract void bindInsert(Insertion item, int position);
+    public void bindInsert(Insertion item, int position) {
+    }
 }

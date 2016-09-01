@@ -9,5 +9,6 @@ public abstract class ItemViewHolder<MODEL> extends SimpleViewHolder {
     }
 
 
-    public abstract void bindItem(MODEL item, int position);
+    public void bindItem(MODEL item, int position) {
+    }
 }

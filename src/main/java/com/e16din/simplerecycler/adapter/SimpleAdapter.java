@@ -17,7 +17,7 @@ public abstract class SimpleAdapter<MODEL> extends SimplePagingAdapter<MODEL> {
     //SimplePagingAdapter - paging logic
 
     private boolean mNeedShowBottomProgress = false;
-
+    private boolean mNeedAsyncInflating = false;
 
     public SimpleAdapter(@NonNull Context context, @NonNull List<MODEL> items, int resId,
                          OnItemClickListener<MODEL> onItemClickListener) {
@@ -49,5 +49,14 @@ public abstract class SimpleAdapter<MODEL> extends SimplePagingAdapter<MODEL> {
 
     public boolean needShowBottomProgress() {
         return mNeedShowBottomProgress;
+    }
+
+    public void setNeedAsyncInflating(boolean needAsyncInflating) {
+        mNeedAsyncInflating = needAsyncInflating;
+    }
+
+    @Override
+    public boolean needAsyncInflating() {
+        return mNeedAsyncInflating;
     }
 }

@@ -1,7 +1,7 @@
 # SimpleRecycler
 
-[![Release](https://jitpack.io/v/e16din/SimpleRecycler.svg)](https://jitpack.io/#e16din/SimpleRecycler)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-SimpleRecycler-green.svg?style=true)](https://android-arsenal.com/details/1/4223)
+[![Release](https://jitpack.io/v/e16din/SimpleRecycler.svg)](https://jitpack.io/#e16din/SimpleRecycler)
 
 This library extends RecyclerView + Recycler Adapter.
 
@@ -21,7 +21,10 @@ Use it to comfortable work with lists.
 ## Usage
 ### Asynchronous layout inflation
 ```java
-mAdapter.setWaitingLayoutId(R.layout.layout_please_wait);
+mAdapter.setNeedAsyncInflating(true);
+
+//set your stub layout
+mAdapter.setStubIdForAsyncInflating(R.layout.layout_stub);
 ```
 
 ### Add items
@@ -78,20 +81,20 @@ public class MyAdapter extends SimpleAdapter<String> {
     }
 
     static class ViewHolder extends ItemViewHolder<String> {
-        TextView vItemText;
+        TextView vText;
 
         public ViewHolder(View itemView) {
             super(itemView);
         }
 
         @Override
-        public void findViews() {
-            vItemText = (TextView) findViewById(R.id.vItemText);
+        public void init() {
+            vText = (TextView) findViewById(R.id.vText);
         }
 
         @Override
         public void bindItem(String item, int position) {
-            vItemText.setText(position + ". " + item);
+            vText.setText(position + ". " + item);
         }
     }
 }
@@ -111,7 +114,7 @@ Step 1. Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 ```groovy
     dependencies {
-        compile 'com.github.e16din:SimpleRecycler:0.4.8'
+        compile 'com.github.e16din:SimpleRecycler:0.4.9'
     }
 ```
 

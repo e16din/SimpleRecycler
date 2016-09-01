@@ -822,11 +822,11 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         }
 
         @Override
-        public void bindInsert(Insertion item, int position) {
+        public void init() {
         }
 
         @Override
-        public void findViews() {
+        public void bindInsert(Insertion item, int position) {
         }
     }
 }

@@ -189,7 +189,9 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
 
         vContainer.addView(v);
 
-        return newViewHolder(vContainer);
+        final ItemViewHolder<MODEL> holder = newViewHolder(vContainer);
+        holder.setInflated(true);
+        return holder;
     }
 
     @Override

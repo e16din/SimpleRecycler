@@ -20,10 +20,24 @@ public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
     public SimpleViewHolder(View itemView) {
         super(itemView);
         findViews();
+        init();
         resetBackgrounds();
     }
 
-    public abstract void findViews();
+    /**
+     * Initialize all your views here.
+     * <p/>
+     * It will be used again after async inflating will be completed.
+     */
+    public abstract void init();
+
+
+    /**
+     * @deprecated Use init()
+     */
+    @Deprecated
+    public void findViews() {
+    }
 
     public final View findViewById(int id) {
         return itemView.findViewById(id);
@@ -36,7 +50,6 @@ public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
         }
 
         if (itemView instanceof ViewGroup) {
-
             if (vContainer != null) {
                 mBackgroundDrawable = vContainer.getBackground();
 
