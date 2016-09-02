@@ -595,7 +595,19 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
                 return super.onCreateViewHolder(parent, viewType);
             case TYPE_INSERTION:
                 View v = LayoutInflater.from(getContext()).inflate(R.layout.layout_container, parent, false);
-                return newInsertionViewHolder(v);
+
+                switch (viewType) {
+                    case 2:
+                        return newInsertionViewHolder2(v);
+                    case 3:
+                        return newInsertionViewHolder3(v);
+                    case 4:
+                        return newInsertionViewHolder4(v);
+                    case 5:
+                        return newInsertionViewHolder5(v);
+                    default:
+                        return newInsertionViewHolder(v, viewType);
+                }
         }
 
         return null;
@@ -604,8 +616,36 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     /**
      * Override this method if you need to bind view holder for insertions
      */
-    public InsertViewHolder newInsertionViewHolder(View v) {
+    public InsertViewHolder newInsertionViewHolder(View v, int viewType) {
         return new EmptyViewHolder(v);
+    }
+
+    /**
+     * viewType == 2
+     */
+    protected InsertViewHolder newInsertionViewHolder2(View v) {
+        return null;
+    }
+
+    /**
+     * viewType == 3
+     */
+    protected InsertViewHolder newInsertionViewHolder3(View v) {
+        return null;
+    }
+
+    /**
+     * viewType == 4
+     */
+    protected InsertViewHolder newInsertionViewHolder4(View v) {
+        return null;
+    }
+
+    /**
+     * viewType == 5
+     */
+    protected InsertViewHolder newInsertionViewHolder5(View v) {
+        return null;
     }
 
     @Override
@@ -645,7 +685,20 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
             });
         }
 
-        holder = newInsertionViewHolder(vContainer);
+        switch (holder.getItemViewType()) {
+            case 2:
+                holder = newInsertionViewHolder2(vContainer);
+            case 3:
+                holder = newInsertionViewHolder3(vContainer);
+            case 4:
+                holder = newInsertionViewHolder4(vContainer);
+            case 5:
+                holder = newInsertionViewHolder5(vContainer);
+            default:
+                holder = newInsertionViewHolder(vContainer, holder.getItemViewType());
+        }
+
+        holder = newInsertionViewHolder(vContainer, holder.getItemViewType());
         addRippleEffect(holder);
         holder.resetBackgrounds();
 

@@ -94,6 +94,34 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
 
     protected abstract ItemViewHolder<MODEL> newViewHolder(View v, int viewType);
 
+    /**
+     * viewType == 2
+     */
+    protected ItemViewHolder<MODEL> newViewHolder2(View v) {
+        return null;
+    }
+
+    /**
+     * viewType == 3
+     */
+    protected ItemViewHolder<MODEL> newViewHolder3(View v) {
+        return null;
+    }
+
+    /**
+     * viewType == 4
+     */
+    protected ItemViewHolder<MODEL> newViewHolder4(View v) {
+        return null;
+    }
+
+    /**
+     * viewType == 5
+     */
+    protected ItemViewHolder<MODEL> newViewHolder5(View v) {
+        return null;
+    }
+
     protected abstract void onBindItemViewHolder(SimpleViewHolder holder, int position);
 
     protected Context getContext() {
@@ -179,7 +207,6 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
 
     //- RecyclerView.Adapter
 
-
     @Override
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(getContext());
@@ -189,7 +216,25 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
 
         vContainer.addView(v);
 
-        final ItemViewHolder<MODEL> holder = newViewHolder(vContainer, viewType);
+        ItemViewHolder<MODEL> holder;
+
+        switch (viewType) {
+            case 2:
+                holder = newViewHolder2(vContainer);
+                break;
+            case 3:
+                holder = newViewHolder3(vContainer);
+                break;
+            case 4:
+                holder = newViewHolder4(vContainer);
+                break;
+            case 5:
+                holder = newViewHolder5(vContainer);
+                break;
+            default:
+                holder = newViewHolder(vContainer, viewType);
+        }
+
         holder.setInflated(true);
 
         return holder;
