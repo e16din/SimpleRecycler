@@ -20,7 +20,7 @@ public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
     public SimpleViewHolder(View itemView) {
         super(itemView);
         findViews();
-        init();
+        init(itemView);
         resetBackgrounds();
     }
 
@@ -29,8 +29,11 @@ public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
      * <p/>
      * It will be used again after async inflating will be completed.
      */
-    public abstract void init();
+    public abstract void init(View v);
 
+    public void reInit() {
+        init(itemView);
+    }
 
     /**
      * @deprecated Use init()
@@ -76,5 +79,8 @@ public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
 
     public void setInflated(boolean inflated) {
         mInflated = inflated;
+    }
+
+    public void onDetached() {
     }
 }

@@ -79,7 +79,7 @@ public abstract class SimpleAsyncAdapter<MODEL> extends SimpleListAdapter<MODEL>
                             vContainer.removeView(vStub);
                             finalHolder.setInflated(true);
                             finalHolder.findViews();
-                            finalHolder.init();
+                            finalHolder.reInit();
                             onViewHolderAsyncInflated(finalHolder);
                         }
                     });

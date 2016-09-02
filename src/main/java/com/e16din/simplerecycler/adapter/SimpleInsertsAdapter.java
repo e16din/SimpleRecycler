@@ -5,6 +5,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,13 +81,17 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
 
     @Override
     public void clear() {
+        clearInserts();
+        super.clear();
+    }
+
+    private void clearInserts() {
         mOnlyItemsCount = 0;
         mOnlyInsertsCount = 0;
         mHeadersCount = 0;
         mFootersCount = 0;
 
         mInserts.clear();
-        super.clear();
     }
 
     /**
@@ -815,6 +820,13 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         mOnInsertViewsClickListener = onInsertViewsClickListener;
     }
 
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        //todo: check clear holders
+        clearInserts();
+        super.onDetachedFromRecyclerView(recyclerView);
+    }
+
     private static class EmptyViewHolder extends InsertViewHolder {
         public EmptyViewHolder(View v) {
             super(v);
@@ -822,7 +834,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         }
 
         @Override
-        public void init() {
+        public void init(View v) {
         }
 
         @Override

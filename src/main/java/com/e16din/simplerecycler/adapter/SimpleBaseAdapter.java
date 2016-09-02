@@ -213,5 +213,20 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
     protected void updateViewHolderSelector(@NonNull SimpleViewHolder holder) {
         holder.mSelectorResId = getItemSelectorId();
     }
+
+    @Override
+    public void onViewDetachedFromWindow(SimpleViewHolder holder) {
+        holder.onDetached();
+        super.onViewDetachedFromWindow(holder);
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        //todo: check clear holders
+        getItems().clear();
+        notifyDataSetChanged();
+
+        super.onDetachedFromRecyclerView(recyclerView);
+    }
 }
 

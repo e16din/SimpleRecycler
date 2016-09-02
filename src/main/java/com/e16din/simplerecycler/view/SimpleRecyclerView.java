@@ -32,4 +32,14 @@ public class SimpleRecyclerView extends RecyclerView {
     protected OnScrollSimpleListener newListener() {
         return new OnScrollSimpleListener();
     }
+
+    @Override
+    protected void onMeasure(int widthSpec, int heightSpec) {
+        try {//workaround for NPE on findMinMaxChildLayoutPositions
+            //todo: catch this bug
+            super.onMeasure(widthSpec, heightSpec);
+        } catch (NullPointerException ignore) {
+            ignore.printStackTrace();
+        }
+    }
 }
