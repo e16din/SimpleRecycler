@@ -154,7 +154,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         int startItemCount = getItemCount();
         int startFootersCount = getFootersCount();
 
-        if (startFootersCount == 0) {
+        if (startFootersCount == 0 || getItemCount() == 0) {
             return;
         }
 
@@ -787,7 +787,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
      */
     @Nullable
     public Insertion getInsertion(int position) {
-        return mInserts.get(position);
+        return mInserts.size() == 0 ? null : mInserts.get(position);
     }
 
     public boolean isInsertion(int position) {
