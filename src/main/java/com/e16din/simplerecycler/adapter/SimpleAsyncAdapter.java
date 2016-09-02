@@ -51,7 +51,7 @@ public abstract class SimpleAsyncAdapter<MODEL> extends SimpleListAdapter<MODEL>
         if (!needAsyncInflating()) {
             View v = inflater.inflate(getItemLayoutId(), vContainer, false);
             vContainer.addView(v);
-            holder = newViewHolder(vContainer);
+            holder = newViewHolder(vContainer, viewType);
             holder.setInflated(true);
         } else {
             final boolean hasStubId = mStubId != NO_STUB_LAYOUT;
@@ -69,7 +69,7 @@ public abstract class SimpleAsyncAdapter<MODEL> extends SimpleListAdapter<MODEL>
 
             vContainer.addView(vStub);
 
-            holder = newViewHolder(vContainer);
+            holder = newViewHolder(vContainer, viewType);
             final SimpleViewHolder finalHolder = holder;
             new AsyncLayoutInflater(getContext()).inflate(getItemLayoutId(), vContainer,
                     new AsyncLayoutInflater.OnInflateFinishedListener() {

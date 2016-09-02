@@ -92,7 +92,7 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
         mItems.remove(0);
     }
 
-    protected abstract ItemViewHolder<MODEL> newViewHolder(View v);
+    protected abstract ItemViewHolder<MODEL> newViewHolder(View v, int viewType);
 
     protected abstract void onBindItemViewHolder(SimpleViewHolder holder, int position);
 
@@ -189,8 +189,9 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
 
         vContainer.addView(v);
 
-        final ItemViewHolder<MODEL> holder = newViewHolder(vContainer);
+        final ItemViewHolder<MODEL> holder = newViewHolder(vContainer, viewType);
         holder.setInflated(true);
+
         return holder;
     }
 
