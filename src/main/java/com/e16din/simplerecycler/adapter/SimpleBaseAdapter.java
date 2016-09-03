@@ -19,6 +19,7 @@ import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
 public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<SimpleViewHolder> {
@@ -38,6 +39,8 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
     @LayoutRes private int mContainerLayoutId = R.layout.layout_container;
 
     @DrawableRes private int mItemSelectorId = R.drawable.selector_list_item_default;
+
+    private Map<Integer, Integer> mLayoutIds;
 
 
     public SimpleBaseAdapter(@NonNull Context context, @NonNull List<MODEL> items, @LayoutRes int resId) {
@@ -93,6 +96,13 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
     }
 
     protected abstract ItemViewHolder<MODEL> newViewHolder(View v, int viewType);
+
+    /**
+     * viewType == 1
+     */
+    protected ItemViewHolder<MODEL> newViewHolder1(View v) {
+        return null;
+    }
 
     /**
      * viewType == 2
@@ -205,6 +215,14 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
         return ContextCompat.getColor(getContext(), resId);
     }
 
+    public Map<Integer, Integer> getLayoutIds() {
+        return mLayoutIds;
+    }
+
+    public void setLayoutIds(Map<Integer, Integer> layoutIds) {
+        mLayoutIds = layoutIds;
+    }
+
     //- RecyclerView.Adapter
 
     @Override
@@ -212,13 +230,25 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
         final LayoutInflater inflater = LayoutInflater.from(getContext());
         FrameLayout vContainer = (FrameLayout) inflater.inflate(getContainerLayoutId(), parent, false);
 
-        View v = inflater.inflate(mItemLayoutId, parent, false);
+        View v = inflater.inflate(getLayoutIdByViewType(viewType), parent, false);
 
         vContainer.addView(v);
 
+        final ItemViewHolder<MODEL> holder = createNewViewHolder(vContainer, viewType);
+
+        holder.setInflated(true);
+
+        return holder;
+    }
+
+    @NonNull
+    protected ItemViewHolder<MODEL> createNewViewHolder(FrameLayout vContainer, int viewType) {
         ItemViewHolder<MODEL> holder;
 
         switch (viewType) {
+            case 1:
+                holder = newViewHolder1(vContainer);
+                break;
             case 2:
                 holder = newViewHolder2(vContainer);
                 break;
@@ -235,9 +265,17 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
                 holder = newViewHolder(vContainer, viewType);
         }
 
-        holder.setInflated(true);
-
         return holder;
+    }
+
+    protected int getLayoutIdByViewType(int viewType) {
+        int layoutId;
+        if (getLayoutIds() != null && getLayoutIds().containsKey(viewType)) {
+            layoutId = getLayoutIds().get(viewType);
+        } else {
+            layoutId = getItemLayoutId();
+        }
+        return layoutId;
     }
 
     @Override
