@@ -235,9 +235,9 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
     @Override
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(getContext());
-        FrameLayout vContainer = (FrameLayout) inflater.inflate(getContainerLayoutId(), parent, false);
+        final FrameLayout vContainer = (FrameLayout) inflater.inflate(getContainerLayoutId(), parent, false);
 
-        View v = inflater.inflate(getLayoutIdByViewType(viewType), parent, false);
+        final View v = inflater.inflate(getLayoutIdByViewType(viewType), parent, false);
 
         vContainer.addView(v);
 
