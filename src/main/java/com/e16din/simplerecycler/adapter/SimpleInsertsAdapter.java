@@ -26,7 +26,7 @@ import java.util.List;
 public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MODEL> {
 
     public static final int TYPE_DEFAULT = 0;
-    public static final int TYPE_INSERTION = 1;
+    public static final int TYPE_INSERTION = 100500;
 
 
     private List<Insertion> mInserts;
@@ -598,18 +598,18 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
                 View v = LayoutInflater.from(getContext()).inflate(R.layout.layout_container, parent, false);
 
                 switch (viewType) {
-                    case 1:
+                    case TYPE_1:
                         return newInsertionViewHolder1(v);
-                    case 2:
+                    case TYPE_2:
                         return newInsertionViewHolder2(v);
-                    case 3:
+                    case TYPE_3:
                         return newInsertionViewHolder3(v);
-                    case 4:
+                    case TYPE_4:
                         return newInsertionViewHolder4(v);
-                    case 5:
+                    case TYPE_5:
                         return newInsertionViewHolder5(v);
                     default:
-                        return newInsertionViewHolder(v, viewType);
+
                 }
         }
 
@@ -700,19 +700,19 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         }
 
         switch (viewType) {
-            case 1:
+            case TYPE_1:
                 holder = newInsertionViewHolder1(vContainer);
                 break;
-            case 2:
+            case TYPE_2:
                 holder = newInsertionViewHolder2(vContainer);
                 break;
-            case 3:
+            case TYPE_3:
                 holder = newInsertionViewHolder3(vContainer);
                 break;
-            case 4:
+            case TYPE_4:
                 holder = newInsertionViewHolder4(vContainer);
                 break;
-            case 5:
+            case TYPE_5:
                 holder = newInsertionViewHolder5(vContainer);
                 break;
             default:

@@ -24,6 +24,13 @@ import java.util.Map;
 @SuppressWarnings("unused")//remove it to see unused warnings
 public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<SimpleViewHolder> {
 
+    public static final int TYPE_1 = 1;
+    public static final int TYPE_2 = 2;
+    public static final int TYPE_3 = 3;
+    public static final int TYPE_4 = 4;
+    public static final int TYPE_5 = 5;
+
+
     private final Context mContext;
 
     protected List<MODEL> mItems;
@@ -246,19 +253,19 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
         ItemViewHolder<MODEL> holder;
 
         switch (viewType) {
-            case 1:
+            case TYPE_1:
                 holder = newViewHolder1(vContainer);
                 break;
-            case 2:
+            case TYPE_2:
                 holder = newViewHolder2(vContainer);
                 break;
-            case 3:
+            case TYPE_3:
                 holder = newViewHolder3(vContainer);
                 break;
-            case 4:
+            case TYPE_4:
                 holder = newViewHolder4(vContainer);
                 break;
-            case 5:
+            case TYPE_5:
                 holder = newViewHolder5(vContainer);
                 break;
             default:
