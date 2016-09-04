@@ -49,7 +49,7 @@ public abstract class SimpleAsyncAdapter<MODEL> extends SimpleListAdapter<MODEL>
         SimpleViewHolder holder;
 
         if (!needAsyncInflating()) {
-            View v = inflater.inflate(getLayoutIdByViewType(viewType), parent, false);
+            View v = inflater.inflate(getItemLayoutId(viewType), parent, false);
 
             vContainer.addView(v);
 
@@ -75,7 +75,7 @@ public abstract class SimpleAsyncAdapter<MODEL> extends SimpleListAdapter<MODEL>
             holder = createNewViewHolder(vContainer, viewType);
             final SimpleViewHolder finalHolder = holder;
 
-            int layoutId = getLayoutIdByViewType(viewType);
+            int layoutId = getItemLayoutId(viewType);
 
             new AsyncLayoutInflater(getContext()).inflate(layoutId, vContainer,
                     new AsyncLayoutInflater.OnInflateFinishedListener() {

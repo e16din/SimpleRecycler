@@ -19,17 +19,9 @@ import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
 public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<SimpleViewHolder> {
-
-    public static final int TYPE_1 = 1;
-    public static final int TYPE_2 = 2;
-    public static final int TYPE_3 = 3;
-    public static final int TYPE_4 = 4;
-    public static final int TYPE_5 = 5;
-
 
     private final Context mContext;
 
@@ -41,19 +33,17 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
 
     private boolean mHasNewItems;
 
-    @LayoutRes private int mItemLayoutId;
+    @LayoutRes private int mDefaultItemLayoutId;
 
     @LayoutRes private int mContainerLayoutId = R.layout.layout_container;
 
     @DrawableRes private int mItemSelectorId = R.drawable.selector_list_item_default;
 
-    private Map<Integer, Integer> mLayoutIds;
-
 
     public SimpleBaseAdapter(@NonNull Context context, @NonNull List<MODEL> items, @LayoutRes int resId) {
         mContext = context;
         mItems = items;
-        mItemLayoutId = resId;
+        mDefaultItemLayoutId = resId;
         onInit();
     }
 
@@ -104,41 +94,6 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
 
     protected abstract ItemViewHolder<MODEL> newViewHolder(View v, int viewType);
 
-    /**
-     * viewType == 1
-     */
-    protected ItemViewHolder<MODEL> newViewHolder1(View v) {
-        return null;
-    }
-
-    /**
-     * viewType == 2
-     */
-    protected ItemViewHolder<MODEL> newViewHolder2(View v) {
-        return null;
-    }
-
-    /**
-     * viewType == 3
-     */
-    protected ItemViewHolder<MODEL> newViewHolder3(View v) {
-        return null;
-    }
-
-    /**
-     * viewType == 4
-     */
-    protected ItemViewHolder<MODEL> newViewHolder4(View v) {
-        return null;
-    }
-
-    /**
-     * viewType == 5
-     */
-    protected ItemViewHolder<MODEL> newViewHolder5(View v) {
-        return null;
-    }
-
     protected abstract void onBindItemViewHolder(SimpleViewHolder holder, int position);
 
     protected Context getContext() {
@@ -146,13 +101,8 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
     }
 
 
-    public void setItemLayoutId(@LayoutRes int layoutId) {
-        mItemLayoutId = layoutId;
-    }
-
-    @LayoutRes
-    public int getItemLayoutId() {
-        return mItemLayoutId;
+    public void setDefaultItemLayoutId(@LayoutRes int layoutId) {
+        mDefaultItemLayoutId = layoutId;
     }
 
     public void setContainerLayoutId(int containerLayoutId) {
@@ -222,14 +172,6 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
         return ContextCompat.getColor(getContext(), resId);
     }
 
-    public Map<Integer, Integer> getLayoutIds() {
-        return mLayoutIds;
-    }
-
-    public void setLayoutIds(Map<Integer, Integer> layoutIds) {
-        mLayoutIds = layoutIds;
-    }
-
     //- RecyclerView.Adapter
 
     @Override
@@ -237,7 +179,7 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
         final LayoutInflater inflater = LayoutInflater.from(getContext());
         final FrameLayout vContainer = (FrameLayout) inflater.inflate(getContainerLayoutId(), parent, false);
 
-        final View v = inflater.inflate(getLayoutIdByViewType(viewType), parent, false);
+        final View v = inflater.inflate(getItemLayoutId(viewType), parent, false);
 
         vContainer.addView(v);
 
@@ -248,41 +190,17 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
         return holder;
     }
 
-    @NonNull
-    protected ItemViewHolder<MODEL> createNewViewHolder(FrameLayout vContainer, int viewType) {
-        ItemViewHolder<MODEL> holder;
-
-        switch (viewType) {
-            case TYPE_1:
-                holder = newViewHolder1(vContainer);
-                break;
-            case TYPE_2:
-                holder = newViewHolder2(vContainer);
-                break;
-            case TYPE_3:
-                holder = newViewHolder3(vContainer);
-                break;
-            case TYPE_4:
-                holder = newViewHolder4(vContainer);
-                break;
-            case TYPE_5:
-                holder = newViewHolder5(vContainer);
-                break;
-            default:
-                holder = newViewHolder(vContainer, viewType);
-        }
-
-        return holder;
+    /**
+     * Override it for several view types
+     */
+    @LayoutRes
+    protected int getItemLayoutId(int viewType) {
+        return mDefaultItemLayoutId;
     }
 
-    protected int getLayoutIdByViewType(int viewType) {
-        int layoutId;
-        if (getLayoutIds() != null && getLayoutIds().containsKey(viewType)) {
-            layoutId = getLayoutIds().get(viewType);
-        } else {
-            layoutId = getItemLayoutId();
-        }
-        return layoutId;
+    @NonNull
+    protected ItemViewHolder<MODEL> createNewViewHolder(FrameLayout vContainer, int viewType) {
+        return newViewHolder(vContainer, viewType);
     }
 
     @Override

@@ -28,12 +28,6 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     public static final int TYPE_DEFAULT = 0;
     public static final int TYPE_INSERTION = 100500;
 
-    public static final int TYPE_INSERTION_1 = 100501;
-    public static final int TYPE_INSERTION_2 = 100502;
-    public static final int TYPE_INSERTION_3 = 100503;
-    public static final int TYPE_INSERTION_4 = 100504;
-    public static final int TYPE_INSERTION_5 = 100505;
-
     private List<Insertion> mInserts;
 
     private OnItemClickListener<Insertion> mOnInsertClickListener;
@@ -597,28 +591,12 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     @Override
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
-            case TYPE_DEFAULT:
-                return super.onCreateViewHolder(parent, viewType);
             case TYPE_INSERTION:
                 View v = LayoutInflater.from(getContext()).inflate(R.layout.layout_container, parent, false);
-
-                switch (viewType) {
-                    case TYPE_INSERTION_1:
-                        return newInsertionViewHolder1(v);
-                    case TYPE_INSERTION_2:
-                        return newInsertionViewHolder2(v);
-                    case TYPE_INSERTION_3:
-                        return newInsertionViewHolder3(v);
-                    case TYPE_INSERTION_4:
-                        return newInsertionViewHolder4(v);
-                    case TYPE_INSERTION_5:
-                        return newInsertionViewHolder5(v);
-                    default:
-                        return newInsertionViewHolder(v, viewType);
-                }
+                return newInsertionViewHolder(v);
+            default:
+                return super.onCreateViewHolder(parent, viewType);
         }
-
-        return null;
     }
 
     /**
@@ -626,43 +604,8 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
      * <p/>
      * viewType == 100500
      */
-    public InsertViewHolder newInsertionViewHolder(View v, int viewType) {
+    public InsertViewHolder newInsertionViewHolder(View v) {
         return new EmptyViewHolder(v);
-    }
-
-    /**
-     * viewType == 100501
-     */
-    protected InsertViewHolder newInsertionViewHolder1(View v) {
-        return null;
-    }
-
-    /**
-     * viewType == 100502
-     */
-    protected InsertViewHolder newInsertionViewHolder2(View v) {
-        return null;
-    }
-
-    /**
-     * viewType == 100503
-     */
-    protected InsertViewHolder newInsertionViewHolder3(View v) {
-        return null;
-    }
-
-    /**
-     * viewType == 100504
-     */
-    protected InsertViewHolder newInsertionViewHolder4(View v) {
-        return null;
-    }
-
-    /**
-     * viewType == 100505
-     */
-    protected InsertViewHolder newInsertionViewHolder5(View v) {
-        return null;
     }
 
     @Override
@@ -704,26 +647,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
             });
         }
 
-        final int viewType = holder == null ? TYPE_INSERTION : holder.getItemViewType();
-        switch (viewType) {
-            case TYPE_1:
-                holder = newInsertionViewHolder1(vContainer);
-                break;
-            case TYPE_2:
-                holder = newInsertionViewHolder2(vContainer);
-                break;
-            case TYPE_3:
-                holder = newInsertionViewHolder3(vContainer);
-                break;
-            case TYPE_4:
-                holder = newInsertionViewHolder4(vContainer);
-                break;
-            case TYPE_5:
-                holder = newInsertionViewHolder5(vContainer);
-                break;
-            default:
-                holder = newInsertionViewHolder(vContainer, viewType);
-        }
+        holder = newInsertionViewHolder(vContainer);
 
         addRippleEffect(holder);
         holder.resetBackgrounds();
