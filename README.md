@@ -67,7 +67,7 @@ public class MyAdapter extends SimpleAdapter<String> {
     }
 
     @Override
-    protected ItemViewHolder<String> newViewHolder(View v) {
+    protected ItemViewHolder<String> newViewHolder(View v, int viewType) {
         return new ViewHolder(v);
     }
 
@@ -99,6 +99,46 @@ mAdapter.setNeedAsyncInflating(true);
 mAdapter.setStubIdForAsyncInflating(R.layout.layout_stub);
 ```
 
+### Several view holders
+```java
+    @Override
+    protected ItemViewHolder<AllResults> newViewHolder(View v, int viewType) {
+        switch (viewType) {
+            case TYPE_FIRST:
+                return new FirstViewHolder(v);
+            case TYPE_SECOND:
+                return new SecondViewHolder(v);
+            case TYPE_THIRD:
+                return new ThirdViewHolder(v);
+        }
+
+        return null;//no way
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (isInsertion(position)) return TYPE_INSERTION;
+
+        if (condition1) return TYPE_FIRST;
+        if (condition2) return TYPE_SECOND;
+        if (condition3) return TYPE_THIRD;
+    }
+
+    @Override
+    protected int getItemLayoutId(int viewType) {
+        switch (viewType) {
+            case TYPE_FIRST:
+                return R.layout.item_first;
+            case TYPE_SECOND:
+                return R.layout.item_second;
+            case TYPE_THIRD:
+                return R.layout.item_third;
+            default:
+                return super.getItemLayoutId(viewType);
+        }
+    }
+```
+
 ## Download
 Step 1. Add it in your root build.gradle at the end of repositories:
 ```groovy
@@ -112,7 +152,7 @@ Step 1. Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 ```groovy
     dependencies {
-        compile 'com.github.e16din:SimpleRecycler:0.4.9'
+        compile 'com.github.e16din:SimpleRecycler:0.5.3'
     }
 ```
 
