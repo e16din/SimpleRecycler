@@ -101,8 +101,10 @@ mAdapter.setStubIdForAsyncInflating(R.layout.layout_stub);
 
 ### Several view holders
 ```java
+public class MyAdapter extends SimpleAdapter<MODEL> {
+
     @Override
-    protected ItemViewHolder<AllResults> newViewHolder(View v, int viewType) {
+    protected ItemViewHolder<MODEL> newViewHolder(View v, int viewType) {
         switch (viewType) {
             case TYPE_FIRST:
                 return new FirstViewHolder(v);
@@ -137,6 +139,7 @@ mAdapter.setStubIdForAsyncInflating(R.layout.layout_stub);
                 return super.getItemLayoutId(viewType);
         }
     }
+}
 ```
 
 ## Download
