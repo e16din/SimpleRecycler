@@ -236,7 +236,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     @NonNull
     public List<Insertion> getFooters() {
         if (getFootersCount() > 0) {
-            int itemCount = getItemCount();
+        int itemCount = getItemCount();
             return mInserts.subList(itemCount - getFootersCount(), itemCount);
         }
 
@@ -335,7 +335,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     public boolean addInsertion(Insertion insert) {
         setHasNewItems(true);
 
-        int insertPosition = getItemCount() - getFootersCount();
+        int insertPosition = getItemCount() <= getFootersCount() ? 0 : getItemCount() - getFootersCount();
 
         boolean result;
 
@@ -393,7 +393,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     public boolean add(MODEL item) {
         setHasNewItems(true);
 
-        int insertPosition = getItemCount() - getFootersCount();
+        int insertPosition =  getItemCount() <= getFootersCount() ? 0 : getItemCount() - getFootersCount();
 
         boolean result;
 
@@ -464,7 +464,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
 
         setHasNewItems(size > 0);
 
-        int insertPosition = getItemCount() - getFootersCount();
+        int insertPosition =  getItemCount() <= getFootersCount() ? 0 : getItemCount() - getFootersCount();
 
         boolean result;
 
@@ -548,7 +548,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     public void addFooter(@LayoutRes int layoutId, Object data) {
         int absoluteFootersCount = getAbsoluteFootersCount();
         if (absoluteFootersCount > 0) {
-            int position = getItemCount() - absoluteFootersCount;
+            int position =  getItemCount() <= absoluteFootersCount ? 0 : getItemCount() - absoluteFootersCount;
             mInserts.add(position, new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
             getItems().add(position, null);
             mFootersCount += 1;
