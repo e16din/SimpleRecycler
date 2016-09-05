@@ -42,18 +42,15 @@ public abstract class SimpleAsyncAdapter<MODEL> extends SimpleListAdapter<MODEL>
     }
 
     @Override
-    public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SimpleViewHolder onCreateViewHolder(ViewGroup vParent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(getContext());
-        FrameLayout vContainer = (FrameLayout) inflater.inflate(getContainerLayoutId(), parent, false);
+        FrameLayout vContainer = (FrameLayout) inflater.inflate(getContainerLayoutId(), vParent, false);
 
         SimpleViewHolder holder;
 
         if (!needAsyncInflating()) {
-            View v = inflater.inflate(getItemLayoutId(viewType), parent, false);
 
-            vContainer.addView(v);
-
-            holder = createNewViewHolder(vContainer, viewType);
+            holder = createNewViewHolder(inflater, vContainer, vParent, viewType);
 
             holder.setInflated(true);
         } else {
@@ -72,10 +69,10 @@ public abstract class SimpleAsyncAdapter<MODEL> extends SimpleListAdapter<MODEL>
 
             vContainer.addView(vStub);
 
-            holder = createNewViewHolder(vContainer, viewType);
+            holder = newViewHolder(vContainer, viewType);
             final SimpleViewHolder finalHolder = holder;
 
-            int layoutId = getItemLayoutId(viewType);
+            final int layoutId = takeLayoutId(viewType, holder);
 
             new AsyncLayoutInflater(getContext()).inflate(layoutId, vContainer,
                     new AsyncLayoutInflater.OnInflateFinishedListener() {

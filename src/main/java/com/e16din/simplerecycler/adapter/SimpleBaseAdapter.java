@@ -170,15 +170,11 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
     //- RecyclerView.Adapter
 
     @Override
-    public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SimpleViewHolder onCreateViewHolder(ViewGroup vParent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(getContext());
-        final FrameLayout vContainer = (FrameLayout) inflater.inflate(getContainerLayoutId(), parent, false);
+        final FrameLayout vContainer = (FrameLayout) inflater.inflate(getContainerLayoutId(), vParent, false);
 
-        final ItemViewHolder<MODEL> holder = createNewViewHolder(vContainer, viewType);
-
-        final View v = inflater.inflate(holder.mLayoutId != 0 ? holder.mLayoutId : getItemLayoutId(viewType),
-                parent, false);
-        vContainer.addView(v);
+        final ItemViewHolder<MODEL> holder = createNewViewHolder(inflater, vContainer, vParent, viewType);
 
         holder.setInflated(true);
 
@@ -194,8 +190,21 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
     }
 
     @NonNull
-    protected ItemViewHolder<MODEL> createNewViewHolder(FrameLayout vContainer, int viewType) {
-        return newViewHolder(vContainer, viewType);
+    protected ItemViewHolder<MODEL> createNewViewHolder(LayoutInflater inflater, FrameLayout vContainer,
+                                                        ViewGroup vParent, int viewType) {
+
+        final ItemViewHolder<MODEL> holder = newViewHolder(vContainer, viewType);
+
+        final int layoutId = takeLayoutId(viewType, holder);
+
+        View v = inflater.inflate(layoutId, vParent, false);
+        vContainer.addView(v);
+
+        return holder;
+    }
+
+    protected int takeLayoutId(int viewType, SimpleViewHolder holder) {
+        return holder.mLayoutId != 0 ? holder.mLayoutId : getItemLayoutId(viewType);
     }
 
     @Override

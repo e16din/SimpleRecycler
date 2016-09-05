@@ -598,13 +598,13 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     }
 
     @Override
-    public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SimpleViewHolder onCreateViewHolder(ViewGroup vParent, int viewType) {
         switch (viewType) {
             case TYPE_INSERTION:
-                View v = LayoutInflater.from(getContext()).inflate(R.layout.layout_container, parent, false);
+                View v = LayoutInflater.from(getContext()).inflate(R.layout.layout_container, vParent, false);
                 return newInsertionViewHolder(v);
             default:
-                return super.onCreateViewHolder(parent, viewType);
+                return super.onCreateViewHolder(vParent, viewType);
         }
     }
 
