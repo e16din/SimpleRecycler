@@ -93,17 +93,11 @@ public abstract class SimpleAsyncAdapter<MODEL> extends SimpleListAdapter<MODEL>
 
     protected abstract boolean needAsyncInflating();
 
-    @Override
-    public void onBindViewHolder(SimpleViewHolder holder, int position) {
-        if (holder.isInflated()) {
-            super.onBindViewHolder(holder, position);
-        }//else onViewHolderAsyncInflated
-    }
 
     protected void onViewHolderAsyncInflated(SimpleViewHolder holder) {
         final int adapterPosition = holder.getAdapterPosition();
         if (adapterPosition >= 0) {
-            super.onBindViewHolder(holder, adapterPosition);
+            onBindViewHolder(holder, adapterPosition);
         }
     }
 

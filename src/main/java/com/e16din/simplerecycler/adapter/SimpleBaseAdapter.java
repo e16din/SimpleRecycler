@@ -214,6 +214,8 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
 
     @Override
     public void onBindViewHolder(SimpleViewHolder holder, int position) {
+        if (!holder.isInflated()) return;//wait for async inflater
+
         updateViewHolderSelector(holder);
         holder.resetBackgrounds();
         onBindItemViewHolder(holder, position);
