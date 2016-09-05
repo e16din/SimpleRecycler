@@ -1,6 +1,7 @@
 package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.view.View;
 
@@ -8,7 +9,6 @@ import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
 import com.e16din.simplerecycler.adapter.listeners.OnItemClickListener;
 import com.e16din.simplerecycler.adapter.listeners.OnItemViewsClickListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
@@ -25,20 +25,20 @@ public abstract class SimpleClickAdapter<MODEL> extends SimpleAsyncAdapter<MODEL
                               OnItemClickListener<MODEL> onItemClickListener) {
         super(context, items, resId);
         mOnItemClickListener = onItemClickListener;
-        onInit();
     }
 
-    public SimpleClickAdapter(@NonNull Context context, @NonNull List<MODEL> items, int resId) {
-        this(context, items, resId, null);
+    public SimpleClickAdapter(@NonNull Context context, @NonNull List<MODEL> items, @LayoutRes int resId) {
+        super(context, items, resId);
     }
 
     public SimpleClickAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
-        this(context, items, 0, null);
+        super(context, items);
     }
 
     public SimpleClickAdapter(@NonNull Context context) {
-        this(context, new ArrayList<MODEL>());
+        super(context);
     }
+
 
     @Override
     protected void onBindItemViewHolder(SimpleViewHolder holder, int position) {

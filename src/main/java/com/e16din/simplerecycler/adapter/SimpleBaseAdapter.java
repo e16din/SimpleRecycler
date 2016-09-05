@@ -44,7 +44,6 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
         mContext = context;
         mItems = items;
         mDefaultItemLayoutId = resId;
-        onInit();
     }
 
     public SimpleBaseAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
@@ -53,10 +52,6 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
 
     public SimpleBaseAdapter(@NonNull Context context) {
         this(context, new ArrayList<MODEL>());
-    }
-
-    protected void onInit() {
-        //override it
     }
 
     public void onLastItem() {
