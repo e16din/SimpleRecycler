@@ -2,6 +2,7 @@ package com.e16din.simplerecycler.adapter.holders;
 
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,16 +19,17 @@ public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
 
     public boolean mInflated;
 
-    public SimpleViewHolder(View itemView, int layoutId) {
-        this(itemView);
-        mLayoutId = layoutId;
-    }
-
     public SimpleViewHolder(View itemView) {
         super(itemView);
+
         findViews();
         init(itemView);
         resetBackgrounds();
+    }
+
+    public SimpleViewHolder layoutId(@LayoutRes int layoutId) {
+        mLayoutId = layoutId;
+        return this;
     }
 
     /**
@@ -87,8 +89,9 @@ public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
         return mInflated;
     }
 
-    public void setInflated(boolean inflated) {
+    public SimpleViewHolder setInflated(boolean inflated) {
         mInflated = inflated;
+        return this;
     }
 
     public void onDetached() {

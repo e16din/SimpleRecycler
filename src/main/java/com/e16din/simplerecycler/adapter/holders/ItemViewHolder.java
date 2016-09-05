@@ -8,7 +8,6 @@ public abstract class ItemViewHolder<MODEL> extends SimpleViewHolder {
         super(itemView);
     }
 
-
     public void bindItem(MODEL item, int position) {
     }
 }

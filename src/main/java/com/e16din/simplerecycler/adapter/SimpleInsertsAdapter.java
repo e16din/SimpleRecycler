@@ -614,7 +614,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
      * viewType == 100500
      */
     public InsertViewHolder newInsertionViewHolder(View v) {
-        return new EmptyViewHolder(v);
+        return new EmptyViewHolder(v, 0);
     }
 
     @Override
@@ -833,8 +833,8 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     }
 
     private static class EmptyViewHolder extends InsertViewHolder {
-        public EmptyViewHolder(View v) {
-            super(v);
+        public EmptyViewHolder(View itemView, int layoutId) {
+            super(itemView);
             setIsRecyclable(false);
         }
 
