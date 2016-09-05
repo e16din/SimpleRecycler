@@ -107,11 +107,11 @@ public class MyAdapter extends SimpleAdapter<MODEL> {
     protected ItemViewHolder<MODEL> newViewHolder(View v, int viewType) {
         switch (viewType) {
             case TYPE_FIRST:
-                return new FirstViewHolder(v);
+                return  new FirstViewHolder(view).layoutId(R.layout.item_first);
             case TYPE_SECOND:
-                return new SecondViewHolder(v);
+                return new SecondViewHolder(v).layoutId(R.layout.item_second);
             case TYPE_THIRD:
-                return new ThirdViewHolder(v);
+                return new ThirdViewHolder(v).layoutId(R.layout.item_third);
         }
 
         return null;//no way
@@ -124,20 +124,6 @@ public class MyAdapter extends SimpleAdapter<MODEL> {
         if (condition1) return TYPE_FIRST;
         if (condition2) return TYPE_SECOND;
         if (condition3) return TYPE_THIRD;
-    }
-
-    @Override
-    protected int getItemLayoutId(int viewType) {
-        switch (viewType) {
-            case TYPE_FIRST:
-                return R.layout.item_first;
-            case TYPE_SECOND:
-                return R.layout.item_second;
-            case TYPE_THIRD:
-                return R.layout.item_third;
-            default:
-                return super.getItemLayoutId(viewType);
-        }
     }
 }
 ```
@@ -155,7 +141,7 @@ Step 1. Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 ```groovy
     dependencies {
-        compile 'com.github.e16din:SimpleRecycler:0.5.3'
+        compile 'com.github.e16din:SimpleRecycler:0.5.6.2'
     }
 ```
 
