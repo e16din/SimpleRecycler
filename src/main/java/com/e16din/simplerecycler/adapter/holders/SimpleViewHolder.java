@@ -31,8 +31,12 @@ public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
      */
     public abstract void init(View v);
 
+    public void reInit(View v) {
+        init(v);
+    }
+
     public void reInit() {
-        init(itemView);
+        reInit(itemView);
     }
 
     /**
