@@ -10,12 +10,18 @@ public abstract class SimpleViewHolder extends RecyclerView.ViewHolder {
 
     public ViewGroup vContainer;
 
+    public int mLayoutId;
+
     public Drawable mBackgroundDrawable;
     public int mSelectorResId;
     public boolean mIsSelectorEnabled = true;
 
     public boolean mInflated;
 
+    public SimpleViewHolder(View itemView, int layoutId) {
+        this(itemView);
+        mLayoutId = layoutId;
+    }
 
     public SimpleViewHolder(View itemView) {
         super(itemView);

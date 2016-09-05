@@ -126,7 +126,7 @@ public abstract class SimpleListAdapter<MODEL> extends SimpleBaseAdapter<MODEL> 
     @Override
     public MODEL remove(int position) {
         MODEL result = null;
-        if (getItemCount() >= position) {
+        if (getItemCount() > position) {
             result = mItems.remove(position);
 
             notifyIfNeed();

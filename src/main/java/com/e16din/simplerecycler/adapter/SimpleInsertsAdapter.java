@@ -65,17 +65,19 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
 
     @Override
     public MODEL remove(int position) {
-        if (isHeader(position)) {
-            mHeadersCount -= 1;
-        } else if (isFooter(position)) {
-            mFootersCount -= 1;
-        } else if (isInsertion(position)) {
-            mOnlyInsertsCount -= 1;
-        } else {
-            mOnlyItemsCount -= 1;
-        }
+        if (getItemCount() > position) {
+            if (isHeader(position)) {
+                mHeadersCount -= 1;
+            } else if (isFooter(position)) {
+                mFootersCount -= 1;
+            } else if (isInsertion(position)) {
+                mOnlyInsertsCount -= 1;
+            } else {
+                mOnlyItemsCount -= 1;
+            }
 
-        mInserts.remove(position);
+            mInserts.remove(position);
+        }
         return super.remove(position);
     }
 
@@ -93,6 +95,8 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
 
         mInserts.clear();
     }
+
+    //todo: check it with paging adapter
 
     /**
      * Clear items and inserts between headers and footers
@@ -236,7 +240,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     @NonNull
     public List<Insertion> getFooters() {
         if (getFootersCount() > 0) {
-        int itemCount = getItemCount();
+            int itemCount = getItemCount();
             return mInserts.subList(itemCount - getFootersCount(), itemCount);
         }
 
@@ -285,6 +289,11 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         }
 
         return insertPosition;
+    }
+
+
+    public List<Insertion> getInserts() {
+        return mInserts;
     }
 
     /**
@@ -393,7 +402,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     public boolean add(MODEL item) {
         setHasNewItems(true);
 
-        int insertPosition =  getItemCount() <= getFootersCount() ? 0 : getItemCount() - getFootersCount();
+        int insertPosition = getItemCount() <= getFootersCount() ? 0 : getItemCount() - getFootersCount();
 
         boolean result;
 
@@ -421,7 +430,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         }
 
         mInserts.addAll(createEmptyInsertsList(collection.size()));
-        addAll(collection);
+        getItems().addAll(collection);
         //no update counters, because we save their old values
     }
 
@@ -450,7 +459,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         }
 
         mInserts.addAll(collection);
-        addAll(createEmptyItemsList(collection.size()));
+        getItems().addAll(createEmptyItemsList(collection.size()));
         //no update counters, because we save their old values
     }
 
@@ -464,7 +473,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
 
         setHasNewItems(size > 0);
 
-        int insertPosition =  getItemCount() <= getFootersCount() ? 0 : getItemCount() - getFootersCount();
+        int insertPosition = getItemCount() <= getFootersCount() ? 0 : getItemCount() - getFootersCount();
 
         boolean result;
 
@@ -548,7 +557,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     public void addFooter(@LayoutRes int layoutId, Object data) {
         int absoluteFootersCount = getAbsoluteFootersCount();
         if (absoluteFootersCount > 0) {
-            int position =  getItemCount() <= absoluteFootersCount ? 0 : getItemCount() - absoluteFootersCount;
+            int position = getItemCount() <= absoluteFootersCount ? 0 : getItemCount() - absoluteFootersCount;
             mInserts.add(position, new Insertion(layoutId, data, Insertion.TYPE_FOOTER));
             getItems().add(position, null);
             mFootersCount += 1;
@@ -610,58 +619,51 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
 
     @Override
     public void onBindViewHolder(SimpleViewHolder holder, int position) {
-        if (isInsertion(position)) {
+        final Insertion insertion = getInsertion(position);
+        if (insertion != null) {
+            final LayoutInflater inflater = LayoutInflater.from(getContext());
 
-            onPreBindInsertionViewHolder(holder, position);
+            final FrameLayout vContainer = (FrameLayout) holder.itemView;
 
-            ((InsertViewHolder) holder).bindInsert(getInsertion(position), position);
+            final ViewGroup vInsertion = (ViewGroup) inflater.inflate(insertion.getLayoutId(), vContainer, false);
+
+            vContainer.removeAllViews();
+            vContainer.addView(vInsertion);
+            vInsertion.setClickable(true);
+
+            if (mOnInsertClickListener != null) {
+                final SimpleViewHolder finalHolder = holder;
+                vInsertion.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mOnInsertClickListener.onClick(insertion, finalHolder.getAdapterPosition());
+                    }
+                });
+            }
+
+            holder = newInsertionViewHolder(vContainer);
+
+            addRippleEffect(holder);
+            holder.resetBackgrounds();
+
+            onBindInsertionViewHolder(holder, position);
+
+            switch (insertion.getType()) {
+                case Insertion.TYPE_HEADER:
+                    onBindHeaderViewHolder(holder, position);
+                    break;
+                case Insertion.TYPE_FOOTER:
+                    onBindFooterViewHolder(holder, position);
+                    break;
+            }
+
+            ((InsertViewHolder) holder).bindInsert(insertion, position);
 
             setLastHolder(position == getItemCount() - 1 ? holder : null);
             return;
         }
 
         super.onBindViewHolder(holder, position);
-    }
-
-    private void onPreBindInsertionViewHolder(SimpleViewHolder holder, final int position) {
-        final Insertion insertion = getInsertion(position);
-
-        if (insertion == null) return;
-
-        final LayoutInflater inflater = LayoutInflater.from(getContext());
-
-        final FrameLayout vContainer = (FrameLayout) holder.itemView;
-
-        final ViewGroup vInsertion = (ViewGroup) inflater.inflate(insertion.getLayoutId(), vContainer, false);
-
-        vContainer.removeAllViews();
-        vContainer.addView(vInsertion);
-        vInsertion.setClickable(true);
-
-        if (mOnInsertClickListener != null) {
-            vInsertion.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnInsertClickListener.onClick(insertion, position);
-                }
-            });
-        }
-
-        holder = newInsertionViewHolder(vContainer);
-
-        addRippleEffect(holder);
-        holder.resetBackgrounds();
-
-        onBindInsertionViewHolder(holder, position);
-
-        switch (insertion.getType()) {
-            case Insertion.TYPE_HEADER:
-                onBindHeaderViewHolder(holder, position);
-                break;
-            case Insertion.TYPE_FOOTER:
-                onBindFooterViewHolder(holder, position);
-                break;
-        }
     }
 
     protected void updateInsertClickListener(final int position, @NonNull View vRoot) {
