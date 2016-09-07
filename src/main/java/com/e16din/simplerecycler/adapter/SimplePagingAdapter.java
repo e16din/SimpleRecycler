@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
 import com.e16din.simplerecycler.R;
-import com.e16din.simplerecycler.adapter.listeners.OnItemClickListener;
 import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;
@@ -24,14 +23,6 @@ public abstract class SimplePagingAdapter<MODEL> extends SimpleInsertsAdapter<MO
     private boolean mAllItemsLoaded;
     private boolean mNeedShowProgressFromStart = true;
 
-    public SimplePagingAdapter(@NonNull Context context, @NonNull List<MODEL> items, int resId,
-                               OnItemClickListener<MODEL> onItemClickListener) {
-        super(context, items, resId, onItemClickListener);
-    }
-
-    public SimplePagingAdapter(@NonNull Context context, @NonNull List<MODEL> items, int resId) {
-        super(context, items, resId);
-    }
 
     public SimplePagingAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
         super(context, items);

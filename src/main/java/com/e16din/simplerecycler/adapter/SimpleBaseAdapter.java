@@ -2,26 +2,19 @@ package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
-import com.e16din.simplerecycler.R;
-import com.e16din.simplerecycler.adapter.holders.ItemViewHolder;
-import com.e16din.simplerecycler.adapter.holders.SimpleViewHolder;
+import com.e16din.handyholder.HandyHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<SimpleViewHolder> {
+public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<HandyHolder<MODEL>> {
 
     private final Context mContext;
 
@@ -29,25 +22,14 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
 
     private Runnable mOnLastItemListener;
 
-    private SimpleViewHolder mLastHolder;
+    private HandyHolder mLastHolder;
 
     private boolean mHasNewItems;
 
-    @LayoutRes private int mDefaultItemLayoutId;
-
-    @LayoutRes private int mContainerLayoutId = R.layout.layout_container;
-
-    @DrawableRes private int mItemSelectorId = R.drawable.selector_list_item_default;
-
-
-    public SimpleBaseAdapter(@NonNull Context context, @NonNull List<MODEL> items, @LayoutRes int resId) {
-        mContext = context;
-        mItems = items;
-        mDefaultItemLayoutId = resId;
-    }
 
     public SimpleBaseAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
-        this(context, items, 0);
+        mContext = context;
+        mItems = items;
     }
 
     public SimpleBaseAdapter(@NonNull Context context) {
@@ -87,35 +69,11 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
         mItems.remove(0);
     }
 
-    protected abstract ItemViewHolder<MODEL> newViewHolder(View v, int viewType);
-
-    protected abstract void onBindItemViewHolder(SimpleViewHolder holder, int position);
+    protected void onBindItemViewHolder(HandyHolder holder, int position) {
+    }
 
     protected Context getContext() {
         return mContext;
-    }
-
-
-    public void setDefaultItemLayoutId(@LayoutRes int layoutId) {
-        mDefaultItemLayoutId = layoutId;
-    }
-
-    public void setContainerLayoutId(int containerLayoutId) {
-        mContainerLayoutId = containerLayoutId;
-    }
-
-    @LayoutRes
-    public int getContainerLayoutId() {
-        return mContainerLayoutId;
-    }
-
-    @DrawableRes
-    protected int getItemSelectorId() {
-        return mItemSelectorId;
-    }
-
-    public void setItemSelectorId(@DrawableRes int itemSelectorId) {
-        mItemSelectorId = itemSelectorId;
     }
 
     //use with SimpleRecyclerView
@@ -137,11 +95,11 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
     }
 
 
-    public SimpleViewHolder getLastHolder() {
+    public HandyHolder getLastHolder() {
         return mLastHolder;
     }
 
-    protected void setLastHolder(SimpleViewHolder lastHolder) {
+    protected void setLastHolder(HandyHolder lastHolder) {
         mLastHolder = lastHolder;
     }
 
@@ -170,78 +128,25 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Simp
     //- RecyclerView.Adapter
 
     @Override
-    public SimpleViewHolder onCreateViewHolder(ViewGroup vParent, int viewType) {
-        final LayoutInflater inflater = LayoutInflater.from(getContext());
-        final FrameLayout vContainer = (FrameLayout) inflater.inflate(getContainerLayoutId(), vParent, false);
-
-        final ItemViewHolder<MODEL> holder = createNewViewHolder(inflater, vContainer, vParent, viewType);
-
-        holder.setInflated(true);
-
-        return holder;
-    }
-
-    /**
-     * Override it for several view types
-     */
-    @LayoutRes
-    protected int getItemLayoutId(int viewType) {
-        return mDefaultItemLayoutId;
-    }
-
-    @NonNull
-    protected ItemViewHolder<MODEL> createNewViewHolder(LayoutInflater inflater, FrameLayout vContainer,
-                                                        ViewGroup vParent, int viewType) {
-
-        final ItemViewHolder<MODEL> holder = newViewHolder(vContainer, viewType);
-
-        final int layoutId = takeLayoutId(viewType, holder);
-
-        View v = inflater.inflate(layoutId, vParent, false);
-        vContainer.addView(v);
-
-        return holder;
-    }
-
-    protected int takeLayoutId(int viewType, SimpleViewHolder holder) {
-        return holder.mLayoutId != 0 ? holder.mLayoutId : getItemLayoutId(viewType);
-    }
-
-    @Override
     public int getItemCount() {
         return mItems.size();
     }
 
+    protected abstract HandyHolder<MODEL> newViewHolder(ViewGroup parent, int viewType);
+
     @Override
-    public void onBindViewHolder(SimpleViewHolder holder, int position) {
+    public HandyHolder<MODEL> onCreateViewHolder(ViewGroup parent, int viewType) {
+        return newViewHolder(parent, viewType);
+    }
+
+    @Override
+    public void onBindViewHolder(HandyHolder<MODEL> holder, int position) {
         if (!holder.isInflated()) return;//wait for async inflater
 
-        updateViewHolderSelector(holder);
-        holder.resetBackgrounds();
         onBindItemViewHolder(holder, position);
-
-        ((ItemViewHolder<MODEL>) holder).bindItem(getItem(position), position);
+        holder.bindItem(getItem(position), position);
 
         setLastHolder(position == getItemCount() - 1 ? holder : null);
-    }
-
-    protected void updateViewHolderSelector(@NonNull SimpleViewHolder holder) {
-        holder.mSelectorResId = getItemSelectorId();
-    }
-
-    @Override
-    public void onViewDetachedFromWindow(SimpleViewHolder holder) {
-        holder.onDetached();
-        super.onViewDetachedFromWindow(holder);
-    }
-
-    @Override
-    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
-        //todo: check clear holders
-        getItems().clear();
-        notifyDataSetChanged();
-
-        super.onDetachedFromRecyclerView(recyclerView);
     }
 }
 

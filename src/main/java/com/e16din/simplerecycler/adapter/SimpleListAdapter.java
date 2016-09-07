@@ -3,7 +3,6 @@ package com.e16din.simplerecycler.adapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 
 import java.util.Collection;
@@ -28,10 +27,6 @@ public abstract class SimpleListAdapter<MODEL> extends SimpleBaseAdapter<MODEL> 
     private boolean mAutoNotifyDataSetChanged = true;
 
 
-    public SimpleListAdapter(@NonNull Context context, @NonNull List<MODEL> items, @LayoutRes int resId) {
-        super(context, items, resId);
-    }
-
     public SimpleListAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
         super(context, items);
     }
@@ -54,6 +49,12 @@ public abstract class SimpleListAdapter<MODEL> extends SimpleBaseAdapter<MODEL> 
         }
     }
 
+    protected void notifyChangedIfNeed(int position) {
+        if (isAutoNotifyDataSetChanged()) {
+            notifyItemChanged(position);
+        }
+    }
+
     //todo: Update descriptions
 
 
@@ -73,7 +74,9 @@ public abstract class SimpleListAdapter<MODEL> extends SimpleBaseAdapter<MODEL> 
      */
     @Override
     public MODEL set(int location, MODEL object) {
-        return mItems.set(location, object);
+        final MODEL result = mItems.set(location, object);
+        notifyChangedIfNeed(location);
+        return result;
     }
 
     /**
@@ -212,7 +215,9 @@ public abstract class SimpleListAdapter<MODEL> extends SimpleBaseAdapter<MODEL> 
 
     @Override
     public boolean remove(Object o) {
-        return mItems.remove(o);
+        final boolean result = mItems.remove(o);
+        notifyIfNeed();
+        return result;
     }
 
     @Override
@@ -346,29 +351,22 @@ public abstract class SimpleListAdapter<MODEL> extends SimpleBaseAdapter<MODEL> 
     @Override
     public void replaceAll(UnaryOperator<MODEL> operator) {
         mItems.replaceAll(operator);
+        notifyIfNeed();
     }
 
     @TargetApi(Build.VERSION_CODES.N)
     @Override
     public void sort(Comparator<? super MODEL> c) {
         mItems.sort(c);
+        notifyIfNeed();
     }
 
     @TargetApi(Build.VERSION_CODES.N)
     @Override
     public boolean removeIf(Predicate<? super MODEL> filter) {
-        return mItems.removeIf(filter);
-    }
-
-    //- Deprecated
-
-
-    /**
-     * @deprecated use method clear() instead this
-     */
-    @Deprecated
-    public void clearAll() {
-        clear();
+        final boolean result = mItems.removeIf(filter);
+        notifyIfNeed();
+        return result;
     }
 }
 

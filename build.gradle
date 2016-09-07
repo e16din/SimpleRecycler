@@ -37,10 +37,7 @@ android {
 }
 
 dependencies {
-    compile ('com.android.support:appcompat-v7:24.2.0@aar'){
-        transitive = true;
-    }
-    compile ('com.android.support:recyclerview-v7:24.2.0@aar'){
-        transitive = true;
+    compile('com.github.e16din:HandyHolder:1.0.0@aar') {
+        transitive = true
     }
 }
