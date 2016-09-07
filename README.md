@@ -3,18 +3,23 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-SimpleRecycler-green.svg?style=true)](https://android-arsenal.com/details/1/4223)
 [![Release](https://jitpack.io/v/e16din/SimpleRecycler.svg)](https://jitpack.io/#e16din/SimpleRecycler)
 
-Use it to comfortable work with lists.
+Use it to comfortable work with lists. 
+
+SimpleRecycler includes [HandyHolder](https://github.com/e16din/HandyHolder) library for comfortable creating and updating holders. 
 
 
 
 ## Out of the box:
-* Asynchronous layout inflation
-* Ripple-effect to items
+
+* HandyHolder: Asynchronous layout inflation
+* HandyHolder: Ripple-effect to items
+* HandyHolder: OnClickListener and handy OnViewsClickListener
+
 * Headers and Footers like in the ListView
 * Custom Insertions between items
-* OnItemClickListener and handy OnItemViewsClickListener
 * Paging with inner logic to load more data
 * Implemented List interface (use adapter as list)
+
 
 
 ## Usage
@@ -68,24 +73,36 @@ public class MyAdapter extends SimpleAdapter<String> {
 
     @Override
     protected ItemViewHolder<String> newViewHolder(View v, int viewType) {
-        return new ViewHolder(v);
+        return HandyHolder.<String>create(this, vParent)
+                    .layoutId(R.layout.item_first)
+                    .clickListener(new OnClickListener<String>() {
+                        @Override
+                        public void onClick(String item, int position) {
+                            remove(position);
+                        }
+                    })
+                    .listener(new Listener())
+                    .init();
     }
 
-    class ViewHolder extends ItemViewHolder<String> {
+    private static class Listener extends HandyListener<String> {
         TextView vItemText;
 
-        public ViewHolder(View itemView) {
-            super(itemView);
+        @Override
+        public void onInit(HandyHolder<String> h, View v) {
+            vItemText = (TextView) v.findViewById(R.id.vItemText);
         }
 
         @Override
-        public void init() {
-            vText = (TextView) findViewById(R.id.vText);
+        public void onPreBind(HandyHolder<String> h, String item, int position) {
+            super.onPreBind(h, item, position);
+
+            h.rippleEffect(MathUtils.isEven(h.getAdapterPosition()));
         }
 
         @Override
-        public void bindItem(String item, int position) {
-            vText.setText(position + ". " + item);
+        public void onBind(String item, int position) {
+            vItemText.setText(position + ". " + item);
         }
     }
 }
@@ -93,10 +110,13 @@ public class MyAdapter extends SimpleAdapter<String> {
 
 ### Asynchronous layout inflation
 ```java
-mAdapter.setNeedAsyncInflating(true);
-
-//set your stub layout
-mAdapter.setStubIdForAsyncInflating(R.layout.layout_stub);
+    @Override
+    protected ItemViewHolder<MODEL> newViewHolder(View v, int viewType) {
+        return HandyHolder.<MODEL>create(this, vParent, R.layout.item_first)
+                    .asyncInflating(true)
+                    .stubId(R.layout.layout_stub)
+                    .init();
+    }
 ```
 
 ### Several view holders
@@ -107,11 +127,11 @@ public class MyAdapter extends SimpleAdapter<MODEL> {
     protected ItemViewHolder<MODEL> newViewHolder(View v, int viewType) {
         switch (viewType) {
             case TYPE_FIRST:
-                return  new FirstViewHolder(view).layoutId(R.layout.item_first);
+                return HandyHolder.<MODEL>create(this, vParent, R.layout.item_first).init();
             case TYPE_SECOND:
-                return new SecondViewHolder(v).layoutId(R.layout.item_second);
+                return HandyHolder.<MODEL>create(this, vParent, R.layout.item_second).init();
             case TYPE_THIRD:
-                return new ThirdViewHolder(v).layoutId(R.layout.item_third);
+                return HandyHolder.<MODEL>create(this, vParent, R.layout.item_third).init();
         }
 
         return null;//no way
@@ -141,7 +161,7 @@ Step 1. Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 ```groovy
     dependencies {
-        compile 'com.github.e16din:SimpleRecycler:0.5.6.2'
+        compile 'com.github.e16din:SimpleRecycler:0.6.0'
     }
 ```
 
