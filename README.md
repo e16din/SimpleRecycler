@@ -14,7 +14,6 @@ SimpleRecycler includes [HandyHolder](https://github.com/e16din/HandyHolder) lib
 * HandyHolder: Asynchronous layout inflation
 * HandyHolder: Ripple-effect to items
 * HandyHolder: OnClickListener and handy OnViewsClickListener
-
 * Headers and Footers like in the ListView
 * Custom Insertions between items
 * Paging with inner logic to load more data
