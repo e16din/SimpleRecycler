@@ -11,7 +11,7 @@ import java.util.List;
 @SuppressWarnings("unused")//remove it to see unused warnings
 public abstract class SimpleRippleAdapter<MODEL> extends SimpleBindListenerAdapter<MODEL> {
 
-    private boolean mRippleEffect;
+    private boolean mRippleEffect = true;
 
     public SimpleRippleAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
         super(context, items);
