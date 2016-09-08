@@ -3,7 +3,7 @@ package com.e16din.simplerecycler.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.e16din.handyholder.HandyHolder;
+import com.e16din.handyholder.wrapper.Handy;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public abstract class SimpleAdapter<MODEL> extends SimplePagingAdapter<MODEL> {
     //SimplePagingAdapter - paging logic
 
     public static void init(Context context) {
-        HandyHolder.init(context);
+        Handy.init(context);
     }
 
 

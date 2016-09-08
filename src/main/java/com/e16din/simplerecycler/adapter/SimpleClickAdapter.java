@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.e16din.handyholder.HandyHolder;
+import com.e16din.handyholder.holder.HandyHolder;
 import com.e16din.handyholder.listeners.click.OnClickListener;
 import com.e16din.handyholder.listeners.click.OnViewsClickListener;
 
@@ -30,17 +30,16 @@ public abstract class SimpleClickAdapter<MODEL> extends SimpleListAdapter<MODEL>
 
 
     @Override
-    public void onBindViewHolder(HandyHolder<MODEL> holder, int position) {
+    public void onBindViewHolder(HandyHolder holder, int position) {
         if (holder.getClickListener() == null) {
-            holder.setClickListener(mOnItemClickListener);
+            holder.clickListener(mOnItemClickListener);
         } else {
             Log.w(TAG, "OnClickListener already exist, check it in the newViewHolder() method.");
         }
 
         if (holder.getViewsClickListener() == null) {
-            holder.setViewsClickListener(mOnItemViewsClickListener);
-            holder.setClickableViewsArray(mClickableViewsArray);
-            holder.setClickableViewsList(mClickableViewsList);
+            holder.setViewsClickListener(mClickableViewsArray, mOnItemViewsClickListener);
+            holder.setViewsClickListener(mClickableViewsList, mOnItemViewsClickListener);
         } else {
             Log.w(TAG, "OnViewsClickListener already exist, check it in the newViewHolder() method.");
         }

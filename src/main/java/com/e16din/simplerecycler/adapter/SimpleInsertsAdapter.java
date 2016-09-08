@@ -10,10 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.e16din.handyholder.HandyHolder;
+import com.e16din.handyholder.holder.HandyHolder;
 import com.e16din.handyholder.listeners.click.OnClickListener;
 import com.e16din.handyholder.listeners.click.OnViewsClickListener;
-import com.e16din.handyholder.listeners.holder.HolderListener;
+import com.e16din.handyholder.listeners.holder.BindListener;
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.model.Insertion;
 
@@ -600,7 +600,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
      * <p/>
      * viewType == 100500
      */
-    public HandyHolder<Insertion> newInsertionViewHolder(ViewGroup vParent) {
+    public HandyHolder<SimpleInsertsAdapter, Insertion> newInsertionViewHolder(ViewGroup vParent) {
         final LayoutInflater inflater = LayoutInflater.from(getContext());
         ViewGroup itemView = (ViewGroup) inflater.inflate(R.layout.layout_root, vParent, false);
 
@@ -613,10 +613,10 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         if (insertion != null) {
             final LayoutInflater inflater = LayoutInflater.from(getContext());
 
-            final FrameLayout itemView = holder.vRoot;
+            final FrameLayout itemView = holder.getRootView();
 
             final ViewGroup vContainer = (ViewGroup) inflater.inflate(insertion.getLayoutId(), itemView, false);
-            holder.vContainer = vContainer;
+            holder.setContainerView(vContainer);
 
             itemView.removeAllViews();
             itemView.addView(vContainer);
@@ -632,8 +632,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
                 });
             }
 
-            holder.onInit(holder, itemView);
-
+            holder.onInit(itemView);
 
             onBindInsertionViewHolder(holder, position);
 
@@ -814,7 +813,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         mOnInsertViewsClickListener = onInsertViewsClickListener;
     }
 
-    private static class EmptyViewHolder extends HandyHolder<Insertion> {
+    private static class EmptyViewHolder extends HandyHolder<SimpleInsertsAdapter, Insertion> {
 
         public void bindInsert(Insertion insert, int position) {
         }
@@ -822,15 +821,11 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         public EmptyViewHolder(ViewGroup vParent) {
             super(vParent);
             setIsRecyclable(false);
-            holderListener(new InsertionFitListener());
+            holderListener(new InsertionHolderListener());
         }
 
-        private static class InsertionFitListener extends HolderListener<Insertion> {
-            @Override
-            public void onInit(HandyHolder<Insertion> h, View v) {
-                //do nothing
-            }
-
+        private static class InsertionHolderListener
+                extends BindListener<SimpleInsertsAdapter, HandyHolder<SimpleInsertsAdapter, Insertion>, Insertion> {
             @Override
             public void onBind(Insertion item, int position) {
                 //do nothing

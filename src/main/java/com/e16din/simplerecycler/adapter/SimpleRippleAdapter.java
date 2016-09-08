@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
-import com.e16din.handyholder.HandyHolder;
+import com.e16din.handyholder.holder.HandyHolder;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public abstract class SimpleRippleAdapter<MODEL> extends SimpleBindListenerAdapt
 
 
     @Override
-    public HandyHolder<MODEL> onCreateViewHolder(ViewGroup parent, int viewType) {
+    public HandyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return super.onCreateViewHolder(parent, viewType)
                 .rippleEffect(mRippleEffect);
     }

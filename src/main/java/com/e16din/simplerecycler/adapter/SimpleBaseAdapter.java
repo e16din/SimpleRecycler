@@ -8,13 +8,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import com.e16din.handyholder.HandyHolder;
+import com.e16din.handyholder.holder.HandyHolder;
+import com.e16din.handyholder.listeners.holder.HolderListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<HandyHolder<MODEL>> {
+public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<HandyHolder> {
 
     protected static final String TAG = "SimpleAdapter";
 
@@ -73,6 +74,11 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Hand
     }
 
     protected void onBindItemViewHolder(HandyHolder holder, int position) {
+    }
+
+    protected void onBindItemViewHolder(HandyHolder holder,
+                                        List<HolderListener<SimpleBaseAdapter, HandyHolder, MODEL>> listeners,
+                                        int position) {
     }
 
     protected Context getContext() {
@@ -135,18 +141,19 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Hand
         return mItems.size();
     }
 
-    protected abstract HandyHolder<MODEL> newViewHolder(ViewGroup parent, int viewType);
+    protected abstract HandyHolder newViewHolder(ViewGroup parent, int viewType);
 
     @Override
-    public HandyHolder<MODEL> onCreateViewHolder(ViewGroup parent, int viewType) {
+    public HandyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return newViewHolder(parent, viewType);
     }
 
     @Override
-    public void onBindViewHolder(HandyHolder<MODEL> holder, int position) {
+    public void onBindViewHolder(HandyHolder holder, int position) {
         if (!holder.isInflated()) return;//wait for async inflater
 
         onBindItemViewHolder(holder, position);
+        onBindItemViewHolder(holder, holder.getListeners(), position);
         holder.bindItem(getItem(position), position);
 
         setLastHolder(position == getItemCount() - 1 ? holder : null);
