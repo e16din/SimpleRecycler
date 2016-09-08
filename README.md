@@ -11,9 +11,9 @@ SimpleRecycler includes [HandyHolder](https://github.com/e16din/HandyHolder) lib
 
 ## Out of the box:
 
-* HandyHolder: Asynchronous layout inflation
-* HandyHolder: Ripple-effect to items
-* HandyHolder: OnClickListener and handy OnViewsClickListener
+* Asynchronous layout inflation
+* Ripple-effect to items
+* OnClickListener and handy OnViewsClickListener
 * Headers and Footers like in the ListView
 * Custom Insertions between items
 * Paging with inner logic to load more data
@@ -84,19 +84,19 @@ public class MyAdapter extends SimpleAdapter<String> {
                     .init();
     }
 
-    private static class Listener extends HandyListener<String> {
+    private static class Listener extends HolderListener<String> {
         TextView vItemText;
 
         @Override
-        public void onInit(HandyHolder<String> h, View v) {
+        public void onInit(HolderListener<String> h, View v) {
             vItemText = (TextView) v.findViewById(R.id.vItemText);
         }
 
         @Override
-        public void onPreBind(HandyHolder<String> h, String item, int position) {
-            super.onPreBind(h, item, position);
+        public void beforeBind(Adapter a, HolderListener<String> h, String item, int position) {
+            super.beforeBind(a, h, item, position);
 
-            h.rippleEffect(MathUtils.isEven(h.getAdapterPosition()));
+            h.rippleEffect(MathUtils.isEven(position));
         }
 
         @Override
@@ -109,13 +109,12 @@ public class MyAdapter extends SimpleAdapter<String> {
 
 ### Asynchronous layout inflation
 ```java
-    @Override
-    protected ItemViewHolder<MODEL> newViewHolder(View v, int viewType) {
-        return HandyHolder.<MODEL>create(this, vParent, R.layout.item_first)
-                    .asyncInflating(true)
-                    .stubId(R.layout.layout_stub)
-                    .init();
-    }
+mAdapter.setAsyncInflating(true);
+```
+
+### Disable ripple effect
+```java
+mAdapter.setRippleEffect(false);
 ```
 
 ### Several view holders
@@ -160,7 +159,7 @@ Step 1. Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 ```groovy
     dependencies {
-        compile 'com.github.e16din:SimpleRecycler:0.6.0'
+        compile 'com.github.e16din:SimpleRecycler:0.6.2'
     }
 ```
 
