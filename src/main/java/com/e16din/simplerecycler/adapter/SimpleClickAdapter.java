@@ -2,10 +2,11 @@ package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.e16din.handyholder.HandyHolder;
-import com.e16din.handyholder.listeners.OnClickListener;
-import com.e16din.handyholder.listeners.OnViewsClickListener;
+import com.e16din.handyholder.listeners.click.OnClickListener;
+import com.e16din.handyholder.listeners.click.OnViewsClickListener;
 
 import java.util.List;
 
@@ -32,11 +33,16 @@ public abstract class SimpleClickAdapter<MODEL> extends SimpleListAdapter<MODEL>
     public void onBindViewHolder(HandyHolder<MODEL> holder, int position) {
         if (holder.getClickListener() == null) {
             holder.setClickListener(mOnItemClickListener);
+        } else {
+            Log.w(TAG, "OnClickListener already exist, check it in the newViewHolder() method.");
         }
+
         if (holder.getViewsClickListener() == null) {
             holder.setViewsClickListener(mOnItemViewsClickListener);
             holder.setClickableViewsArray(mClickableViewsArray);
             holder.setClickableViewsList(mClickableViewsList);
+        } else {
+            Log.w(TAG, "OnViewsClickListener already exist, check it in the newViewHolder() method.");
         }
 
         super.onBindViewHolder(holder, position);

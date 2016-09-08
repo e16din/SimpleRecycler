@@ -16,6 +16,9 @@ import java.util.List;
 @SuppressWarnings("unused")//remove it to see unused warnings
 public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<HandyHolder<MODEL>> {
 
+    protected static final String TAG = "SimpleAdapter";
+
+
     private final Context mContext;
 
     protected List<MODEL> mItems;

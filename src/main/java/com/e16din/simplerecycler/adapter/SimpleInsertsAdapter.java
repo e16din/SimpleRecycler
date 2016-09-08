@@ -11,9 +11,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.e16din.handyholder.HandyHolder;
-import com.e16din.handyholder.listeners.HandyListener;
-import com.e16din.handyholder.listeners.OnClickListener;
-import com.e16din.handyholder.listeners.OnViewsClickListener;
+import com.e16din.handyholder.listeners.click.OnClickListener;
+import com.e16din.handyholder.listeners.click.OnViewsClickListener;
+import com.e16din.handyholder.listeners.holder.HolderListener;
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.model.Insertion;
 
@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleInsertsAdapter<MODEL> extends SimpleClickAdapter<MODEL> {
+public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MODEL> {
 
     public static final int TYPE_DEFAULT = 0;
     public static final int TYPE_INSERTION = 100500;
@@ -822,10 +822,10 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleClickAdapter<MOD
         public EmptyViewHolder(ViewGroup vParent) {
             super(vParent);
             setIsRecyclable(false);
-            listener(new InsertionFitListener());
+            holderListener(new InsertionFitListener());
         }
 
-        private static class InsertionFitListener extends HandyListener<Insertion> {
+        private static class InsertionFitListener extends HolderListener<Insertion> {
             @Override
             public void onInit(HandyHolder<Insertion> h, View v) {
                 //do nothing
