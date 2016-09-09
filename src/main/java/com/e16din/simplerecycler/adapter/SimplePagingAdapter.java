@@ -12,7 +12,7 @@ import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
 public abstract class SimplePagingAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
-        extends SimpleRippleAdapter<HOLDER, MODEL> {
+        extends SimpleBindListenerAdapter<HOLDER, MODEL> {
 
     public static final int TYPE_BOTTOM_PROGRESS = Insertion.TYPE_ABSOLUTE_FOOTER + 1;
 
