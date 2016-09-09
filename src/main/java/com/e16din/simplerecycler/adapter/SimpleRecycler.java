@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.e16din.handyholder.wrapper.Handy;
 
-public class SymplyRecycler {
+public class SimpleRecycler {
 
     public static void init(Context context) {
         Handy.init(context);
