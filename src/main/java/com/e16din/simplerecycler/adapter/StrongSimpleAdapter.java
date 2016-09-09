@@ -4,8 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
-import com.e16din.handyholder.wrapper.Handy;
-
 import java.util.List;
 
 public abstract class StrongSimpleAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
@@ -19,11 +17,6 @@ public abstract class StrongSimpleAdapter<HOLDER extends RecyclerView.ViewHolder
     //SimpleRippleAdapter - ripple effect
     //SimpleInsertsAdapter - headers, footers, insertions
     //SimplePagingAdapter - paging logic
-
-    public static void init(Context context) {
-        Handy.init(context);
-    }
-
 
     private boolean mNeedShowBottomProgress = false;
 

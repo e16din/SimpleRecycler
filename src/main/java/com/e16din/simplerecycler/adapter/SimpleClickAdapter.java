@@ -40,12 +40,7 @@ public abstract class SimpleClickAdapter<HOLDER extends RecyclerView.ViewHolder,
 
         final RecyclerView.ViewHolder holder = super.onCreateViewHolder(parent, viewType);
 
-        if (holder instanceof HandyHolder) {
-            HandyHolder h = (HandyHolder) holder;
-            if (h.isInflated()) {//already inited
-                return holder;
-            }
-        }
+        if (isInflatedHandyHolder(holder)) return holder;
 
         final SimpleHandy<MODEL> handy = new SimpleHandy<MODEL>(this, parent) {
             @Override
@@ -65,6 +60,16 @@ public abstract class SimpleClickAdapter<HOLDER extends RecyclerView.ViewHolder,
         }
 
         return handy.init();
+    }
+
+    protected boolean isInflatedHandyHolder(RecyclerView.ViewHolder holder) {
+        if (holder instanceof HandyHolder) {
+            HandyHolder h = (HandyHolder) holder;
+            if (h.isInflated()) {//already inited
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setOnItemClickListener(OnClickListener<MODEL> listener) {
