@@ -2,7 +2,7 @@ package com.e16din.simplerecycler;
 
 import android.content.Context;
 
-import com.e16din.handyholder.wrapper.Handy;
+import com.e16din.handyholder.holder.HandyHolder;
 
 public final class SimpleRecycler {
 
@@ -10,7 +10,7 @@ public final class SimpleRecycler {
     }
 
     public static void init(Context context) {
-        Handy.init(context);
+        HandyHolder.init(context);
     }
 
 }

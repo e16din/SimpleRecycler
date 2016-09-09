@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import com.e16din.handyholder.listeners.click.OnClickListener;
 import com.e16din.handyholder.listeners.click.OnViewsClickListener;
-import com.e16din.handyholder.wrapper.SimpleHandy;
+import com.e16din.handyholder.wrapper.Handy;
 
 import java.util.List;
 
@@ -29,28 +29,34 @@ public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewH
             return super.onCreateViewHolder(parent, viewType);
         }// else
 
-        final SimpleHandy<MODEL> handy = new SimpleHandy<MODEL>(this, parent) {
+        final Handy<MODEL> handy = new Handy<MODEL>(this, parent) {
             @Override
             public RecyclerView.ViewHolder newHolder(ViewGroup viewGroup) {
                 return newViewHolder(viewGroup, viewType);
             }
         };
 
-        handy.asyncInflating(isAsyncInflating());
-        handy.rippleEffect(isRippleEffect());
+        if (!handy.set().isAlreadySetAsyncInflating()) {
+            handy.set().asyncInflating(isAsyncInflating());
+        }
+
+        if (!handy.set().isAlreadySetRippleEffect()) {
+            handy.set().rippleEffect(isRippleEffect());
+        }
 
         //click listeners
         if (mOnItemClickListener != null) {
-            handy.clickListener(mOnItemClickListener);
-        }
-        if (mOnItemViewsClickListener != null) {
-            if (mClickableViewsArray != null)
-                handy.setViewsClickListener(mClickableViewsArray, mOnItemViewsClickListener);
-            if (mClickableViewsList != null)
-                handy.setViewsClickListener(mClickableViewsList, mOnItemViewsClickListener);
+            handy.set().clickListener(mOnItemClickListener);
         }
 
-        return handy.init();
+        if (mOnItemViewsClickListener != null) {
+            if (mClickableViewsArray != null)
+                handy.set().setViewsClickListener(mClickableViewsArray, mOnItemViewsClickListener);
+            if (mClickableViewsList != null)
+                handy.set().setViewsClickListener(mClickableViewsList, mOnItemViewsClickListener);
+        }
+
+        return handy.set().init();
     }
 
 
