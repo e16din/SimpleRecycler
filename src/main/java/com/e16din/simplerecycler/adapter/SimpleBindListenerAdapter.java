@@ -2,18 +2,16 @@ package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.view.ViewGroup;
-
-import com.e16din.handyholder.holder.HandyHolder;
-import com.e16din.handyholder.listeners.holder.BindListener;
+import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleBindListenerAdapter<MODEL> extends SimpleAsyncAdapter<MODEL> {
+public abstract class SimpleBindListenerAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
+        extends SimpleAsyncAdapter<HOLDER, MODEL> {
 
-    private List<BindListener<SimpleAdapter<MODEL>, HandyHolder, MODEL>> mListeners;
+    private List<OnBindListener<MODEL>> mListeners;
 
     public SimpleBindListenerAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
         super(context, items);
@@ -24,17 +22,15 @@ public abstract class SimpleBindListenerAdapter<MODEL> extends SimpleAsyncAdapte
     }
 
     @Override
-    public HandyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final HandyHolder holder = super.onCreateViewHolder(parent, viewType);
+    protected void onBindItemViewHolder(HOLDER holder, int position) {
+        if (mListeners == null) return;
 
-        for (BindListener<SimpleAdapter<MODEL>, HandyHolder, MODEL> listener : mListeners) {
-            holder.holderListener(listener);
+        for (OnBindListener<MODEL> listener : mListeners) {
+            listener.onBind(get(position), position);
         }
-
-        return holder;
     }
 
-    public void addHolderListener(BindListener<SimpleAdapter<MODEL>, HandyHolder, MODEL> listener) {
+    public void addOnBindListener(OnBindListener<MODEL> listener) {
         if (mListeners == null) {
             mListeners = new ArrayList<>();
         }

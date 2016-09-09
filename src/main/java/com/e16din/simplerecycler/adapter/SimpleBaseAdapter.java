@@ -9,13 +9,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.e16din.handyholder.holder.HandyHolder;
-import com.e16din.handyholder.listeners.holder.HolderListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<HandyHolder> {
+public abstract class SimpleBaseAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
+        extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     protected static final String TAG = "SimpleAdapter";
 
@@ -26,7 +26,7 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Hand
 
     private Runnable mOnLastItemListener;
 
-    private HandyHolder mLastHolder;
+    private RecyclerView.ViewHolder mLastHolder;
 
     private boolean mHasNewItems;
 
@@ -73,12 +73,7 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Hand
         mItems.remove(0);
     }
 
-    protected void onBindItemViewHolder(HandyHolder holder, int position) {
-    }
-
-    protected void onBindItemViewHolder(HandyHolder holder,
-                                        List<HolderListener<SimpleBaseAdapter, HandyHolder, MODEL>> listeners,
-                                        int position) {
+    protected void onBindItemViewHolder(HOLDER holder, int position) {
     }
 
     protected Context getContext() {
@@ -104,11 +99,11 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Hand
     }
 
 
-    public HandyHolder getLastHolder() {
+    public RecyclerView.ViewHolder getLastHolder() {
         return mLastHolder;
     }
 
-    protected void setLastHolder(HandyHolder lastHolder) {
+    protected void setLastHolder(RecyclerView.ViewHolder lastHolder) {
         mLastHolder = lastHolder;
     }
 
@@ -141,20 +136,24 @@ public abstract class SimpleBaseAdapter<MODEL> extends RecyclerView.Adapter<Hand
         return mItems.size();
     }
 
-    protected abstract HandyHolder newViewHolder(ViewGroup parent, int viewType);
+    protected abstract RecyclerView.ViewHolder newViewHolder(ViewGroup parent, int viewType);
 
     @Override
-    public HandyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return newViewHolder(parent, viewType);
     }
 
     @Override
-    public void onBindViewHolder(HandyHolder holder, int position) {
-        if (!holder.isInflated()) return;//wait for async inflater
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof HandyHolder) {
+            HandyHolder h = (HandyHolder) holder;
+            if (h.isInflated()) return;//wait for async inflater
 
-        onBindItemViewHolder(holder, position);
-        onBindItemViewHolder(holder, holder.getListeners(), position);
-        holder.bindItem(getItem(position), position);
+            h.bindItem(getItem(position), position);
+        }
+
+        onBindItemViewHolder((HOLDER) holder, position);
+
 
         setLastHolder(position == getItemCount() - 1 ? holder : null);
     }

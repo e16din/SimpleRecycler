@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -22,7 +23,8 @@ import java.util.stream.Stream;
  * https://developer.android.com/reference/java/util/List.html
  */
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleListAdapter<MODEL> extends SimpleBaseAdapter<MODEL> implements List<MODEL> {
+public abstract class SimpleListAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
+        extends SimpleBaseAdapter<HOLDER, MODEL> implements List<MODEL> {
 
     private boolean mAutoNotifyDataSetChanged = true;
 

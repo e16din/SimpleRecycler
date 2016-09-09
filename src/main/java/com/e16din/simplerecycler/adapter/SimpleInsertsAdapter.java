@@ -5,6 +5,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,6 @@ import android.widget.FrameLayout;
 import com.e16din.handyholder.holder.HandyHolder;
 import com.e16din.handyholder.listeners.click.OnClickListener;
 import com.e16din.handyholder.listeners.click.OnViewsClickListener;
-import com.e16din.handyholder.listeners.holder.BindListener;
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.model.Insertion;
 
@@ -22,7 +22,8 @@ import java.util.Collection;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MODEL> {
+public abstract class SimpleInsertsAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
+        extends SimpleListAdapter<HOLDER, MODEL> {
 
     public static final int TYPE_DEFAULT = 0;
     public static final int TYPE_INSERTION = 100500;
@@ -586,7 +587,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
     }
 
     @Override
-    public HandyHolder onCreateViewHolder(ViewGroup vParent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup vParent, int viewType) {
         switch (viewType) {
             case TYPE_INSERTION:
                 return newInsertionViewHolder(vParent);
@@ -600,58 +601,65 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
      * <p/>
      * viewType == 100500
      */
-    public HandyHolder<SimpleInsertsAdapter, Insertion> newInsertionViewHolder(ViewGroup vParent) {
+    public RecyclerView.ViewHolder newInsertionViewHolder(ViewGroup vParent) {
         final LayoutInflater inflater = LayoutInflater.from(getContext());
         ViewGroup itemView = (ViewGroup) inflater.inflate(R.layout.layout_root, vParent, false);
 
-        return new EmptyViewHolder(itemView);
+        return new InsertViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(HandyHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final Insertion insertion = getInsertion(position);
-        if (insertion != null) {
-            final LayoutInflater inflater = LayoutInflater.from(getContext());
-
-            final FrameLayout itemView = holder.getRootView();
-
-            final ViewGroup vContainer = (ViewGroup) inflater.inflate(insertion.getLayoutId(), itemView, false);
-            holder.setContainerView(vContainer);
-
-            itemView.removeAllViews();
-            itemView.addView(vContainer);
-            vContainer.setClickable(true);
-
-            if (mOnInsertClickListener != null) {
-                final HandyHolder finalHolder = holder;
-                vContainer.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mOnInsertClickListener.onClick(insertion, finalHolder.getAdapterPosition());
-                    }
-                });
-            }
-
-            holder.onInit(itemView);
-
-            onBindInsertionViewHolder(holder, position);
-
-            switch (insertion.getType()) {
-                case Insertion.TYPE_HEADER:
-                    onBindHeaderViewHolder(holder, position);
-                    break;
-                case Insertion.TYPE_FOOTER:
-                    onBindFooterViewHolder(holder, position);
-                    break;
-            }
-
-//            ((EmptyViewHolder) holder).bindInsert(insertion, position);
-
-            setLastHolder(position == getItemCount() - 1 ? holder : null);
+        if (insertion == null) {
+            super.onBindViewHolder(holder, position);
             return;
         }
 
-        super.onBindViewHolder(holder, position);
+        final LayoutInflater inflater = LayoutInflater.from(getContext());
+
+        final FrameLayout itemView = (FrameLayout) holder.itemView;
+
+        final ViewGroup vContainer = (ViewGroup) inflater.inflate(insertion.getLayoutId(), itemView, false);
+        if (holder instanceof HandyHolder) {
+            HandyHolder h = (HandyHolder) holder;
+            h.setContainerView(vContainer);
+        }
+
+        itemView.removeAllViews();
+        itemView.addView(vContainer);
+        vContainer.setClickable(true);
+
+        if (mOnInsertClickListener != null) {
+            final RecyclerView.ViewHolder finalHolder = holder;
+            vContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnInsertClickListener.onClick(insertion, finalHolder.getAdapterPosition());
+                }
+            });
+        }
+
+        if (holder instanceof HandyHolder) {
+            HandyHolder h = (HandyHolder) holder;
+            h.onInit(itemView);
+        }
+
+        final InsertViewHolder insertHolder = (InsertViewHolder) holder;
+        onBindInsertionViewHolder(insertHolder, position);
+
+        switch (insertion.getType()) {
+            case Insertion.TYPE_HEADER:
+                onBindHeaderViewHolder(insertHolder, position);
+                break;
+            case Insertion.TYPE_FOOTER:
+                onBindFooterViewHolder(insertHolder, position);
+                break;
+        }
+
+        (insertHolder).bindInsert(insertion, position);
+
+        setLastHolder(position == getItemCount() - 1 ? holder : null);
     }
 
     protected void updateInsertClickListener(final int position, @NonNull View view) {
@@ -696,7 +704,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
      * @param holder   view holder
      * @param position insertion position
      */
-    protected void onBindInsertionViewHolder(HandyHolder holder, int position) {
+    protected void onBindInsertionViewHolder(InsertViewHolder holder, int position) {
         updateInsertClickListener(position, holder.itemView);
     }
 
@@ -706,7 +714,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
      * @param holder   view holder
      * @param position footer position
      */
-    protected void onBindFooterViewHolder(HandyHolder holder, int position) {
+    protected void onBindFooterViewHolder(InsertViewHolder holder, int position) {
     }
 
     /**
@@ -715,7 +723,7 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
      * @param holder   view holder
      * @param position header position
      */
-    protected void onBindHeaderViewHolder(HandyHolder holder, int position) {
+    protected void onBindHeaderViewHolder(InsertViewHolder holder, int position) {
     }
 
     @DrawableRes
@@ -813,23 +821,14 @@ public abstract class SimpleInsertsAdapter<MODEL> extends SimpleRippleAdapter<MO
         mOnInsertViewsClickListener = onInsertViewsClickListener;
     }
 
-    private static class EmptyViewHolder extends HandyHolder<SimpleInsertsAdapter, Insertion> {
+    public static class InsertViewHolder extends RecyclerView.ViewHolder {
 
         public void bindInsert(Insertion insert, int position) {
         }
 
-        public EmptyViewHolder(ViewGroup vParent) {
+        public InsertViewHolder(ViewGroup vParent) {
             super(vParent);
             setIsRecyclable(false);
-            holderListener(new InsertionHolderListener());
-        }
-
-        private static class InsertionHolderListener
-                extends BindListener<SimpleInsertsAdapter, HandyHolder<SimpleInsertsAdapter, Insertion>, Insertion> {
-            @Override
-            public void onBind(Insertion item, int position) {
-                //do nothing
-            }
         }
     }
 
