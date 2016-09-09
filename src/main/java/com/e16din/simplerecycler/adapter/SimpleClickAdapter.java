@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.e16din.handyholder.holder.HandyHolder;
 import com.e16din.handyholder.listeners.click.OnClickListener;
 import com.e16din.handyholder.listeners.click.OnViewsClickListener;
 import com.e16din.handyholder.wrapper.SimpleHandy;
@@ -38,6 +39,13 @@ public abstract class SimpleClickAdapter<HOLDER extends RecyclerView.ViewHolder,
         }//else
 
         final RecyclerView.ViewHolder holder = super.onCreateViewHolder(parent, viewType);
+
+        if (holder instanceof HandyHolder) {
+            HandyHolder h = (HandyHolder) holder;
+            if (h.isInflated()) {//already inited
+                return holder;
+            }
+        }
 
         final SimpleHandy<MODEL> handy = new SimpleHandy<MODEL>(this, parent) {
             @Override

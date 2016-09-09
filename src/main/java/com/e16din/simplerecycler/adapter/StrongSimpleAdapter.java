@@ -50,4 +50,9 @@ public abstract class StrongSimpleAdapter<HOLDER extends RecyclerView.ViewHolder
     public boolean needShowBottomProgress() {
         return mNeedShowBottomProgress;
     }
+
+    @Override
+    protected void onBindItemViewHolder(HOLDER holder, int position) {
+        super.onBindItemViewHolder(holder, position);
+    }
 }
