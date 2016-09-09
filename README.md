@@ -64,45 +64,28 @@ mAdapter.setOnItemViewsClickListener(new int[]{R.id.vName, R.id.vClickableImage}
 
 ### Implement adapter
 ```java
-public class MyAdapter extends SimpleAdapter<String> {
+public class MyAdapter extends StrongSimpleAdapter<MyHolder, String> {
 
     public MyAdapter(@NonNull Context context, @NonNull List<String> items) {
         super(context, items, R.layout.item);
     }
-
+    
     @Override
-    protected ItemViewHolder<String> newViewHolder(View v, int viewType) {
-        return HandyHolder.<String>create(this, vParent)
-                    .layoutId(R.layout.item_first)
-                    .clickListener(new OnClickListener<String>() {
-                        @Override
-                        public void onClick(String item, int position) {
-                            remove(position);
-                        }
-                    })
-                    .listener(new Listener())
-                    .init();
+    protected void onBindItemViewHolder(MyHolder holder, int position) {
+        super.onBindItemViewHolder(holder, position);
+        
+        String item = get(position);
+        
+        //... 
     }
 
-    private static class Listener extends HolderListener<String> {
-        TextView vItemText;
-
-        @Override
-        public void onInit(HolderListener<String> h, View v) {
-            vItemText = (TextView) v.findViewById(R.id.vItemText);
-        }
-
-        @Override
-        public void beforeBind(Adapter a, HolderListener<String> h, String item, int position) {
-            super.beforeBind(a, h, item, position);
-
-            h.rippleEffect(MathUtils.isEven(position));
-        }
-
-        @Override
-        public void onBind(String item, int position) {
-            vItemText.setText(position + ". " + item);
-        }
+    @Override
+    protected MyHolder<String> newViewHolder(View v, int viewType) {
+        return new MyHolder(v);
+    }
+    
+    static class MyHolder extends ViewHolder {
+        //...
     }
 }
 ```
@@ -125,11 +108,11 @@ public class MyAdapter extends SimpleAdapter<MODEL> {
     protected ItemViewHolder<MODEL> newViewHolder(View v, int viewType) {
         switch (viewType) {
             case TYPE_FIRST:
-                return HandyHolder.<MODEL>create(this, vParent, R.layout.item_first).init();
+                return new FirstHolder(v);
             case TYPE_SECOND:
-                return HandyHolder.<MODEL>create(this, vParent, R.layout.item_second).init();
+                return new SecondHolder(v);
             case TYPE_THIRD:
-                return HandyHolder.<MODEL>create(this, vParent, R.layout.item_third).init();
+                return new ThirdHolder(v);
         }
 
         return null;//no way
@@ -159,7 +142,9 @@ Step 1. Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 ```groovy
     dependencies {
-        compile 'com.github.e16din:SimpleRecycler:0.6.3'
+        compile("com.github.e16din:SimpleRecycler:0.6.4@aar") {
+            transitive = true
+        }
     }
 ```
 
