@@ -5,7 +5,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleInsertsAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
-        extends SimpleListAdapter<HOLDER, MODEL> {
+public abstract class SimpleInsertsAdapter<HOLDER extends HandyHolder, MODEL> extends SimpleListAdapter<HOLDER, MODEL> {
 
     public static final int TYPE_DEFAULT = 0;
     public static final int TYPE_INSERTION = 100500;
@@ -587,7 +585,7 @@ public abstract class SimpleInsertsAdapter<HOLDER extends RecyclerView.ViewHolde
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup vParent, int viewType) {
+    public HandyHolder onCreateViewHolder(ViewGroup vParent, int viewType) {
         switch (viewType) {
             case TYPE_INSERTION:
                 return newInsertionViewHolder(vParent);
@@ -601,7 +599,7 @@ public abstract class SimpleInsertsAdapter<HOLDER extends RecyclerView.ViewHolde
      * <p/>
      * viewType == 100500
      */
-    public RecyclerView.ViewHolder newInsertionViewHolder(ViewGroup vParent) {
+    public HandyHolder newInsertionViewHolder(ViewGroup vParent) {
         final LayoutInflater inflater = LayoutInflater.from(getContext());
         ViewGroup itemView = (ViewGroup) inflater.inflate(R.layout.layout_root, vParent, false);
 
@@ -609,7 +607,7 @@ public abstract class SimpleInsertsAdapter<HOLDER extends RecyclerView.ViewHolde
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(HandyHolder holder, int position) {
         final Insertion insertion = getInsertion(position);
         if (insertion == null) {
             super.onBindViewHolder(holder, position);
@@ -621,17 +619,16 @@ public abstract class SimpleInsertsAdapter<HOLDER extends RecyclerView.ViewHolde
         final FrameLayout itemView = (FrameLayout) holder.itemView;
 
         final ViewGroup vContainer = (ViewGroup) inflater.inflate(insertion.getLayoutId(), itemView, false);
-        if (holder instanceof HandyHolder) {
-            HandyHolder h = (HandyHolder) holder;
-            h.setContainerView(vContainer);
-        }
+
+        holder.setContainerView(vContainer);
+
 
         itemView.removeAllViews();
         itemView.addView(vContainer);
         vContainer.setClickable(true);
 
         if (mOnInsertClickListener != null) {
-            final RecyclerView.ViewHolder finalHolder = holder;
+            final HandyHolder finalHolder = holder;
             vContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -640,10 +637,7 @@ public abstract class SimpleInsertsAdapter<HOLDER extends RecyclerView.ViewHolde
             });
         }
 
-        if (holder instanceof HandyHolder) {
-            HandyHolder h = (HandyHolder) holder;
-            h.onInit(itemView);
-        }
+        holder.onInit(itemView);
 
         final InsertViewHolder insertHolder = (InsertViewHolder) holder;
         onBindInsertionViewHolder(insertHolder, position);
@@ -821,7 +815,7 @@ public abstract class SimpleInsertsAdapter<HOLDER extends RecyclerView.ViewHolde
         mOnInsertViewsClickListener = onInsertViewsClickListener;
     }
 
-    public static class InsertViewHolder extends RecyclerView.ViewHolder {
+    public static class InsertViewHolder extends HandyHolder {
 
         public void bindInsert(Insertion insert, int position) {
         }

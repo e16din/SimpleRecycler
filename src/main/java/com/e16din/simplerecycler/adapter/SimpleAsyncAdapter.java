@@ -2,13 +2,13 @@ package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+
+import com.e16din.handyholder.holder.HandyHolder;
 
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleAsyncAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
-        extends SimpleRippleAdapter<HOLDER, MODEL> {
+public abstract class SimpleAsyncAdapter<HOLDER extends HandyHolder, MODEL> extends SimpleRippleAdapter<HOLDER, MODEL> {
 
     private boolean mAsyncInflating;
 

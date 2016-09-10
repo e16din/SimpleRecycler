@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleBaseAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
-        extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class SimpleBaseAdapter<HOLDER extends HandyHolder, MODEL> extends RecyclerView.Adapter<HandyHolder> {
 
     protected static final String TAG = "SimpleAdapter";
 
@@ -26,7 +25,7 @@ public abstract class SimpleBaseAdapter<HOLDER extends RecyclerView.ViewHolder, 
 
     private Runnable mOnLastItemListener;
 
-    private RecyclerView.ViewHolder mLastHolder;
+    private HandyHolder mLastHolder;
 
     private boolean mHasNewItems;
 
@@ -99,11 +98,11 @@ public abstract class SimpleBaseAdapter<HOLDER extends RecyclerView.ViewHolder, 
     }
 
 
-    public RecyclerView.ViewHolder getLastHolder() {
+    public HandyHolder getLastHolder() {
         return mLastHolder;
     }
 
-    protected void setLastHolder(RecyclerView.ViewHolder lastHolder) {
+    protected void setLastHolder(HandyHolder lastHolder) {
         mLastHolder = lastHolder;
     }
 
@@ -136,24 +135,16 @@ public abstract class SimpleBaseAdapter<HOLDER extends RecyclerView.ViewHolder, 
         return mItems.size();
     }
 
-    protected abstract RecyclerView.ViewHolder newViewHolder(ViewGroup parent, int viewType);
+    protected abstract HandyHolder newViewHolder(ViewGroup parent, int viewType);
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public HandyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return newViewHolder(parent, viewType);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof HandyHolder) {
-            HandyHolder h = (HandyHolder) holder;
-            if (h.isInflated()) return;//wait for async inflater
-
-            h.bindItem(getItem(position), position);
-        }
-
+    public void onBindViewHolder(HandyHolder holder, int position) {
         onBindItemViewHolder((HOLDER) holder, position);
-
 
         setLastHolder(position == getItemCount() - 1 ? holder : null);
     }

@@ -2,17 +2,15 @@ package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.e16din.handyholder.AlreadyBox;
 import com.e16din.handyholder.holder.HandyHolder;
-import com.e16din.handyholder.wrapper.Handy;
 
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
+public abstract class SimpleHandyHolderAdapter<HOLDER extends HandyHolder, MODEL>
         extends SimpleClickAdapter<HOLDER, MODEL> {
 
     public SimpleHandyHolderAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
@@ -24,30 +22,33 @@ public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewH
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
+    public HandyHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
         if (viewType == TYPE_INSERTION) {
             return super.onCreateViewHolder(parent, viewType);
         }// else
 
-
-        final Handy<MODEL> handy = new Handy<MODEL>(this, parent) {
+        final HandyHolderWrapper<MODEL> handy = new HandyHolderWrapper<MODEL>(this, parent) {
             @Override
-            public RecyclerView.ViewHolder newHolder(ViewGroup viewGroup) {
+            public HandyHolder newHolder(ViewGroup viewGroup) {
                 return newViewHolder(viewGroup, viewType);
             }
         };
 
-        if (handy.set().holder() instanceof HandyHolder) {
-            HandyHolder h = (HandyHolder) handy.set().holder();
-            if (!h.set().isAlreadyInited()) {
-                updateHandyHolderSettings(h.set());
-            }
+        if (!handy.set().isAlreadyInited()) {
+            updateHandyHolderSettings(handy.set());
+            return (HandyHolder) handy.set().init();
+        }
 
-            return h;
-        }// else
+        return (HandyHolder) handy.set().holder();
+    }
 
-        updateHandyHolderSettings(handy.set());
-        return handy.set().init();
+    @Override
+    public void onBindViewHolder(HandyHolder holder, int position) {
+        if (holder.isInflated()) return;//wait for async inflater
+
+        holder.bindItem(get(position), position);
+
+        super.onBindViewHolder(holder, position);
     }
 
     private void updateHandyHolderSettings(AlreadyBox set) {

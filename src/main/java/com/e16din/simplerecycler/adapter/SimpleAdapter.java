@@ -2,11 +2,12 @@ package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+
+import com.e16din.handyholder.holder.HandyHolder;
 
 import java.util.List;
 
-public abstract class SimpleAdapter<MODEL> extends StrongSimpleAdapter<RecyclerView.ViewHolder, MODEL> {
+public abstract class SimpleAdapter<MODEL> extends StrongSimpleAdapter<HandyHolder, MODEL> {
 
     //SimpleBaseAdapter - base logic
     //SimpleListAdapter - List interface

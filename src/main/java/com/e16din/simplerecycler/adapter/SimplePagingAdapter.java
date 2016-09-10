@@ -5,13 +5,14 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
+import com.e16din.handyholder.holder.HandyHolder;
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.model.Insertion;
 
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimplePagingAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
+public abstract class SimplePagingAdapter<HOLDER extends HandyHolder, MODEL>
         extends SimpleBindListenerAdapter<HOLDER, MODEL> {
 
     public static final int TYPE_BOTTOM_PROGRESS = Insertion.TYPE_ABSOLUTE_FOOTER + 1;

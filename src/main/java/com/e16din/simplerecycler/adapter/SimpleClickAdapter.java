@@ -2,16 +2,15 @@ package com.e16din.simplerecycler.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 
+import com.e16din.handyholder.holder.HandyHolder;
 import com.e16din.handyholder.listeners.click.OnClickListener;
 import com.e16din.handyholder.listeners.click.OnViewsClickListener;
 
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
-public abstract class SimpleClickAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
-        extends SimpleAsyncAdapter<HOLDER, MODEL> {
+public abstract class SimpleClickAdapter<HOLDER extends HandyHolder, MODEL> extends SimpleAsyncAdapter<HOLDER, MODEL> {
 
     protected OnClickListener<MODEL> mOnItemClickListener;
     protected OnViewsClickListener<MODEL> mOnItemViewsClickListener;
