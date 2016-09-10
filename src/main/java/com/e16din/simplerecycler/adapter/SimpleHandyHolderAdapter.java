@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.e16din.handyholder.AlreadyBox;
+import com.e16din.handyholder.holder.HandyHolder;
 import com.e16din.handyholder.listeners.click.OnClickListener;
 import com.e16din.handyholder.listeners.click.OnViewsClickListener;
 import com.e16din.handyholder.wrapper.Handy;
@@ -29,6 +31,7 @@ public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewH
             return super.onCreateViewHolder(parent, viewType);
         }// else
 
+
         final Handy<MODEL> handy = new Handy<MODEL>(this, parent) {
             @Override
             public RecyclerView.ViewHolder newHolder(ViewGroup viewGroup) {
@@ -36,27 +39,39 @@ public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewH
             }
         };
 
-        if (!handy.set().isAlreadySetAsyncInflating()) {
-            handy.set().asyncInflating(isAsyncInflating());
+        if (handy.set().holder() instanceof HandyHolder) {
+            HandyHolder h = (HandyHolder) handy.set().holder();
+            if (!h.set().isAlreadyInited()) {
+                updateHandyHolderSettings(h.set());
+            }
+
+            return h;
+        }// else
+
+        updateHandyHolderSettings(handy.set());
+        return handy.set().init();
+    }
+
+    private void updateHandyHolderSettings(AlreadyBox set) {
+        if (!set.isAlreadySetAsyncInflating()) {
+            set.asyncInflating(isAsyncInflating());
         }
 
-        if (!handy.set().isAlreadySetRippleEffect()) {
-            handy.set().rippleEffect(isRippleEffect());
+        if (!set.isAlreadySetRippleEffect()) {
+            set.rippleEffect(isRippleEffect());
         }
 
         //click listeners
         if (mOnItemClickListener != null) {
-            handy.set().clickListener(mOnItemClickListener);
+            set.clickListener(mOnItemClickListener);
         }
 
         if (mOnItemViewsClickListener != null) {
             if (mClickableViewsArray != null)
-                handy.set().setViewsClickListener(mClickableViewsArray, mOnItemViewsClickListener);
+                set.setViewsClickListener(mClickableViewsArray, mOnItemViewsClickListener);
             if (mClickableViewsList != null)
-                handy.set().setViewsClickListener(mClickableViewsList, mOnItemViewsClickListener);
+                set.setViewsClickListener(mClickableViewsList, mOnItemViewsClickListener);
         }
-
-        return handy.set().init();
     }
 
 
