@@ -822,6 +822,7 @@ public abstract class SimpleInsertsAdapter<HOLDER extends HandyHolder, MODEL> ex
 
         public InsertViewHolder(ViewGroup vParent) {
             super(vParent);
+
             setIsRecyclable(false);
         }
     }

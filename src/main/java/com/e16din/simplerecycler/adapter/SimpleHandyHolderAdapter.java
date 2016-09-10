@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import com.e16din.handyholder.AlreadyBox;
 import com.e16din.handyholder.holder.HandyHolder;
+import com.e16din.handyholder.wrapper.Handy;
 
 import java.util.List;
 
@@ -27,19 +28,21 @@ public abstract class SimpleHandyHolderAdapter<HOLDER extends HandyHolder, MODEL
             return super.onCreateViewHolder(parent, viewType);
         }// else
 
-        final HandyHolderWrapper<MODEL> handy = new HandyHolderWrapper<MODEL>(this, parent) {
+        final Handy<MODEL> handy = new Handy<MODEL>(this, parent) {
             @Override
             public HandyHolder newHolder(ViewGroup viewGroup) {
                 return newViewHolder(viewGroup, viewType);
             }
         };
 
-        if (!handy.set().isAlreadyInited()) {
-            updateHandyHolderSettings(handy.set());
-            return (HandyHolder) handy.set().init();
+        final HandyHolder h = (HandyHolder) handy.set().holder();
+
+        if (h.set().isAlreadyInited()) {
+            return h;
         }
 
-        return (HandyHolder) handy.set().holder();
+        updateHandyHolderSettings(h.set());
+        return (HandyHolder) h.set().init();
     }
 
     @Override
