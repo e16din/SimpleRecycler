@@ -37,7 +37,7 @@ android {
 }
 
 dependencies {
-    compile('com.github.e16din:HandyHolder:1.2.1@aar') {
+    compile('com.github.e16din:HandyHolder:1.2.2@aar') {
         transitive = true
     }
 }
