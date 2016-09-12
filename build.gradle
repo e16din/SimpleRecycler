@@ -1,43 +1,24 @@
-apply plugin: 'com.android.library'
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
     repositories {
-        mavenCentral()
-        maven {
-            url "https://jitpack.io"
-        }
+        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
-repositories {
-    mavenCentral()
-    maven {
-        url "https://jitpack.io"
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "https://jitpack.io" }
     }
 }
 
-android {
-    compileSdkVersion 24
-    buildToolsVersion '24.0.2'
-
-    defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 24
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-}
-
-dependencies {
-    compile('com.github.e16din:HandyHolder:1.2.4@aar') {
-        transitive = true
-    }
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }
