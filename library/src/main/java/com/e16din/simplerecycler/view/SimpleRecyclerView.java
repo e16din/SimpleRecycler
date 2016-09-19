@@ -8,6 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
 public class SimpleRecyclerView extends RecyclerView {
+
+    private OnScrollSimpleListener mOnScrollListener;
+
     public SimpleRecyclerView(Context context) {
         super(context);
     }
@@ -24,8 +27,9 @@ public class SimpleRecyclerView extends RecyclerView {
     public void setAdapter(Adapter adapter) {
         super.setAdapter(adapter);
 
-        clearOnScrollListeners();
-        addOnScrollListener(newListener());
+        removeOnScrollListener(mOnScrollListener);
+        mOnScrollListener = newListener();
+        addOnScrollListener(mOnScrollListener);
     }
 
     @NonNull

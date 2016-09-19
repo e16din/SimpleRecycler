@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
+import com.e16din.handyholder.AlreadyBox;
 import com.e16din.handyholder.listeners.click.OnClickListener;
 import com.e16din.handyholder.listeners.click.OnViewsClickListener;
 
@@ -56,5 +57,21 @@ public abstract class SimpleClickAdapter<HOLDER extends RecyclerView.ViewHolder,
 
     public List<Integer> getClickableViewsList() {
         return mClickableViewsList;
+    }
+
+    @Override
+    protected void onUpdateHandyHolderSettings(AlreadyBox set) {
+        super.onUpdateHandyHolderSettings(set);
+
+        if (mOnItemClickListener != null) {
+            set.onClick(mOnItemClickListener);
+        }
+
+        if (mOnItemViewsClickListener != null) {
+            if (mClickableViewsArray != null)
+                set.onViewsClick(mClickableViewsArray, mOnItemViewsClickListener);
+            if (mClickableViewsList != null)
+                set.onViewsClick(mClickableViewsList, mOnItemViewsClickListener);
+        }
     }
 }

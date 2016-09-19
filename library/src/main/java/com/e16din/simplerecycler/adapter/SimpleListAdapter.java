@@ -57,6 +57,12 @@ public abstract class SimpleListAdapter<HOLDER extends RecyclerView.ViewHolder, 
         }
     }
 
+    public void notifyItemRangeInsertedIfNeed(int positionStart, int itemCount) {
+        if (isAutoNotifyDataSetChanged()) {
+            notifyItemRangeInserted(positionStart, itemCount);
+        }
+    }
+
     //todo: Update descriptions
 
 

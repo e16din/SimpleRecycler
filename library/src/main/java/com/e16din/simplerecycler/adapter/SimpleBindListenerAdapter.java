@@ -9,7 +9,7 @@ import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
 public abstract class SimpleBindListenerAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
-        extends SimpleHandyHolderAdapter<HOLDER, MODEL> {
+        extends SimpleClickAdapter<HOLDER, MODEL> {
 
     private List<OnBindListener<MODEL>> mListeners;
 

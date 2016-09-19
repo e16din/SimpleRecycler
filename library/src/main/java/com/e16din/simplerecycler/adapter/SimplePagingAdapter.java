@@ -93,10 +93,13 @@ public abstract class SimplePagingAdapter<HOLDER extends RecyclerView.ViewHolder
      * @param items Items
      */
     public void addPage(@NonNull List<MODEL> items) {
+        setAutoNotifyDataSetChanged(false);
         addAll(items);
+        setAutoNotifyDataSetChanged(true);
         onNewItemsAdded(items.size());
-    }
 
+        notifyItemRangeInsertedIfNeed(size() - (items.size() + getHeadersCount()), items.size());
+    }
 
     /**
      * Add new page to adapter.
@@ -107,8 +110,12 @@ public abstract class SimplePagingAdapter<HOLDER extends RecyclerView.ViewHolder
      * @param items    Items
      */
     public void addPage(int position, @NonNull List<MODEL> items) {
+        setAutoNotifyDataSetChanged(false);
         addAll(position, items);
+        setAutoNotifyDataSetChanged(true);
         onNewItemsAdded(items.size());
+
+        notifyItemRangeInsertedIfNeed(size() - (items.size() + getHeadersCount()), items.size());
     }
 
     public void showBottomProgress() {

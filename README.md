@@ -99,6 +99,14 @@ mAdapter.setAsyncInflating(true);
 ```java
 mAdapter.setRippleEffect(false);
 ```
+### Customize ripple effect color
+```xml
+<color name="simplePressedColor">color</color>
+```
+or
+```java
+mAdapter.setRippleColor(color)
+```
 
 ### Several view holders
 ```java
@@ -142,7 +150,7 @@ Step 1. Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 ```groovy
     dependencies {
-        compile("com.github.e16din:SimpleRecycler:0.7.1@aar") {
+        compile("com.github.e16din:SimpleRecycler:0.7.2@aar") {
             transitive = true
         }
     }

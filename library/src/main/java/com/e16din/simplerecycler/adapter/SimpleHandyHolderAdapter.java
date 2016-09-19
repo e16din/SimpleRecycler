@@ -13,7 +13,7 @@ import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
 public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewHolder, MODEL>
-        extends SimpleClickAdapter<HOLDER, MODEL> {
+        extends SimpleInsertsAdapter<HOLDER, MODEL> {
 
     public SimpleHandyHolderAdapter(@NonNull Context context, @NonNull List<MODEL> items) {
         super(context, items);
@@ -48,7 +48,7 @@ public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewH
             return h;
         }
 
-        updateHandyHolderSettings(handy.set());
+        onUpdateHandyHolderSettings(handy.set());
         final RecyclerView.ViewHolder holder = handy.set().init();
         holder.itemView.setTag(handy);
         return holder;
@@ -65,25 +65,5 @@ public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewH
         super.onBindViewHolder(holder, position);
     }
 
-    private void updateHandyHolderSettings(AlreadyBox set) {
-        if (!set.isAlreadySetAsyncInflating()) {
-            set.asyncInflating(isAsyncInflating());
-        }
-
-        if (!set.isAlreadySetRippleEffect()) {
-            set.rippleEffect(isRippleEffect());
-        }
-
-        //click listeners
-        if (mOnItemClickListener != null) {
-            set.clickListener(mOnItemClickListener);
-        }
-
-        if (mOnItemViewsClickListener != null) {
-            if (mClickableViewsArray != null)
-                set.setViewsClickListener(mClickableViewsArray, mOnItemViewsClickListener);
-            if (mClickableViewsList != null)
-                set.setViewsClickListener(mClickableViewsList, mOnItemViewsClickListener);
-        }
-    }
+    protected abstract void onUpdateHandyHolderSettings(AlreadyBox set);
 }

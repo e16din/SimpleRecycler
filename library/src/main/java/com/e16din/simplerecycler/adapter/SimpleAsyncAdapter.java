@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
+import com.e16din.handyholder.AlreadyBox;
+
 import java.util.List;
 
 @SuppressWarnings("unused")//remove it to see unused warnings
@@ -28,4 +30,12 @@ public abstract class SimpleAsyncAdapter<HOLDER extends RecyclerView.ViewHolder,
         mAsyncInflating = asyncInflating;
     }
 
+    @Override
+    protected void onUpdateHandyHolderSettings(AlreadyBox set) {
+        super.onUpdateHandyHolderSettings(set);
+
+        if (!set.isAlreadySetAsyncInflating()) {
+            set.asyncInflating(isAsyncInflating());
+        }
+    }
 }
