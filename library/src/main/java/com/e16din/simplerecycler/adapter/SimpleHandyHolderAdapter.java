@@ -5,9 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import com.e16din.handyholder.AlreadyBox;
-import com.e16din.handyholder.holder.StrongHandyHolder;
-import com.e16din.handyholder.wrapper.StrongHandy;
+import com.e16din.handyholder.settings.AlreadyBox;
+import com.e16din.handyholder.HandyHolder;
+import com.e16din.handyholder.HandyWrapper;
 
 import java.util.List;
 
@@ -28,8 +28,8 @@ public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewH
 
         final RecyclerView.ViewHolder[] viewHolder = new RecyclerView.ViewHolder[1];
 
-        final StrongHandy<SimpleHandyHolderAdapter, RecyclerView.ViewHolder, MODEL> handy =
-                new StrongHandy<SimpleHandyHolderAdapter, RecyclerView.ViewHolder, MODEL>(this, parent) {
+        final HandyWrapper<SimpleHandyHolderAdapter, RecyclerView.ViewHolder, MODEL> handy =
+                new HandyWrapper<SimpleHandyHolderAdapter, RecyclerView.ViewHolder, MODEL>(this, parent) {
                     @Override
                     public RecyclerView.ViewHolder newHolder(ViewGroup vRoot) {
                         if (viewType == TYPE_INSERTION) {
@@ -43,7 +43,7 @@ public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewH
                 };
 
         if (handy.set().isAlreadyInited()) {
-            StrongHandyHolder h = (StrongHandyHolder) viewHolder[0];
+            HandyHolder h = (HandyHolder) viewHolder[0];
             h.itemView.setTag(handy);
             return h;
         }
@@ -56,7 +56,7 @@ public abstract class SimpleHandyHolderAdapter<HOLDER extends RecyclerView.ViewH
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        StrongHandy handy = (StrongHandy) holder.itemView.getTag();
+        HandyWrapper handy = (HandyWrapper) holder.itemView.getTag();
 
         if (!handy.set().mInflated) return;//wait for async inflater
 

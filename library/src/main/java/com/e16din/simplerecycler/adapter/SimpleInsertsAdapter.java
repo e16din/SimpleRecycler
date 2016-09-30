@@ -11,8 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.e16din.handyholder.holder.HandyHolder;
-import com.e16din.handyholder.holder.StrongHandyHolder;
+import com.e16din.handyholder.HandyHolder;
 import com.e16din.handyholder.listeners.click.OnClickListener;
 import com.e16din.handyholder.listeners.click.OnViewsClickListener;
 import com.e16din.simplerecycler.R;
@@ -648,8 +647,8 @@ public abstract class SimpleInsertsAdapter<HOLDER extends RecyclerView.ViewHolde
 
         final ViewGroup vContainer = (ViewGroup) inflater.inflate(insertion.getLayoutId(), itemView, false);
 
-        if (holder instanceof StrongHandyHolder) {
-            ((StrongHandyHolder) holder).setContainerView(vContainer);
+        if (holder instanceof HandyHolder) {
+            ((HandyHolder) holder).setContainerView(vContainer);
         }
 
         itemView.removeAllViews();
@@ -666,8 +665,8 @@ public abstract class SimpleInsertsAdapter<HOLDER extends RecyclerView.ViewHolde
             });
         }
 
-        if (holder instanceof StrongHandyHolder) {
-            ((StrongHandyHolder) holder).onInit(itemView);
+        if (holder instanceof HandyHolder) {
+            ((HandyHolder) holder).onInit(itemView);
         }
 
         onBindInsertionViewHolder(holder, position);

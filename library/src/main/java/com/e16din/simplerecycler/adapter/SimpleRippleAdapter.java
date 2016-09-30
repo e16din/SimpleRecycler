@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 
-import com.e16din.handyholder.AlreadyBox;
+import com.e16din.handyholder.settings.AlreadyBox;
 import com.e16din.simplerecycler.R;
 
 import java.util.List;
