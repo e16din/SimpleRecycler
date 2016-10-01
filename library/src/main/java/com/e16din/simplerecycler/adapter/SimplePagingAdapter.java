@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import com.e16din.handyholder.HandyCreator;
+import com.e16din.handyholder.HandyHolder;
 import com.e16din.simplerecycler.R;
 import com.e16din.simplerecycler.model.Insertion;
 
@@ -41,7 +41,7 @@ public abstract class SimplePagingAdapter<HOLDER extends RecyclerView.ViewHolder
      * viewType == 100500
      */
     public RecyclerView.ViewHolder newInsertionViewHolder(ViewGroup vParent) {
-        return new HandyCreator<>().create(this, vParent, mBottomProgressLayoutId)
+        return HandyHolder.create(this, vParent, mBottomProgressLayoutId)
                 .set()
                 .isRecyclable(false)
                 .asyncInflating(false)
